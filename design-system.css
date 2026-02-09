@@ -920,7 +920,7 @@ button.danger {
 /* Monitor capsule sits below header */
 body.has-monitor .site-header { top: 0; }
 body.has-monitor .top-bar { display: none; }
-body.has-monitor .page-hero { padding-top: 36px; }
+body.has-monitor .page-hero { padding-top: 54px; }
 
 /* --- Page-specific: Log Box --- */
 .log-box {
