@@ -87,7 +87,7 @@
 
 /* --- Reset --- */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overscroll-behavior: none; }
 body {
     font-family: var(--font-sans);
     background: var(--bg-app);
@@ -95,6 +95,7 @@ body {
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
+    overscroll-behavior: none;
 }
 
 /* --- Animated Glow Background --- */
@@ -155,7 +156,7 @@ body {
 /* --- Glass Header --- */
 .site-header {
     position: sticky;
-    top: 2px;
+    top: 0;
     z-index: 1000;
     background: rgba(14, 14, 20, 0.82);
     backdrop-filter: blur(20px);
