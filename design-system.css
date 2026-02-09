@@ -813,6 +813,7 @@ button.danger {
     border: none;
     border-radius: 0;
     margin-right: 0;
+    flex-shrink: 0;
 }
 #inputMonitorBar .monitor-divider {
     width: 1px;
@@ -828,6 +829,9 @@ button.danger {
     padding: 2px 6px;
     border-radius: 6px;
     transition: background 0.15s ease;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 #inputMonitorBar .monitor-field:hover {
     background: rgba(255, 255, 255, 0.06);
@@ -871,6 +875,8 @@ button.danger {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: all 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 #inputMonitorBar .source-real {
     background: rgba(34, 197, 94, 0.15);
@@ -886,6 +892,10 @@ button.danger {
     color: #facc15;
     font-size: 11px;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
 }
 #inputMonitorBar .monitor-value.group-val {
     color: #facc15;
