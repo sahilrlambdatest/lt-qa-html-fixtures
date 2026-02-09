@@ -50,6 +50,26 @@
         keyboard shortcuts, file upload, context menu, date/time pickers, copy/paste, and clear+retype.
     </div>
 
+    <!-- ===== DOM Context Switcher ===== -->
+    <div class="section" style="border:2px solid #e11d48;position:relative;">
+        <h2 style="border-bottom-color:#e11d48;">DOM Context Switcher</h2>
+        <p>Same set of interactions rendered in <strong>Standard DOM</strong>, <strong>Shadow DOM</strong>, or <strong>Iframe</strong>. Switch to test how SmartWait + input handling behaves across DOM boundaries.</p>
+
+        <div id="domSwitcherBar" style="display:flex;gap:0;margin:16px 0 20px;border:1.5px solid #e2e8f0;border-radius:10px;overflow:hidden;max-width:480px;">
+            <button onclick="switchDom('standard')" id="domBtn-standard" class="dom-btn dom-btn-active" style="flex:1;margin:0;border-radius:0;box-shadow:none;padding:12px 8px;font-size:13px;background:#e11d48;color:white;">Standard DOM</button>
+            <button onclick="switchDom('shadow')" id="domBtn-shadow" class="dom-btn" style="flex:1;margin:0;border-radius:0;box-shadow:none;padding:12px 8px;font-size:13px;background:#f8fafc;color:#4a5568;">Shadow DOM</button>
+            <button onclick="switchDom('iframe')" id="domBtn-iframe" class="dom-btn" style="flex:1;margin:0;border-radius:0;box-shadow:none;padding:12px 8px;font-size:13px;background:#f8fafc;color:#4a5568;">Iframe</button>
+        </div>
+
+        <div id="domContextLabel" style="margin-bottom:12px;">
+            <span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#d1fae5;color:#059669;">ACTIVE: Standard DOM</span>
+        </div>
+
+        <div id="domRenderTarget" style="min-height:100px;"></div>
+
+        <div class="result-box" id="domSwitchResult">Switch DOM contexts above — interactions are identical, DOM wrapper changes</div>
+    </div>
+
     <!-- ===== Section 1: Click Variations ===== -->
     <div class="section">
         <h2>Section 1: Click Variations</h2>
@@ -898,6 +918,308 @@ function execRichCmd(cmd) {
     document.execCommand(cmd, false, null);
     document.getElementById('richTextEditor').focus();
 }
+
+// ===== DOM Context Switcher =====
+var DOM_PANEL_HTML = `
+<style>
+    .dp-label { font-weight: 600; display: block; margin-top: 14px; font-size: 14px; color: #4a5568; }
+    .dp-input { padding: 10px 14px; width: 100%; max-width: 340px; margin: 6px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; color: #2d3748; outline: none; box-sizing: border-box; }
+    .dp-input:focus { border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225,29,72,0.15); }
+    .dp-textarea { padding: 10px 14px; width: 100%; max-width: 340px; margin: 6px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; height: 60px; resize: vertical; color: #2d3748; outline: none; box-sizing: border-box; }
+    .dp-textarea:focus { border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225,29,72,0.15); }
+    .dp-select { padding: 10px 14px; width: 100%; max-width: 340px; margin: 6px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; color: #2d3748; outline: none; box-sizing: border-box; }
+    .dp-btn { padding: 10px 20px; cursor: pointer; margin: 8px 8px 8px 0; background: linear-gradient(135deg, #e11d48, #be123c); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; }
+    .dp-btn:hover { opacity: 0.9; }
+    .dp-btn-secondary { background: linear-gradient(135deg, #059669, #047857); }
+    .dp-result { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin: 8px 0; font-family: monospace; font-size: 13px; }
+    .dp-section { margin: 16px 0; padding: 16px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; }
+    .dp-section-title { font-weight: 700; font-size: 14px; color: #1a202c; margin: 0 0 10px; }
+    .dp-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+    .dp-toggle { width: 44px; height: 24px; border-radius: 12px; background: #d2d6dc; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .dp-toggle.on { background: #e11d48; }
+    .dp-toggle-thumb { width: 20px; height: 20px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .dp-toggle.on .dp-toggle-thumb { transform: translateX(20px); }
+    .dp-editable { padding: 10px 14px; min-height: 50px; background: white; border: 1.5px solid #d2d6dc; border-radius: 10px; font-size: 14px; outline: none; line-height: 1.5; }
+    .dp-editable:focus { border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225,29,72,0.15); }
+    .dp-hover-zone { padding: 14px 20px; background: #fef3c7; border-radius: 8px; cursor: pointer; font-weight: 600; color: #92400e; text-align: center; position: relative; margin: 6px 0; }
+    .dp-tooltip { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; white-space: nowrap; font-weight: 400; z-index: 10; }
+    .dp-drag-item { padding: 10px 14px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin: 4px 0; cursor: grab; font-size: 13px; }
+    .dp-assert { color: #059669; font-weight: 600; font-size: 14px; margin: 4px 0; }
+</style>
+<div style="font-family: 'Segoe UI', system-ui, sans-serif;">
+
+    <!-- Text Inputs -->
+    <div class="dp-section">
+        <div class="dp-section-title">Text Inputs</div>
+        <label class="dp-label" for="dp-text">Full Name</label>
+        <input class="dp-input" type="text" id="dp-text" placeholder="Type your name here">
+        <label class="dp-label" for="dp-email">Email</label>
+        <input class="dp-input" type="email" id="dp-email" placeholder="you@email.com">
+        <label class="dp-label" for="dp-search">Search</label>
+        <input class="dp-input" type="search" id="dp-search" placeholder="Search something...">
+        <label class="dp-label" for="dp-password">Password</label>
+        <input class="dp-input" type="password" id="dp-password" placeholder="Enter password">
+        <label class="dp-label" for="dp-number">Quantity</label>
+        <input class="dp-input" type="number" id="dp-number" min="0" max="100" placeholder="0-100">
+        <label class="dp-label" for="dp-textarea">Comments</label>
+        <textarea class="dp-textarea" id="dp-textarea" placeholder="Multi-line text"></textarea>
+    </div>
+
+    <!-- Clicks -->
+    <div class="dp-section">
+        <div class="dp-section-title">Click Actions</div>
+        <button class="dp-btn" id="dp-click-btn">Single Click</button>
+        <button class="dp-btn dp-btn-secondary" id="dp-dblclick-btn">Double-Click Me</button>
+        <div id="dp-click-output" class="dp-result">Click output here</div>
+    </div>
+
+    <!-- Select / Dropdown -->
+    <div class="dp-section">
+        <div class="dp-section-title">Select & Dropdown</div>
+        <label class="dp-label" for="dp-select">Choose option</label>
+        <select class="dp-select" id="dp-select">
+            <option value="">Select...</option>
+            <option value="alpha">Alpha</option>
+            <option value="beta">Beta</option>
+            <option value="gamma">Gamma</option>
+        </select>
+        <label class="dp-label">Checkbox Group</label>
+        <div class="dp-row"><label><input type="checkbox" id="dp-cb1" value="read"> Read</label></div>
+        <div class="dp-row"><label><input type="checkbox" id="dp-cb2" value="write"> Write</label></div>
+        <div class="dp-row"><label><input type="checkbox" id="dp-cb3" value="admin"> Admin</label></div>
+        <label class="dp-label">Radio Group</label>
+        <div class="dp-row"><label><input type="radio" name="dp-radio" value="low"> Low</label></div>
+        <div class="dp-row"><label><input type="radio" name="dp-radio" value="medium" checked> Medium</label></div>
+        <div class="dp-row"><label><input type="radio" name="dp-radio" value="high"> High</label></div>
+    </div>
+
+    <!-- Toggle -->
+    <div class="dp-section">
+        <div class="dp-section-title">Toggle Switches</div>
+        <div class="dp-row">
+            <div class="dp-toggle" id="dp-toggle1"><div class="dp-toggle-thumb"></div></div>
+            <span style="font-weight:600;font-size:14px;">Dark Mode</span>
+        </div>
+        <div class="dp-row">
+            <div class="dp-toggle" id="dp-toggle2"><div class="dp-toggle-thumb"></div></div>
+            <span style="font-weight:600;font-size:14px;">Notifications</span>
+        </div>
+    </div>
+
+    <!-- Hover -->
+    <div class="dp-section">
+        <div class="dp-section-title">Hover Interaction</div>
+        <div class="dp-hover-zone" id="dp-hover-target">
+            Hover over me for tooltip
+            <span class="dp-tooltip" id="dp-tooltip">Tooltip from DOM context!</span>
+        </div>
+    </div>
+
+    <!-- Date/Color Pickers -->
+    <div class="dp-section">
+        <div class="dp-section-title">Date & Color Pickers</div>
+        <label class="dp-label" for="dp-date">Date</label>
+        <input class="dp-input" type="date" id="dp-date">
+        <label class="dp-label" for="dp-time">Time</label>
+        <input class="dp-input" type="time" id="dp-time">
+        <label class="dp-label" for="dp-color">Color</label>
+        <input type="color" id="dp-color" value="#e11d48" style="width:60px;height:36px;padding:2px;cursor:pointer;border:1.5px solid #d2d6dc;border-radius:8px;">
+    </div>
+
+    <!-- Slider -->
+    <div class="dp-section">
+        <div class="dp-section-title">Range Slider</div>
+        <label class="dp-label" for="dp-slider">Volume</label>
+        <input type="range" id="dp-slider" min="0" max="100" value="50" style="width:100%;max-width:340px;cursor:grab;">
+        <div style="font-family:monospace;font-size:12px;color:#94a3b8;" id="dp-slider-val">Value: 50</div>
+    </div>
+
+    <!-- Contenteditable -->
+    <div class="dp-section">
+        <div class="dp-section-title">Contenteditable</div>
+        <div class="dp-editable" contenteditable="true" id="dp-editable">Type here — this is contenteditable, not an input element.</div>
+    </div>
+
+    <!-- File Upload -->
+    <div class="dp-section">
+        <div class="dp-section-title">File Upload</div>
+        <label class="dp-label" for="dp-file">Choose file</label>
+        <input type="file" id="dp-file" style="border:none;padding:0;font-size:14px;">
+    </div>
+
+    <!-- Assertable Content -->
+    <div class="dp-section">
+        <div class="dp-section-title">Assertable Content (Fix 4 — SmartWait skip)</div>
+        <p class="dp-assert" id="dp-assert-text">Assertion target: Hello from this DOM context!</p>
+        <p class="dp-assert" id="dp-assert-num">Numeric value: 256</p>
+        <p id="dp-assert-status" style="display:inline-block;padding:4px 12px;border-radius:6px;font-weight:600;font-size:13px;background:#d1fae5;color:#059669;">Status: Active</p>
+    </div>
+
+    <!-- Output -->
+    <div class="dp-result" id="dp-output">Interact with elements above — output appears here</div>
+</div>
+`;
+
+var PANEL_JS_SRC = function(root) {
+    // Text inputs
+    ['dp-text','dp-email','dp-search','dp-password','dp-number'].forEach(function(id) {
+        var el = root.getElementById ? root.getElementById(id) : root.querySelector('#' + id);
+        if (el) el.addEventListener('input', function(e) {
+            setOut(root, 'Input #' + id + ': "' + e.target.value + '"');
+        });
+    });
+    var ta = root.getElementById ? root.getElementById('dp-textarea') : root.querySelector('#dp-textarea');
+    if (ta) ta.addEventListener('input', function(e) { setOut(root, 'Textarea: "' + e.target.value + '"'); });
+
+    // Clicks
+    var clickBtn = root.getElementById ? root.getElementById('dp-click-btn') : root.querySelector('#dp-click-btn');
+    if (clickBtn) clickBtn.addEventListener('click', function() {
+        var out = root.getElementById ? root.getElementById('dp-click-output') : root.querySelector('#dp-click-output');
+        if (out) out.textContent = 'Single click at ' + new Date().toLocaleTimeString();
+        setOut(root, 'Single click');
+    });
+    var dblBtn = root.getElementById ? root.getElementById('dp-dblclick-btn') : root.querySelector('#dp-dblclick-btn');
+    if (dblBtn) dblBtn.addEventListener('dblclick', function() {
+        var out = root.getElementById ? root.getElementById('dp-click-output') : root.querySelector('#dp-click-output');
+        if (out) out.textContent = 'Double-click at ' + new Date().toLocaleTimeString();
+        setOut(root, 'Double-click');
+    });
+
+    // Select
+    var sel = root.getElementById ? root.getElementById('dp-select') : root.querySelector('#dp-select');
+    if (sel) sel.addEventListener('change', function(e) { setOut(root, 'Selected: ' + e.target.value); });
+
+    // Checkboxes
+    ['dp-cb1','dp-cb2','dp-cb3'].forEach(function(id) {
+        var el = root.getElementById ? root.getElementById(id) : root.querySelector('#' + id);
+        if (el) el.addEventListener('change', function(e) { setOut(root, 'Checkbox ' + e.target.value + ': ' + (e.target.checked ? 'ON' : 'OFF')); });
+    });
+
+    // Radios
+    root.querySelectorAll('input[name="dp-radio"]').forEach(function(r) {
+        r.addEventListener('change', function() { setOut(root, 'Radio: ' + r.value); });
+    });
+
+    // Toggles
+    ['dp-toggle1','dp-toggle2'].forEach(function(id) {
+        var el = root.getElementById ? root.getElementById(id) : root.querySelector('#' + id);
+        if (el) el.addEventListener('click', function() {
+            var isOn = el.classList.toggle('on');
+            setOut(root, id + ': ' + (isOn ? 'ON' : 'OFF'));
+        });
+    });
+
+    // Hover
+    var hoverT = root.getElementById ? root.getElementById('dp-hover-target') : root.querySelector('#dp-hover-target');
+    var tooltip = root.getElementById ? root.getElementById('dp-tooltip') : root.querySelector('#dp-tooltip');
+    if (hoverT && tooltip) {
+        hoverT.addEventListener('mouseenter', function() { tooltip.style.display = 'block'; setOut(root, 'Hover: tooltip visible'); });
+        hoverT.addEventListener('mouseleave', function() { tooltip.style.display = 'none'; });
+    }
+
+    // Date/time/color
+    ['dp-date','dp-time','dp-color'].forEach(function(id) {
+        var el = root.getElementById ? root.getElementById(id) : root.querySelector('#' + id);
+        if (el) el.addEventListener('change', function(e) { setOut(root, id + ': ' + e.target.value); });
+    });
+
+    // Slider
+    var slider = root.getElementById ? root.getElementById('dp-slider') : root.querySelector('#dp-slider');
+    if (slider) slider.addEventListener('input', function(e) {
+        var valEl = root.getElementById ? root.getElementById('dp-slider-val') : root.querySelector('#dp-slider-val');
+        if (valEl) valEl.textContent = 'Value: ' + e.target.value;
+        setOut(root, 'Slider: ' + e.target.value);
+    });
+
+    // Contenteditable
+    var editable = root.getElementById ? root.getElementById('dp-editable') : root.querySelector('#dp-editable');
+    if (editable) editable.addEventListener('input', function(e) { setOut(root, 'Editable: "' + e.target.textContent.substring(0, 50) + '"'); });
+
+    // File
+    var fileInput = root.getElementById ? root.getElementById('dp-file') : root.querySelector('#dp-file');
+    if (fileInput) fileInput.addEventListener('change', function(e) {
+        var f = e.target.files[0];
+        setOut(root, f ? 'File: ' + f.name : 'No file');
+    });
+
+    function setOut(r, msg) {
+        var out = r.getElementById ? r.getElementById('dp-output') : r.querySelector('#dp-output');
+        if (out) out.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+        // Also update parent result box
+        var parentResult = document.getElementById('domSwitchResult');
+        if (parentResult) parentResult.textContent = '[' + currentDomMode.toUpperCase() + '] ' + msg;
+    }
+};
+
+var currentDomMode = 'standard';
+
+function switchDom(mode) {
+    currentDomMode = mode;
+    var target = document.getElementById('domRenderTarget');
+    var label = document.getElementById('domContextLabel');
+
+    // Update button styles
+    document.querySelectorAll('.dom-btn').forEach(function(btn) {
+        btn.style.background = '#f8fafc';
+        btn.style.color = '#4a5568';
+        btn.classList.remove('dom-btn-active');
+    });
+    var activeBtn = document.getElementById('domBtn-' + mode);
+    activeBtn.style.background = '#e11d48';
+    activeBtn.style.color = 'white';
+    activeBtn.classList.add('dom-btn-active');
+
+    // Clear target
+    target.innerHTML = '';
+
+    if (mode === 'standard') {
+        label.innerHTML = '<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#d1fae5;color:#059669;">ACTIVE: Standard DOM</span>';
+        var container = document.createElement('div');
+        container.innerHTML = DOM_PANEL_HTML;
+        target.appendChild(container);
+        PANEL_JS_SRC(container);
+    }
+    else if (mode === 'shadow') {
+        label.innerHTML = '<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#ede9fe;color:#7c3aed;">ACTIVE: Shadow DOM (open)</span>';
+        var host = document.createElement('div');
+        host.id = 'shadow-dom-host';
+        target.appendChild(host);
+        var shadow = host.attachShadow({ mode: 'open' });
+        shadow.innerHTML = DOM_PANEL_HTML;
+        PANEL_JS_SRC(shadow);
+    }
+    else if (mode === 'iframe') {
+        label.innerHTML = '<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#cffafe;color:#0891b2;">ACTIVE: Iframe (srcdoc)</span>';
+        var iframe = document.createElement('iframe');
+        iframe.id = 'dom-context-iframe';
+        iframe.style.cssText = 'width:100%;border:2px solid #0891b2;border-radius:10px;min-height:400px;';
+        iframe.title = 'DOM Context: Iframe';
+        target.appendChild(iframe);
+
+        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;font-family:system-ui,sans-serif;">' + DOM_PANEL_HTML + '</body></html>');
+        iframeDoc.close();
+
+        // Auto-resize iframe to fit content
+        function resizeIframe() {
+            try {
+                var h = iframeDoc.documentElement.scrollHeight;
+                if (h > 100) iframe.style.height = (h + 20) + 'px';
+            } catch(e) {}
+        }
+        setTimeout(resizeIframe, 100);
+        setTimeout(resizeIframe, 500);
+
+        // Attach JS inside iframe
+        PANEL_JS_SRC(iframeDoc);
+    }
+
+    document.getElementById('domSwitchResult').textContent = 'Switched to: ' + mode.toUpperCase() + ' — interact with elements above';
+}
+
+// Initialize with standard DOM on load
+switchDom('standard');
 </script>
 </body>
 </html>
