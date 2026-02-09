@@ -9,6 +9,7 @@
     </style>
 </head>
 <body class="has-monitor">
+<script>(function(){var t=localStorage.getItem('lt-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 <!-- INPUT VALUE MONITOR BAR -->
 <div id="inputMonitorBar">
     <span class="monitor-title">Input Monitor</span>
@@ -53,6 +54,12 @@
             <div class="logo-icon">LT</div>
             <div class="logo-text">Static Page</div>
         </a>
+        <nav class="header-nav">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="icon-sun">&#9728;</span>
+                <span class="icon-moon">&#9790;</span>
+            </button>
+        </nav>
     </div>
 </header>
 
@@ -291,6 +298,15 @@
         if (activeField) updateBar();
     }, 500);
 })();
+</script>
+<script>
+document.getElementById('themeToggle').addEventListener('click', function() {
+    var html = document.documentElement;
+    var current = html.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('lt-theme', next);
+});
 </script>
 </body>
 </html>

@@ -17,9 +17,51 @@
         code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: var(--accent); }
         .result-box.updated { border-color: var(--accent); background: rgba(14,165,233,0.1); }
         .ctx-item:hover, .menu-item:hover { background: rgba(255,255,255,0.06); }
+        /* DOM Context Switcher */
+        .dom-switcher-bar { display:flex; gap:0; margin:16px 0 20px; border:1.5px solid var(--border-default); border-radius:var(--radius-md); overflow:hidden; max-width:480px; background:var(--bg-secondary); }
+        .dom-btn { flex:1; margin:0!important; border-radius:0!important; box-shadow:none!important; padding:11px 8px; font-size:13px; font-weight:600; background:transparent; color:var(--text-secondary); border:none; transition:all .15s ease; cursor:pointer; }
+        .dom-btn:hover { background:var(--bg-card-hover); color:var(--text-primary); transform:none; }
+        .dom-btn-active { background:var(--accent)!important; color:white!important; }
+        .dom-context-badge { display:inline-block; padding:4px 12px; border-radius:6px; font-size:12px; font-weight:700; }
     </style>
 </head>
-<body>
+<body class="has-monitor">
+<script>(function(){var t=localStorage.getItem('lt-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+
+<!-- INPUT VALUE MONITOR BAR -->
+<div id="inputMonitorBar">
+    <span class="monitor-title">Input Monitor</span>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Active:</span>
+        <span class="monitor-element-id" id="monitorActiveField">&mdash;</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Event Value:</span>
+        <span class="monitor-value" id="monitorEventValue">&mdash;</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">.value:</span>
+        <span class="monitor-value" id="monitorDomValue">&mdash;</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Source:</span>
+        <span class="monitor-source" id="monitorSource">&mdash;</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Keys:</span>
+        <span class="monitor-value" id="monitorKeyLog" style="max-width:200px;">&mdash;</span>
+    </div>
+    <div class="monitor-divider" id="monitorGroupDivider" style="display:none;"></div>
+    <div class="monitor-field" id="monitorGroupSection" style="display:none;">
+        <span class="monitor-group-label" id="monitorGroupLabel">&mdash;</span>
+        <span class="monitor-value group-val" id="monitorGroupValue">&mdash;</span>
+    </div>
+</div>
 
 <div class="top-bar"></div>
 <div class="glow-container"><div class="glow-inner"></div></div>
@@ -32,6 +74,10 @@
             <div class="logo-text">All Interactions</div>
         </a>
         <nav class="header-nav">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="icon-sun">&#9728;</span>
+                <span class="icon-moon">&#9790;</span>
+            </button>
             <a href="index.html" class="header-btn">
                 <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10H5M5 10l4-4M5 10l4 4"/></svg>
                 <span class="hide-mobile">All Pages</span>
@@ -54,18 +100,18 @@
     </div>
 
     <!-- ===== DOM Context Switcher ===== -->
-    <div class="section-card" style="box-shadow:inset 0 0 0 2px var(--accent);position:relative;">
+    <div class="section-card featured">
         <div class="section-card-header"><h2>DOM Context Switcher</h2></div>
         <p>Same set of interactions rendered in <strong>Standard DOM</strong>, <strong>Shadow DOM</strong>, or <strong>Iframe</strong>. Switch to test how SmartWait + input handling behaves across DOM boundaries.</p>
 
-        <div id="domSwitcherBar" style="display:flex;gap:0;margin:16px 0 20px;border:1.5px solid var(--border-default);border-radius:10px;overflow:hidden;max-width:480px;">
-            <button onclick="switchDom('standard')" id="domBtn-standard" class="dom-btn dom-btn-active" style="flex:1;margin:0;border-radius:0;box-shadow:none;padding:12px 8px;font-size:13px;background:var(--accent);color:white;">Standard DOM</button>
-            <button onclick="switchDom('shadow')" id="domBtn-shadow" class="dom-btn" style="flex:1;margin:0;border-radius:0;box-shadow:none;padding:12px 8px;font-size:13px;background:var(--bg-secondary);color:var(--text-secondary);">Shadow DOM</button>
-            <button onclick="switchDom('iframe')" id="domBtn-iframe" class="dom-btn" style="flex:1;margin:0;border-radius:0;box-shadow:none;padding:12px 8px;font-size:13px;background:var(--bg-secondary);color:var(--text-secondary);">Iframe</button>
+        <div id="domSwitcherBar" class="dom-switcher-bar">
+            <button onclick="switchDom('standard')" id="domBtn-standard" class="dom-btn dom-btn-active">Standard DOM</button>
+            <button onclick="switchDom('shadow')" id="domBtn-shadow" class="dom-btn">Shadow DOM</button>
+            <button onclick="switchDom('iframe')" id="domBtn-iframe" class="dom-btn">Iframe</button>
         </div>
 
         <div id="domContextLabel" style="margin-bottom:12px;">
-            <span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;background:rgba(5,150,105,0.15);color:#34d399;">ACTIVE: Standard DOM</span>
+            <span class="dom-context-badge" style="background:rgba(5,150,105,0.15);color:#34d399;">ACTIVE: Standard DOM</span>
         </div>
 
         <div id="domRenderTarget" style="min-height:100px;"></div>
@@ -1161,29 +1207,24 @@ function switchDom(mode) {
     var target = document.getElementById('domRenderTarget');
     var label = document.getElementById('domContextLabel');
 
-    // Update button styles
+    // Update button styles via CSS classes
     document.querySelectorAll('.dom-btn').forEach(function(btn) {
-        btn.style.background = '#f8fafc';
-        btn.style.color = '#4a5568';
         btn.classList.remove('dom-btn-active');
     });
-    var activeBtn = document.getElementById('domBtn-' + mode);
-    activeBtn.style.background = '#e11d48';
-    activeBtn.style.color = 'white';
-    activeBtn.classList.add('dom-btn-active');
+    document.getElementById('domBtn-' + mode).classList.add('dom-btn-active');
 
     // Clear target
     target.innerHTML = '';
 
     if (mode === 'standard') {
-        label.innerHTML = '<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#d1fae5;color:#059669;">ACTIVE: Standard DOM</span>';
+        label.innerHTML = '<span class="dom-context-badge" style="background:rgba(5,150,105,0.15);color:#34d399;">ACTIVE: Standard DOM</span>';
         var container = document.createElement('div');
         container.innerHTML = DOM_PANEL_HTML;
         target.appendChild(container);
         PANEL_JS_SRC(container);
     }
     else if (mode === 'shadow') {
-        label.innerHTML = '<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#ede9fe;color:#7c3aed;">ACTIVE: Shadow DOM (open)</span>';
+        label.innerHTML = '<span class="dom-context-badge" style="background:rgba(124,58,237,0.15);color:#a78bfa;">ACTIVE: Shadow DOM (open)</span>';
         var host = document.createElement('div');
         host.id = 'shadow-dom-host';
         target.appendChild(host);
@@ -1192,7 +1233,7 @@ function switchDom(mode) {
         PANEL_JS_SRC(shadow);
     }
     else if (mode === 'iframe') {
-        label.innerHTML = '<span style="display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#cffafe;color:#0891b2;">ACTIVE: Iframe (srcdoc)</span>';
+        label.innerHTML = '<span class="dom-context-badge" style="background:rgba(6,182,212,0.15);color:#22d3ee;">ACTIVE: Iframe (srcdoc)</span>';
         var iframe = document.createElement('iframe');
         iframe.id = 'dom-context-iframe';
         iframe.style.cssText = 'width:100%;border:2px solid #0891b2;border-radius:10px;min-height:400px;';
@@ -1223,6 +1264,180 @@ function switchDom(mode) {
 
 // Initialize with standard DOM on load
 switchDom('standard');
+</script>
+
+<!-- INPUT VALUE MONITOR SCRIPT -->
+<script>
+(function() {
+    var eventValue = '';
+    var keyLog = [];
+    var activeField = null;
+    var inputEventFired = false;
+    var activeGroup = null;
+    var activeGroupLabel = '';
+
+    function getFieldLabel(el) {
+        var label = '';
+        if (el.id) label = '#' + el.id;
+        else if (el.name) label = '[name=' + el.name + ']';
+        else if (el.placeholder) label = '"' + el.placeholder.substring(0, 20) + '..."';
+        else if (el.className) label = '.' + el.className.split(' ')[0];
+        else label = el.tagName.toLowerCase();
+        var type = el.getAttribute('type') || el.tagName.toLowerCase();
+        return label + ' (' + type + ')';
+    }
+
+    function detectGroup(el) {
+        if (el.tagName !== 'INPUT') return null;
+        if (el.getAttribute('maxlength') !== '1') return null;
+        var parent = el.parentElement;
+        if (!parent) return null;
+        var elClasses = Array.from(el.classList);
+        var siblings = Array.from(parent.querySelectorAll('input[maxlength="1"]'));
+        if (siblings.length < 2) return null;
+        if (elClasses.length === 0) return siblings;
+        var group = siblings.filter(function(sib) {
+            return elClasses.some(function(cls) { return sib.classList.contains(cls); });
+        });
+        return group.length >= 2 ? group : null;
+    }
+
+    function getGroupLabel(group) {
+        if (!group || group.length === 0) return '';
+        var first = group[0]; var last = group[group.length - 1];
+        var type = 'Group';
+        if (first.classList.contains('otp-digit')) type = 'OTP';
+        else if (first.classList.contains('pin-digit')) type = 'PIN';
+        var firstId = first.id ? '#' + first.id : '?';
+        var lastId = last.id ? '#' + last.id : '?';
+        return type + ' ' + firstId + ' \u2192 ' + lastId + ' (' + group.length + ' fields)';
+    }
+
+    function getGroupValue(group) {
+        if (!group) return '';
+        return group.map(function(el) { return el.value || '_'; }).join('');
+    }
+
+    function isSameGroup(a, b) {
+        if (!a || !b) return false;
+        if (a.length !== b.length) return false;
+        return a[0] === b[0];
+    }
+
+    function updateBar() {
+        var domVal = activeField ? (activeField.value || activeField.textContent || '') : '';
+        document.getElementById('monitorActiveField').textContent = activeField ? getFieldLabel(activeField) : '\u2014';
+        document.getElementById('monitorEventValue').textContent = eventValue || '\u2014';
+        document.getElementById('monitorDomValue').textContent = domVal || '\u2014';
+        document.getElementById('monitorKeyLog').textContent = keyLog.length > 0 ? keyLog.slice(-20).join('') : '\u2014';
+
+        var domValEl = document.getElementById('monitorDomValue');
+        var sourceEl = document.getElementById('monitorSource');
+        var groupSection = document.getElementById('monitorGroupSection');
+        var groupDivider = document.getElementById('monitorGroupDivider');
+
+        if (activeGroup && activeGroup.length > 1) {
+            document.getElementById('monitorGroupLabel').textContent = activeGroupLabel;
+            document.getElementById('monitorGroupValue').textContent = getGroupValue(activeGroup);
+            groupSection.style.display = '';
+            groupDivider.style.display = '';
+        } else {
+            groupSection.style.display = 'none';
+            groupDivider.style.display = 'none';
+        }
+
+        if (!activeField || (!eventValue && !domVal)) {
+            sourceEl.textContent = '\u2014';
+            sourceEl.className = 'monitor-source';
+            domValEl.className = 'monitor-value';
+        } else if (inputEventFired && eventValue === domVal) {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        } else if (domVal && !inputEventFired) {
+            sourceEl.textContent = 'JS INJECTED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else if (eventValue !== domVal) {
+            sourceEl.textContent = 'MODIFIED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        }
+    }
+
+    document.addEventListener('focusin', function(e) {
+        var tag = e.target.tagName;
+        var isEditable = e.target.isContentEditable;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || isEditable) {
+            var newGroup = detectGroup(e.target);
+            var stayingInGroup = isSameGroup(newGroup, activeGroup);
+            activeField = e.target;
+            eventValue = e.target.value || e.target.textContent || '';
+            if (stayingInGroup) {
+                inputEventFired = true;
+            } else {
+                keyLog = [];
+                inputEventFired = false;
+                activeGroup = newGroup;
+                activeGroupLabel = newGroup ? getGroupLabel(newGroup) : '';
+            }
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+        if (!activeField) return;
+        var isGroupKey = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupKey && !activeField.contains(e.target)) return;
+        var key = e.key;
+        if (key === 'Backspace') keyLog.push('\u232b');
+        else if (key === 'Enter') keyLog.push('\u21b5');
+        else if (key === 'Tab') keyLog.push('\u21e5');
+        else if (key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta') { /* skip modifiers */ }
+        else if (key.length === 1) keyLog.push(key);
+        updateBar();
+    }, true);
+
+    document.addEventListener('input', function(e) {
+        if (!activeField) return;
+        var isGroupInput = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupInput && !activeField.contains(e.target)) return;
+        inputEventFired = true;
+        eventValue = e.target.value || e.target.textContent || '';
+        activeField = e.target;
+        updateBar();
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT') {
+            activeField = e.target;
+            activeGroup = null;
+            activeGroupLabel = '';
+            inputEventFired = true;
+            eventValue = e.target.value;
+            updateBar();
+        }
+    }, true);
+
+    setInterval(function() {
+        if (activeField) updateBar();
+    }, 500);
+})();
+</script>
+
+<!-- THEME TOGGLE -->
+<script>
+document.getElementById('themeToggle').addEventListener('click', function() {
+    var html = document.documentElement;
+    var current = html.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('lt-theme', next);
+});
 </script>
 </body>
 </html>
