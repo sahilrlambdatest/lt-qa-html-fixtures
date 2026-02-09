@@ -1220,6 +1220,10 @@ function switchDom(mode) {
         label.innerHTML = '<span class="dom-context-badge" style="background:rgba(5,150,105,0.15);color:#34d399;">ACTIVE: Standard DOM</span>';
         var container = document.createElement('div');
         container.innerHTML = DOM_PANEL_HTML;
+        // Override hardcoded light colors with theme-aware CSS variables for standard DOM
+        var themeStyle = document.createElement('style');
+        themeStyle.textContent = '.dp-section{background:var(--bg-secondary)!important;border-color:var(--border-default)!important}.dp-section-title{color:var(--text-primary)!important}.dp-label{color:var(--text-secondary)!important}.dp-input,.dp-textarea,.dp-select{background:var(--bg-input)!important;border-color:var(--border-default)!important;color:var(--text-primary)!important}.dp-result{background:var(--bg-secondary)!important;border-color:var(--border-default)!important;color:var(--text-primary)!important}.dp-editable{background:var(--bg-input)!important;border-color:var(--border-default)!important;color:var(--text-primary)!important}.dp-drag-item{background:var(--bg-card)!important;border-color:var(--border-default)!important;color:var(--text-primary)!important}.dp-hover-zone{background:var(--bg-secondary)!important;color:var(--text-primary)!important}';
+        container.prepend(themeStyle);
         target.appendChild(container);
         PANEL_JS_SRC(container);
     }

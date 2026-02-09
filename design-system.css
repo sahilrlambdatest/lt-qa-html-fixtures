@@ -292,7 +292,7 @@ body {
 
 /* --- Page Hero --- */
 .page-hero {
-    padding: 28px 0 24px;
+    padding: 12px 0 16px;
 }
 .page-hero h1 {
     font-size: 32px;
@@ -655,8 +655,8 @@ button.danger {
 
 /* --- Footer --- */
 .site-footer {
-    margin-top: 32px;
-    padding: 24px;
+    margin-top: 12px;
+    padding: 16px;
     text-align: center;
     border-top: 1px solid var(--border-subtle);
     color: var(--text-tertiary);
@@ -704,7 +704,7 @@ button.danger {
         --container-max: 100%;
         --header-height: 60px;
     }
-    .page-hero { padding: 24px 0 20px; }
+    .page-hero { padding: 10px 0 14px; }
     .page-hero h1 { font-size: 26px; }
     .card-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
     .section-card { padding: 22px; }
@@ -714,7 +714,7 @@ button.danger {
 @media (max-width: 640px) {
     .container, .container-narrow { padding: 0 16px; }
     .header-inner { padding: 0 16px; }
-    .page-hero { padding: 20px 0 16px; }
+    .page-hero { padding: 8px 0 12px; }
     .page-hero h1 { font-size: 22px; }
     .page-hero .subtitle { font-size: 13px; }
     .card-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -919,7 +919,7 @@ button.danger {
 /* Monitor capsule sits below header */
 body.has-monitor .site-header { top: 0; }
 body.has-monitor .top-bar { display: none; }
-body.has-monitor .page-hero { padding-top: 56px; }
+body.has-monitor .page-hero { padding-top: 36px; }
 
 /* --- Page-specific: Log Box --- */
 .log-box {
