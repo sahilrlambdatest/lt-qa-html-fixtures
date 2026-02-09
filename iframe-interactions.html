@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Interactions - SmartWait Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #eceff1 100%); min-height: 100vh; color: #2d3748; }
+        .info { background: linear-gradient(135deg, #eceff1, #e8edf2); padding: 16px 20px; border-radius: 12px; border-left: 4px solid #0891b2; margin: 20px 0; font-size: 14px; line-height: 1.6; color: #455a64; }
+        .section { background: white; padding: 28px; border-radius: 16px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); }
+        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+        h2 { color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #0891b2; padding-bottom: 12px; margin-top: 0; margin-bottom: 20px; }
+        h3 { color: #4a5568; font-size: 16px; margin: 16px 0 8px; }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin: 4px 4px 4px 0; }
+        .tag-iframe { background: #cffafe; color: #0891b2; }
+        .tag-nested { background: #fef3c7; color: #d97706; }
+        .tag-network { background: #dbeafe; color: #2563eb; }
+        .tag-cross { background: #fee2e2; color: #dc2626; }
+        .tag-srcdoc { background: #d1fae5; color: #059669; }
+        p { color: #4a5568; line-height: 1.6; margin: 8px 0; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #0891b2; }
+        .result-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin: 8px 0; font-family: monospace; font-size: 13px; min-height: 20px; }
+        iframe { border: 2px solid #e2e8f0; border-radius: 10px; margin: 12px 0; display: block; }
+        button { padding: 10px 20px; cursor: pointer; margin: 8px 8px 8px 0; background: linear-gradient(135deg, #0891b2, #0e7490); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(8,145,178,0.3); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(8,145,178,0.4); }
+    </style>
+</head>
+<body>
+
+<header style="background: linear-gradient(135deg, #0891b2, #0e7490); padding: 30px 40px; color: white;">
+    <div style="max-width: 900px; margin: auto;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Iframe Interactions</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Test SmartWait & input handling across iframe boundaries</p>
+    </div>
+</header>
+
+<main style="max-width: 900px; margin: 30px auto; padding: 0 20px 40px;">
+
+    <div class="info">
+        Tests SmartWait behavior with elements inside <strong>same-origin iframes</strong>, <strong>nested iframes (3 deep)</strong>,
+        <strong>iframes with network activity</strong>, <strong>srcdoc iframes</strong>, and <strong>dynamically created iframes</strong>.
+        Each iframe has its own document context — SmartWait must handle cross-frame network requests correctly.
+    </div>
+
+    <!-- Section 1: Same-Origin Iframe with Inputs -->
+    <div class="section">
+        <h2>Section 1: Same-Origin Iframe — Inputs</h2>
+        <span class="tag tag-iframe">iframe</span>
+        <span class="tag tag-srcdoc">srcdoc</span>
+        <p>Inputs inside a same-origin iframe using <code>srcdoc</code>. KaneAI must switch to iframe context to interact.</p>
+
+        <iframe id="inputIframe" srcdoc='
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: system-ui, sans-serif; padding: 20px; margin: 0; background: #fefce8; }
+                    label { font-weight: 600; display: block; margin-top: 12px; font-size: 14px; color: #4a5568; }
+                    input, textarea, select { padding: 10px 14px; width: 100%; max-width: 340px; margin: 6px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; color: #2d3748; outline: none; box-sizing: border-box; }
+                    input:focus, textarea:focus { border-color: #0891b2; box-shadow: 0 0 0 3px rgba(8,145,178,0.15); }
+                    textarea { height: 60px; resize: vertical; }
+                    h3 { color: #92400e; font-size: 16px; margin: 0 0 12px; }
+                    p { font-size: 13px; color: #78716c; margin: 4px 0; }
+                </style>
+            </head>
+            <body>
+                <h3>Inside Iframe (same-origin srcdoc)</h3>
+
+                <label for="iframeText">Full Name</label>
+                <input type="text" id="iframeText" placeholder="Type inside iframe">
+
+                <label for="iframeEmail">Email</label>
+                <input type="email" id="iframeEmail" placeholder="email@iframe.com">
+
+                <label for="iframeNumber">Quantity</label>
+                <input type="number" id="iframeNumber" min="1" max="100" placeholder="1-100">
+
+                <label for="iframeSelect">Priority</label>
+                <select id="iframeSelect">
+                    <option value="">Select...</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+
+                <label for="iframeTextarea">Description</label>
+                <textarea id="iframeTextarea" placeholder="Multi-line inside iframe"></textarea>
+
+                <label><input type="checkbox" id="iframeCheckbox"> Accept terms (inside iframe)</label>
+
+                <p id="iframeAssert1">Assertable text inside iframe: Hello from iframe!</p>
+                <p id="iframeAssert2">Iframe value: 42</p>
+            </body>
+            </html>
+        ' width="100%" height="420" title="Input Iframe"></iframe>
+
+        <div class="result-box" id="iframeInputResult">Interact with the iframe inputs above</div>
+    </div>
+
+    <!-- Section 2: Nested Iframes (3 levels) -->
+    <div class="section">
+        <h2>Section 2: Nested Iframes — 3 Levels Deep</h2>
+        <span class="tag tag-iframe">iframe</span>
+        <span class="tag tag-nested">nested</span>
+        <p>An iframe inside an iframe inside an iframe. Input at the deepest level: <code>parent → iframe1 → iframe2 → iframe3 → input</code></p>
+
+        <iframe id="nestedIframe1" srcdoc='
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: system-ui, sans-serif; padding: 16px; margin: 0; background: #ede9fe; }
+                    h4 { color: #7c3aed; margin: 0 0 8px; font-size: 14px; }
+                    iframe { border: 2px dashed #a78bfa; border-radius: 8px; margin: 8px 0; }
+                </style>
+            </head>
+            <body>
+                <h4>Level 1 Iframe (purple)</h4>
+                <iframe srcdoc="
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body { font-family: system-ui, sans-serif; padding: 16px; margin: 0; background: #fef3c7; }
+                            h4 { color: #d97706; margin: 0 0 8px; font-size: 14px; }
+                            iframe { border: 2px dashed #fbbf24; border-radius: 8px; margin: 8px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        <h4>Level 2 Iframe (amber)</h4>
+                        <iframe srcdoc=&quot;
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <style>
+                                    body { font-family: system-ui, sans-serif; padding: 16px; margin: 0; background: #d1fae5; }
+                                    h4 { color: #059669; margin: 0 0 8px; font-size: 14px; }
+                                    label { font-weight: 600; display: block; margin-top: 10px; font-size: 13px; color: #4a5568; }
+                                    input { padding: 8px 12px; width: 90%; max-width: 280px; border: 1.5px solid #d2d6dc; border-radius: 8px; font-size: 13px; color: #2d3748; margin: 4px 0; display: block; box-sizing: border-box; }
+                                    input:focus { border-color: #059669; outline: none; }
+                                    p { font-size: 12px; color: #065f46; margin: 6px 0; }
+                                </style>
+                            </head>
+                            <body>
+                                <h4>Level 3 Iframe (deepest - green)</h4>
+                                <label for=&amp;quot;deepIframeInput&amp;quot;>Deep Nested Input</label>
+                                <input type=&amp;quot;text&amp;quot; id=&amp;quot;deepIframeInput&amp;quot; placeholder=&amp;quot;3 iframes deep!&amp;quot;>
+                                <label for=&amp;quot;deepIframeEmail&amp;quot;>Deep Email</label>
+                                <input type=&amp;quot;email&amp;quot; id=&amp;quot;deepIframeEmail&amp;quot; placeholder=&amp;quot;deep@nested.com&amp;quot;>
+                                <p id=&amp;quot;deepAssert&amp;quot;>Deep iframe assertion: Level 3 reached!</p>
+                            </body>
+                            </html>
+                        &quot; width=&quot;100%&quot; height=&quot;220&quot; title=&quot;Level 3&quot;></iframe>
+                    </body>
+                    </html>
+                " width="100%" height="300" title="Level 2"></iframe>
+            </body>
+            </html>
+        ' width="100%" height="380" title="Level 1 Nested Iframe"></iframe>
+
+        <div class="result-box" id="nestedIframeResult">Navigate 3 iframes deep to find the input</div>
+    </div>
+
+    <!-- Section 3: Iframe with Network Activity -->
+    <div class="section">
+        <h2>Section 3: Iframe with Network Activity</h2>
+        <span class="tag tag-iframe">iframe</span>
+        <span class="tag tag-network">network</span>
+        <p>Iframe that makes its own fetch calls. Tests whether SmartWait detects network activity originating from within an iframe's document context.</p>
+
+        <iframe id="networkIframe" srcdoc='
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: system-ui, sans-serif; padding: 20px; margin: 0; background: #eff6ff; }
+                    h3 { color: #1d4ed8; margin: 0 0 12px; font-size: 16px; }
+                    input { padding: 10px 14px; width: 100%; max-width: 340px; border: 1.5px solid #d2d6dc; border-radius: 10px; font-size: 14px; color: #2d3748; outline: none; margin: 6px 0; display: block; box-sizing: border-box; }
+                    input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+                    button { padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; margin: 8px 0; }
+                    .status { padding: 8px 12px; border-radius: 8px; margin: 8px 0; font-size: 13px; }
+                    .loading { background: #fef3c7; color: #d97706; }
+                    .done { background: #d1fae5; color: #059669; }
+                    #results { margin: 8px 0; font-size: 13px; color: #4a5568; }
+                </style>
+            </head>
+            <body>
+                <h3>Iframe with Fetch Calls</h3>
+                <label style="font-weight:600;font-size:14px;color:#4a5568;">Search (triggers fetch inside iframe)</label>
+                <input type="text" id="iframeSearchInput" placeholder="Type to fetch from iframe context">
+                <button id="iframeFetchBtn">Fetch Data</button>
+                <div id="iframeStatus" class="status" style="display:none;"></div>
+                <div id="results"></div>
+
+                <script>
+                    var btn = document.getElementById("iframeFetchBtn");
+                    var input = document.getElementById("iframeSearchInput");
+                    var status = document.getElementById("iframeStatus");
+                    var results = document.getElementById("results");
+
+                    btn.addEventListener("click", function() {
+                        status.style.display = "block";
+                        status.className = "status loading";
+                        status.textContent = "Fetching from iframe...";
+
+                        fetch("https://jsonplaceholder.typicode.com/users?_limit=3")
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                status.className = "status done";
+                                status.textContent = "Loaded " + data.length + " users";
+                                results.innerHTML = data.map(function(u) { return "<div>" + u.name + " (" + u.email + ")</div>"; }).join("");
+                            })
+                            .catch(function(err) {
+                                status.textContent = "Error: " + err.message;
+                            });
+                    });
+
+                    // Auto-fetch on input with debounce
+                    var timer;
+                    input.addEventListener("input", function() {
+                        clearTimeout(timer);
+                        timer = setTimeout(function() {
+                            if (input.value.length >= 2) btn.click();
+                        }, 600);
+                    });
+                </script>
+            </body>
+            </html>
+        ' width="100%" height="300" title="Network Iframe"></iframe>
+
+        <div class="result-box" id="networkIframeResult">Iframe makes its own fetch requests — observe SmartWait behavior</div>
+    </div>
+
+    <!-- Section 4: Iframe with Form (Fix 5 testing) -->
+    <div class="section">
+        <h2>Section 4: Iframe Form — Sequential Inputs (Fix 5)</h2>
+        <span class="tag tag-iframe">iframe</span>
+        <span class="tag tag-srcdoc">form</span>
+        <p>Complete form inside an iframe. Tests Fix 5 (redundant SmartWait removal in <code>input_value()</code>) — filling multiple fields sequentially inside an iframe context.</p>
+
+        <iframe id="formIframe" srcdoc='
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: system-ui, sans-serif; padding: 20px; margin: 0; background: #fdf4ff; }
+                    h3 { color: #a21caf; margin: 0 0 12px; font-size: 16px; }
+                    label { font-weight: 600; display: block; margin-top: 10px; font-size: 13px; color: #4a5568; }
+                    input, select, textarea { padding: 9px 12px; width: 100%; max-width: 340px; border: 1.5px solid #d2d6dc; border-radius: 8px; font-size: 13px; color: #2d3748; outline: none; margin: 4px 0; display: block; box-sizing: border-box; }
+                    input:focus, select:focus, textarea:focus { border-color: #a21caf; box-shadow: 0 0 0 3px rgba(162,28,175,0.12); }
+                    textarea { height: 50px; resize: vertical; }
+                    button { padding: 9px 18px; background: linear-gradient(135deg, #a21caf, #86198f); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; margin: 12px 0; }
+                    .success { background: #d1fae5; color: #059669; padding: 10px; border-radius: 8px; margin: 8px 0; font-weight: 600; display: none; }
+                </style>
+            </head>
+            <body>
+                <h3>Registration Form (inside iframe)</h3>
+                <form id="iframeForm">
+                    <label for="regFirst">First Name</label>
+                    <input type="text" id="regFirst" placeholder="First" required>
+
+                    <label for="regLast">Last Name</label>
+                    <input type="text" id="regLast" placeholder="Last" required>
+
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" placeholder="you@email.com" required>
+
+                    <label for="regPhone">Phone</label>
+                    <input type="tel" id="regPhone" placeholder="+1 555 000 0000">
+
+                    <label for="regPass">Password</label>
+                    <input type="password" id="regPass" placeholder="Min 8 characters" required>
+
+                    <label for="regConfirm">Confirm Password</label>
+                    <input type="password" id="regConfirm" placeholder="Repeat password" required>
+
+                    <label for="regRole">Role</label>
+                    <select id="regRole">
+                        <option value="">Select role...</option>
+                        <option value="developer">Developer</option>
+                        <option value="tester">Tester</option>
+                        <option value="manager">Manager</option>
+                    </select>
+
+                    <label for="regBio">Bio</label>
+                    <textarea id="regBio" placeholder="Tell us about yourself..."></textarea>
+
+                    <label><input type="checkbox" id="regTerms"> I agree to Terms of Service</label>
+
+                    <button type="submit">Register</button>
+                </form>
+                <div class="success" id="successMsg">Registration successful!</div>
+
+                <script>
+                    document.getElementById("iframeForm").addEventListener("submit", function(e) {
+                        e.preventDefault();
+                        var pass = document.getElementById("regPass").value;
+                        var confirm = document.getElementById("regConfirm").value;
+                        if (pass !== confirm) {
+                            alert("Passwords do not match");
+                            return;
+                        }
+                        document.getElementById("successMsg").style.display = "block";
+                    });
+                </script>
+            </body>
+            </html>
+        ' width="100%" height="580" title="Form Iframe"></iframe>
+
+        <div class="result-box" id="formIframeResult">Fill the registration form — each input tests Fix 5 timing inside iframe</div>
+    </div>
+
+    <!-- Section 5: Dynamic Iframe Creation -->
+    <div class="section">
+        <h2>Section 5: Dynamically Created Iframe</h2>
+        <span class="tag tag-iframe">iframe</span>
+        <span class="tag tag-network">dynamic</span>
+        <p>Iframe created at runtime via JavaScript. Tests SmartWait when new iframe appears in DOM after page load.</p>
+
+        <button id="createIframeBtn" onclick="createDynamicIframe()">Create Iframe Now</button>
+        <button id="removeIframeBtn" onclick="removeDynamicIframe()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 2px 6px rgba(220,38,38,0.3);">Remove Iframe</button>
+        <div id="dynamicIframeContainer"></div>
+        <div class="result-box" id="dynamicIframeResult">Click "Create Iframe Now" to dynamically inject an iframe</div>
+    </div>
+
+    <!-- Section 6: Iframe with Polling/Continuous Requests -->
+    <div class="section">
+        <h2>Section 6: Iframe with Continuous Polling</h2>
+        <span class="tag tag-iframe">iframe</span>
+        <span class="tag tag-network">polling</span>
+        <p>Iframe that continuously polls an API (every 3s). Tests SmartWait's activity-based exit when network never goes idle inside an iframe.</p>
+
+        <iframe id="pollingIframe" srcdoc='
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: system-ui, sans-serif; padding: 16px; margin: 0; background: #fef2f2; }
+                    h3 { color: #dc2626; margin: 0 0 8px; font-size: 15px; }
+                    .poll-status { padding: 8px 12px; border-radius: 8px; margin: 6px 0; font-size: 12px; font-family: monospace; }
+                    .active { background: #fee2e2; color: #dc2626; }
+                    .stopped { background: #d1fae5; color: #059669; }
+                    input { padding: 8px 12px; width: 90%; max-width: 300px; border: 1.5px solid #d2d6dc; border-radius: 8px; font-size: 13px; margin: 6px 0; display: block; box-sizing: border-box; }
+                    button { padding: 7px 14px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin: 4px 4px 4px 0; }
+                    .btn-stop { background: #dc2626; color: white; }
+                    .btn-start { background: #059669; color: white; }
+                    #log { max-height: 100px; overflow-y: auto; font-family: monospace; font-size: 11px; color: #4a5568; margin: 6px 0; }
+                </style>
+            </head>
+            <body>
+                <h3>Continuous Polling Iframe</h3>
+                <div class="poll-status active" id="pollStatus">POLLING ACTIVE — fetching every 3s</div>
+                <button class="btn-stop" id="stopBtn">Stop Polling</button>
+                <button class="btn-start" id="startBtn" style="display:none;">Start Polling</button>
+                <label style="font-weight:600;font-size:13px;color:#4a5568;margin-top:10px;display:block;">Input (works while polling)</label>
+                <input type="text" id="pollingInput" placeholder="Type while iframe polls">
+                <div id="log"></div>
+
+                <script>
+                    var pollInterval;
+                    var pollCount = 0;
+                    var logEl = document.getElementById("log");
+
+                    function addLog(msg) {
+                        var line = document.createElement("div");
+                        line.textContent = new Date().toLocaleTimeString() + " - " + msg;
+                        logEl.appendChild(line);
+                        logEl.scrollTop = logEl.scrollHeight;
+                    }
+
+                    function doPoll() {
+                        pollCount++;
+                        addLog("Poll #" + pollCount + " started");
+                        fetch("https://jsonplaceholder.typicode.com/posts/" + ((pollCount % 100) + 1))
+                            .then(function(r) { return r.json(); })
+                            .then(function(d) { addLog("Poll #" + pollCount + " done: " + d.title.substring(0, 30)); })
+                            .catch(function(e) { addLog("Poll #" + pollCount + " error: " + e.message); });
+                    }
+
+                    function startPolling() {
+                        pollInterval = setInterval(doPoll, 3000);
+                        doPoll();
+                        document.getElementById("pollStatus").textContent = "POLLING ACTIVE — fetching every 3s";
+                        document.getElementById("pollStatus").className = "poll-status active";
+                        document.getElementById("stopBtn").style.display = "";
+                        document.getElementById("startBtn").style.display = "none";
+                    }
+
+                    function stopPolling() {
+                        clearInterval(pollInterval);
+                        document.getElementById("pollStatus").textContent = "POLLING STOPPED";
+                        document.getElementById("pollStatus").className = "poll-status stopped";
+                        document.getElementById("stopBtn").style.display = "none";
+                        document.getElementById("startBtn").style.display = "";
+                        addLog("Polling stopped");
+                    }
+
+                    document.getElementById("stopBtn").addEventListener("click", stopPolling);
+                    document.getElementById("startBtn").addEventListener("click", startPolling);
+
+                    startPolling();
+                </script>
+            </body>
+            </html>
+        ' width="100%" height="320" title="Polling Iframe"></iframe>
+
+        <div class="result-box" id="pollingIframeResult">Iframe polls every 3s — SmartWait should use activity-based exit (Fix 2), not wait for all requests</div>
+    </div>
+
+    <!-- Section 7: Assertable Content in Iframe -->
+    <div class="section">
+        <h2>Section 7: Assertable Content Inside Iframe (Fix 4)</h2>
+        <span class="tag tag-iframe">iframe</span>
+        <span class="tag tag-srcdoc">assertions</span>
+        <p>Static content inside an iframe for assertion testing. SmartWait should be <strong>skipped</strong> for assertions (Fix 4) — even when asserting content inside an iframe context.</p>
+
+        <iframe id="assertIframe" srcdoc='
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: system-ui, sans-serif; padding: 20px; margin: 0; background: #f0fdf4; }
+                    h3 { color: #16a34a; margin: 0 0 12px; font-size: 16px; }
+                    p { margin: 6px 0; font-size: 14px; color: #4a5568; }
+                    .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+                    .badge-active { background: #d1fae5; color: #059669; }
+                    .badge-count { background: #ede9fe; color: #7c3aed; }
+                    table { border-collapse: collapse; margin: 10px 0; width: 100%; max-width: 400px; }
+                    th { background: #16a34a; color: white; padding: 8px 14px; text-align: left; font-size: 13px; }
+                    td { padding: 8px 14px; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+                </style>
+            </head>
+            <body>
+                <h3>Assertable Content (inside iframe)</h3>
+
+                <p id="iframeAssertText">This text is inside an iframe — assert me without SmartWait!</p>
+                <p>Numeric value: <span id="iframeAssertNum">128</span></p>
+                <p>Status: <span class="badge badge-active" id="iframeAssertBadge">Healthy</span></p>
+                <p>Total items: <span class="badge badge-count" id="iframeAssertTotal">23</span></p>
+                <p>Boolean flag: <span id="iframeAssertBool" data-value="true">true</span></p>
+
+                <table>
+                    <tr><th>Metric</th><th>Value</th></tr>
+                    <tr><td>Latency</td><td id="iframeMetric1">45ms</td></tr>
+                    <tr><td>Throughput</td><td id="iframeMetric2">1200 req/s</td></tr>
+                    <tr><td>Error Rate</td><td id="iframeMetric3">0.02%</td></tr>
+                    <tr><td>Uptime</td><td id="iframeMetric4">99.97%</td></tr>
+                </table>
+            </body>
+            </html>
+        ' width="100%" height="350" title="Assert Iframe"></iframe>
+
+        <div class="result-box" id="assertIframeResult">Assert content inside iframe — Fix 4 should skip SmartWait for these assertions</div>
+    </div>
+
+</main>
+
+<footer style="background: #164e63; color: rgba(255,255,255,0.7); text-align: center; padding: 20px 40px; font-size: 13px;">
+    <p style="color: rgba(255,255,255,0.7); margin: 0;">Iframe Test Page &mdash; KaneAI SmartWait Test Suite</p>
+</footer>
+
+<script>
+// ========== Section 5: Dynamic Iframe ==========
+function createDynamicIframe() {
+    var container = document.getElementById('dynamicIframeContainer');
+    if (container.querySelector('iframe')) {
+        document.getElementById('dynamicIframeResult').textContent = 'Iframe already exists — remove it first';
+        return;
+    }
+
+    var iframe = document.createElement('iframe');
+    iframe.id = 'dynamicIframe';
+    iframe.width = '100%';
+    iframe.height = '200';
+    iframe.title = 'Dynamic Iframe';
+    iframe.style.border = '2px solid #0891b2';
+    iframe.style.borderRadius = '10px';
+    iframe.style.marginTop = '12px';
+    iframe.srcdoc = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: system-ui, sans-serif; padding: 16px; margin: 0; background: #ecfdf5; }
+                h3 { color: #059669; margin: 0 0 10px; font-size: 15px; }
+                input { padding: 9px 12px; width: 90%; max-width: 320px; border: 1.5px solid #d2d6dc; border-radius: 8px; font-size: 13px; margin: 6px 0; display: block; box-sizing: border-box; }
+                p { font-size: 12px; color: #4a5568; margin: 6px 0; }
+            </style>
+        </head>
+        <body>
+            <h3>Dynamically Created Iframe</h3>
+            <p>I was created at runtime — I didn't exist at page load!</p>
+            <label style="font-weight:600;font-size:13px;color:#4a5568;">Dynamic Input</label>
+            <input type="text" id="dynamicInput" placeholder="Type in dynamically created iframe">
+            <p id="dynamicAssert">Dynamic iframe timestamp: ${new Date().toISOString()}</p>
+        </body>
+        </html>
+    `;
+    container.appendChild(iframe);
+    document.getElementById('dynamicIframeResult').textContent = 'Dynamic iframe created at ' + new Date().toLocaleTimeString();
+}
+
+function removeDynamicIframe() {
+    var container = document.getElementById('dynamicIframeContainer');
+    var iframe = container.querySelector('iframe');
+    if (iframe) {
+        container.removeChild(iframe);
+        document.getElementById('dynamicIframeResult').textContent = 'Dynamic iframe removed at ' + new Date().toLocaleTimeString();
+    } else {
+        document.getElementById('dynamicIframeResult').textContent = 'No iframe to remove';
+    }
+}
+
+// Parent-level monitoring for iframe interactions
+window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'iframe-input') {
+        document.getElementById('iframeInputResult').textContent = 'Iframe input: ' + e.data.value;
+    }
+});
+</script>
+</body>
+</html>

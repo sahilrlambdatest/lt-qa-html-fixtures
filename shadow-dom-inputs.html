@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow DOM Inputs - SmartWait Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #eceff1 100%); min-height: 100vh; color: #2d3748; }
+        .info { background: linear-gradient(135deg, #eceff1, #e8edf2); padding: 16px 20px; border-radius: 12px; border-left: 4px solid #7c3aed; margin: 20px 0; font-size: 14px; line-height: 1.6; color: #455a64; }
+        .section { background: white; padding: 28px; border-radius: 16px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); }
+        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+        h2 { color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #7c3aed; padding-bottom: 12px; margin-top: 0; margin-bottom: 20px; }
+        h3 { color: #4a5568; font-size: 16px; margin: 16px 0 8px; }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin: 4px 4px 4px 0; }
+        .tag-shadow { background: #ede9fe; color: #7c3aed; }
+        .tag-open { background: #d1fae5; color: #059669; }
+        .tag-closed { background: #fee2e2; color: #dc2626; }
+        .tag-nested { background: #fef3c7; color: #d97706; }
+        .tag-network { background: #dbeafe; color: #2563eb; }
+        p { color: #4a5568; line-height: 1.6; margin: 8px 0; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #7c3aed; }
+        .result-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin: 8px 0; font-family: monospace; font-size: 13px; min-height: 20px; }
+        button { padding: 10px 20px; cursor: pointer; margin: 8px 8px 8px 0; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(124,58,237,0.3); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.4); }
+    </style>
+</head>
+<body>
+
+<header style="background: linear-gradient(135deg, #7c3aed, #6d28d9); padding: 30px 40px; color: white;">
+    <div style="max-width: 900px; margin: auto;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Shadow DOM Inputs</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Test SmartWait & input handling across shadow DOM boundaries</p>
+    </div>
+</header>
+
+<main style="max-width: 900px; margin: 30px auto; padding: 0 20px 40px;">
+
+    <div class="info">
+        Tests SmartWait behavior with elements inside <strong>open shadow DOM</strong>, <strong>closed shadow DOM</strong>,
+        <strong>nested shadow DOM</strong>, and <strong>shadow DOM with network activity</strong>.
+        Each section isolates a different shadow DOM pattern that KaneAI must handle correctly.
+    </div>
+
+    <!-- Section 1: Open Shadow DOM - Basic Inputs -->
+    <div class="section">
+        <h2>Section 1: Open Shadow DOM — Basic Inputs</h2>
+        <span class="tag tag-shadow">shadow-dom</span>
+        <span class="tag tag-open">open</span>
+        <p>Standard inputs inside an open shadow root. KaneAI should be able to pierce and interact.</p>
+
+        <div id="openShadowHost1"></div>
+
+        <h3>Assertable Values (inside shadow)</h3>
+        <div id="openShadowAssert"></div>
+    </div>
+
+    <!-- Section 2: Closed Shadow DOM -->
+    <div class="section">
+        <h2>Section 2: Closed Shadow DOM — Inputs</h2>
+        <span class="tag tag-shadow">shadow-dom</span>
+        <span class="tag tag-closed">closed</span>
+        <p>Inputs inside a closed shadow root. Standard DOM traversal cannot access these — requires special handling.</p>
+
+        <div id="closedShadowHost"></div>
+        <div class="result-box" id="closedShadowResult">Closed shadow output will appear here</div>
+    </div>
+
+    <!-- Section 3: Nested Shadow DOM -->
+    <div class="section">
+        <h2>Section 3: Nested Shadow DOM — 3 Levels Deep</h2>
+        <span class="tag tag-shadow">shadow-dom</span>
+        <span class="tag tag-nested">nested</span>
+        <p>Input buried 3 shadow roots deep: <code>host → shadow → host → shadow → host → shadow → input</code></p>
+
+        <div id="nestedShadowHost"></div>
+        <div class="result-box" id="nestedShadowResult">Nested shadow output will appear here</div>
+    </div>
+
+    <!-- Section 4: Shadow DOM with Slots -->
+    <div class="section">
+        <h2>Section 4: Shadow DOM with Slots</h2>
+        <span class="tag tag-shadow">shadow-dom</span>
+        <span class="tag tag-open">slot</span>
+        <p>Light DOM content projected into shadow DOM via <code>&lt;slot&gt;</code>. The input exists in light DOM but renders inside shadow.</p>
+
+        <div id="slotShadowHost">
+            <input type="text" id="slottedInput" slot="input-slot" placeholder="I'm in light DOM but rendered in shadow" style="padding:10px 14px;width:100%;max-width:360px;border:1.5px solid #d2d6dc;border-radius:10px;font-size:14px;margin:8px 0;">
+            <span slot="label-slot" style="font-weight:600;color:#4a5568;">Slotted Label:</span>
+        </div>
+        <div class="result-box" id="slotResult">Slot output will appear here</div>
+    </div>
+
+    <!-- Section 5: Shadow DOM with Network Activity -->
+    <div class="section">
+        <h2>Section 5: Shadow DOM with Network Activity</h2>
+        <span class="tag tag-shadow">shadow-dom</span>
+        <span class="tag tag-network">network</span>
+        <p>Shadow DOM component that makes fetch calls on interaction. Tests SmartWait's network idle detection for requests originating inside shadow DOM.</p>
+
+        <div id="networkShadowHost"></div>
+        <div class="result-box" id="networkShadowResult">Network shadow output will appear here</div>
+    </div>
+
+    <!-- Section 6: Shadow DOM Form (multiple inputs) -->
+    <div class="section">
+        <h2>Section 6: Shadow DOM Form — Multiple Inputs</h2>
+        <span class="tag tag-shadow">shadow-dom</span>
+        <span class="tag tag-open">form</span>
+        <p>A complete form inside shadow DOM. Tests Fix 5 (redundant SmartWait removal) with multiple sequential inputs inside shadow.</p>
+
+        <div id="formShadowHost"></div>
+        <div class="result-box" id="formShadowResult">Form output will appear here</div>
+    </div>
+
+    <!-- Section 7: Custom Elements with Shadow DOM -->
+    <div class="section">
+        <h2>Section 7: Custom Elements (Web Components)</h2>
+        <span class="tag tag-shadow">shadow-dom</span>
+        <span class="tag tag-open">custom-element</span>
+        <p>Proper Web Components using <code>customElements.define()</code>. Tests KaneAI interaction with real-world component patterns.</p>
+
+        <lt-text-input id="customInput1" label="Username" placeholder="Enter username"></lt-text-input>
+        <lt-text-input id="customInput2" label="Email" placeholder="Enter email" input-type="email"></lt-text-input>
+        <lt-toggle-switch id="customToggle" label="Enable notifications"></lt-toggle-switch>
+        <div class="result-box" id="customElementResult">Custom element output will appear here</div>
+    </div>
+
+</main>
+
+<footer style="background: #4c1d95; color: rgba(255,255,255,0.7); text-align: center; padding: 20px 40px; font-size: 13px;">
+    <p style="color: rgba(255,255,255,0.7); margin: 0;">Shadow DOM Test Page &mdash; KaneAI SmartWait Test Suite</p>
+</footer>
+
+<script>
+// ========== Section 1: Open Shadow DOM ==========
+(function() {
+    var host = document.getElementById('openShadowHost1');
+    var shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
+        <style>
+            :host { display: block; margin: 12px 0; }
+            label { font-weight: 600; display: block; margin-top: 14px; font-size: 14px; color: #4a5568; }
+            input, textarea, select { padding: 10px 14px; width: 100%; max-width: 360px; margin: 8px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; color: #2d3748; outline: none; }
+            input:focus, textarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
+        </style>
+        <label for="shadowText">Text Input (open shadow)</label>
+        <input type="text" id="shadowText" placeholder="Type inside open shadow DOM">
+
+        <label for="shadowEmail">Email (open shadow)</label>
+        <input type="email" id="shadowEmail" placeholder="email@shadow.com">
+
+        <label for="shadowSearch">Search (open shadow)</label>
+        <input type="search" id="shadowSearch" placeholder="Search inside shadow...">
+
+        <label for="shadowTextarea">Textarea (open shadow)</label>
+        <textarea id="shadowTextarea" placeholder="Multi-line inside shadow" style="height:70px;resize:vertical;"></textarea>
+
+        <label for="shadowSelect">Select (open shadow)</label>
+        <select id="shadowSelect">
+            <option value="">Choose...</option>
+            <option value="alpha">Alpha</option>
+            <option value="beta">Beta</option>
+            <option value="gamma">Gamma</option>
+        </select>
+
+        <label><input type="checkbox" id="shadowCheckbox"> Agree to shadow terms</label>
+    `;
+
+    // Assert host
+    var assertHost = document.getElementById('openShadowAssert');
+    var assertShadow = assertHost.attachShadow({ mode: 'open' });
+    assertShadow.innerHTML = `
+        <style>
+            p { color: #4a5568; margin: 6px 0; font-size: 14px; }
+            .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+            .badge-active { background: #d1fae5; color: #059669; }
+            .badge-count { background: #ede9fe; color: #7c3aed; }
+        </style>
+        <p id="shadowAssertText">This text lives inside an open shadow root — assert it!</p>
+        <p>Computed value: <span id="shadowAssertValue">256</span></p>
+        <p>Status: <span class="badge badge-active" id="shadowAssertStatus">Active</span></p>
+        <p>Item count: <span class="badge badge-count" id="shadowAssertCount">7</span></p>
+    `;
+})();
+
+// ========== Section 2: Closed Shadow DOM ==========
+(function() {
+    var host = document.getElementById('closedShadowHost');
+    var shadow = host.attachShadow({ mode: 'closed' });
+    shadow.innerHTML = `
+        <style>
+            label { font-weight: 600; display: block; margin-top: 14px; font-size: 14px; color: #4a5568; }
+            input { padding: 10px 14px; width: 100%; max-width: 360px; margin: 8px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; color: #2d3748; outline: none; }
+            input:focus { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.15); }
+            button { padding: 10px 20px; background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 8px 0; }
+        </style>
+        <label>Secret Input (closed shadow)</label>
+        <input type="text" id="closedInput" placeholder="Inside closed shadow — hard to access">
+        <label>Password (closed shadow)</label>
+        <input type="password" id="closedPassword" placeholder="Closed shadow password">
+        <button id="closedBtn">Submit (closed)</button>
+        <p id="closedOutput" style="margin:8px 0;color:#4a5568;font-size:14px;"></p>
+    `;
+
+    var closedInput = shadow.getElementById('closedInput');
+    var closedBtn = shadow.getElementById('closedBtn');
+    var closedOutput = shadow.getElementById('closedOutput');
+
+    closedBtn.addEventListener('click', function() {
+        closedOutput.textContent = 'Closed shadow says: ' + closedInput.value;
+        document.getElementById('closedShadowResult').textContent = 'Value from closed shadow: ' + closedInput.value;
+    });
+
+    closedInput.addEventListener('input', function() {
+        document.getElementById('closedShadowResult').textContent = 'Typing in closed shadow: ' + closedInput.value;
+    });
+})();
+
+// ========== Section 3: Nested Shadow DOM (3 levels) ==========
+(function() {
+    var host1 = document.getElementById('nestedShadowHost');
+    var shadow1 = host1.attachShadow({ mode: 'open' });
+    shadow1.innerHTML = `
+        <div style="border:2px dashed #7c3aed;padding:16px;border-radius:10px;margin:8px 0;">
+            <p style="color:#7c3aed;font-weight:600;font-size:13px;margin:0 0 8px;">Level 1 Shadow</p>
+            <div id="level2Host"></div>
+        </div>
+    `;
+
+    var host2 = shadow1.getElementById('level2Host');
+    var shadow2 = host2.attachShadow({ mode: 'open' });
+    shadow2.innerHTML = `
+        <div style="border:2px dashed #d97706;padding:16px;border-radius:10px;margin:8px 0;">
+            <p style="color:#d97706;font-weight:600;font-size:13px;margin:0 0 8px;">Level 2 Shadow</p>
+            <div id="level3Host"></div>
+        </div>
+    `;
+
+    var host3 = shadow2.getElementById('level3Host');
+    var shadow3 = host3.attachShadow({ mode: 'open' });
+    shadow3.innerHTML = `
+        <div style="border:2px dashed #059669;padding:16px;border-radius:10px;margin:8px 0;">
+            <p style="color:#059669;font-weight:600;font-size:13px;margin:0 0 8px;">Level 3 Shadow (deepest)</p>
+            <label style="font-weight:600;font-size:14px;color:#4a5568;display:block;margin-bottom:8px;">Deep Nested Input</label>
+            <input type="text" id="deepNestedInput" placeholder="3 shadow roots deep!" style="padding:10px 14px;width:100%;max-width:360px;border:1.5px solid #d2d6dc;border-radius:10px;font-size:14px;color:#2d3748;">
+            <p id="deepAssertText" style="margin:8px 0;color:#059669;font-weight:600;">Deep value: 999</p>
+        </div>
+    `;
+
+    var deepInput = shadow3.getElementById('deepNestedInput');
+    deepInput.addEventListener('input', function() {
+        document.getElementById('nestedShadowResult').textContent = 'From 3 levels deep: ' + deepInput.value;
+    });
+})();
+
+// ========== Section 4: Shadow DOM with Slots ==========
+(function() {
+    var host = document.getElementById('slotShadowHost');
+    var shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
+        <style>
+            :host { display: block; margin: 12px 0; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; }
+            .wrapper { display: flex; flex-direction: column; gap: 8px; }
+        </style>
+        <div class="wrapper">
+            <slot name="label-slot"></slot>
+            <slot name="input-slot"></slot>
+            <p id="slotOutput" style="color:#4a5568;font-size:13px;margin:4px 0;">Slot output: waiting for input...</p>
+        </div>
+    `;
+
+    var slottedInput = document.getElementById('slottedInput');
+    slottedInput.addEventListener('input', function() {
+        shadow.getElementById('slotOutput').textContent = 'Slot output: ' + slottedInput.value;
+        document.getElementById('slotResult').textContent = 'Slotted input value: ' + slottedInput.value;
+    });
+})();
+
+// ========== Section 5: Shadow DOM with Network Activity ==========
+(function() {
+    var host = document.getElementById('networkShadowHost');
+    var shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
+        <style>
+            label { font-weight: 600; display: block; margin-top: 14px; font-size: 14px; color: #4a5568; }
+            input { padding: 10px 14px; width: 100%; max-width: 360px; margin: 8px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; color: #2d3748; outline: none; }
+            input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+            button { padding: 10px 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 8px 0; }
+            .status { padding: 8px 12px; border-radius: 8px; margin: 8px 0; font-size: 13px; }
+            .loading { background: #fef3c7; color: #d97706; }
+            .done { background: #d1fae5; color: #059669; }
+            .error { background: #fee2e2; color: #dc2626; }
+        </style>
+        <label>Search (triggers network from shadow)</label>
+        <input type="text" id="networkInput" placeholder="Type to trigger fetch from shadow DOM">
+        <button id="networkBtn">Fetch Data</button>
+        <div id="networkStatus" class="status" style="display:none;"></div>
+        <div id="networkResults" style="margin:8px 0;color:#4a5568;font-size:14px;"></div>
+    `;
+
+    var networkInput = shadow.getElementById('networkInput');
+    var networkBtn = shadow.getElementById('networkBtn');
+    var networkStatus = shadow.getElementById('networkStatus');
+    var networkResults = shadow.getElementById('networkResults');
+
+    var debounceTimer;
+    networkInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+            if (networkInput.value.length >= 2) {
+                doFetch(networkInput.value);
+            }
+        }, 500);
+    });
+
+    networkBtn.addEventListener('click', function() {
+        doFetch(networkInput.value || 'test');
+    });
+
+    function doFetch(query) {
+        networkStatus.style.display = 'block';
+        networkStatus.className = 'status loading';
+        networkStatus.textContent = 'Fetching from shadow DOM...';
+
+        fetch('https://jsonplaceholder.typicode.com/posts?_limit=3&q=' + encodeURIComponent(query))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                networkStatus.className = 'status done';
+                networkStatus.textContent = 'Loaded ' + data.length + ' results from shadow DOM fetch';
+                networkResults.textContent = data.map(function(d) { return d.title; }).slice(0, 3).join(' | ');
+                document.getElementById('networkShadowResult').textContent = 'Shadow fetch complete: ' + data.length + ' results';
+            })
+            .catch(function(err) {
+                networkStatus.className = 'status error';
+                networkStatus.textContent = 'Fetch error: ' + err.message;
+                document.getElementById('networkShadowResult').textContent = 'Shadow fetch error: ' + err.message;
+            });
+    }
+})();
+
+// ========== Section 6: Shadow DOM Form ==========
+(function() {
+    var host = document.getElementById('formShadowHost');
+    var shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
+        <style>
+            :host { display: block; margin: 12px 0; }
+            label { font-weight: 600; display: block; margin-top: 14px; font-size: 14px; color: #4a5568; }
+            input, select, textarea { padding: 10px 14px; width: 100%; max-width: 360px; margin: 8px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; color: #2d3748; outline: none; }
+            input:focus, select:focus, textarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
+            textarea { height: 70px; resize: vertical; }
+            button { padding: 10px 20px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 12px 0; }
+            .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+            .form-row > div { flex: 1; min-width: 160px; }
+        </style>
+        <form id="shadowForm">
+            <label for="sfFirstName">First Name</label>
+            <input type="text" id="sfFirstName" placeholder="First name" required>
+
+            <label for="sfLastName">Last Name</label>
+            <input type="text" id="sfLastName" placeholder="Last name" required>
+
+            <label for="sfEmail">Email</label>
+            <input type="email" id="sfEmail" placeholder="email@example.com" required>
+
+            <label for="sfPhone">Phone</label>
+            <input type="tel" id="sfPhone" placeholder="+1 (555) 123-4567">
+
+            <label for="sfCountry">Country</label>
+            <select id="sfCountry">
+                <option value="">Select country...</option>
+                <option value="us">United States</option>
+                <option value="uk">United Kingdom</option>
+                <option value="in">India</option>
+                <option value="de">Germany</option>
+            </select>
+
+            <label for="sfMessage">Message</label>
+            <textarea id="sfMessage" placeholder="Your message here..."></textarea>
+
+            <button type="submit">Submit Form (shadow)</button>
+        </form>
+        <p id="formOutput" style="margin:8px 0;color:#059669;font-weight:600;font-size:14px;"></p>
+    `;
+
+    var form = shadow.getElementById('shadowForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var data = {
+            firstName: shadow.getElementById('sfFirstName').value,
+            lastName: shadow.getElementById('sfLastName').value,
+            email: shadow.getElementById('sfEmail').value,
+            phone: shadow.getElementById('sfPhone').value,
+            country: shadow.getElementById('sfCountry').value,
+            message: shadow.getElementById('sfMessage').value
+        };
+        shadow.getElementById('formOutput').textContent = 'Submitted: ' + JSON.stringify(data);
+        document.getElementById('formShadowResult').textContent = 'Shadow form submitted: ' + data.firstName + ' ' + data.lastName + ' (' + data.email + ')';
+    });
+
+    // Expose typing feedback
+    ['sfFirstName', 'sfLastName', 'sfEmail', 'sfPhone', 'sfMessage'].forEach(function(id) {
+        shadow.getElementById(id).addEventListener('input', function(e) {
+            document.getElementById('formShadowResult').textContent = 'Typing in ' + id + ': ' + e.target.value;
+        });
+    });
+})();
+
+// ========== Section 7: Custom Elements ==========
+(function() {
+    // Custom text input element
+    class LtTextInput extends HTMLElement {
+        constructor() {
+            super();
+            this.attachShadow({ mode: 'open' });
+        }
+        connectedCallback() {
+            var label = this.getAttribute('label') || 'Input';
+            var placeholder = this.getAttribute('placeholder') || '';
+            var type = this.getAttribute('input-type') || 'text';
+
+            this.shadowRoot.innerHTML = `
+                <style>
+                    :host { display: block; margin: 12px 0; }
+                    label { font-weight: 600; display: block; font-size: 14px; color: #4a5568; margin-bottom: 6px; }
+                    input { padding: 10px 14px; width: 100%; max-width: 360px; border: 1.5px solid #d2d6dc; border-radius: 10px; font-size: 14px; color: #2d3748; outline: none; }
+                    input:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
+                    .error { color: #dc2626; font-size: 12px; margin-top: 4px; display: none; }
+                </style>
+                <label>${label}</label>
+                <input type="${type}" placeholder="${placeholder}" id="innerInput">
+                <div class="error" id="error"></div>
+            `;
+
+            var input = this.shadowRoot.getElementById('innerInput');
+            var error = this.shadowRoot.getElementById('error');
+            var self = this;
+
+            input.addEventListener('input', function() {
+                self.dispatchEvent(new CustomEvent('lt-input', { detail: { value: input.value }, bubbles: true }));
+                if (type === 'email' && input.value && !input.value.includes('@')) {
+                    error.textContent = 'Invalid email format';
+                    error.style.display = 'block';
+                } else {
+                    error.style.display = 'none';
+                }
+            });
+        }
+        get value() {
+            var input = this.shadowRoot && this.shadowRoot.getElementById('innerInput');
+            return input ? input.value : '';
+        }
+        set value(v) {
+            var input = this.shadowRoot && this.shadowRoot.getElementById('innerInput');
+            if (input) input.value = v;
+        }
+    }
+    customElements.define('lt-text-input', LtTextInput);
+
+    // Custom toggle switch
+    class LtToggleSwitch extends HTMLElement {
+        constructor() {
+            super();
+            this.attachShadow({ mode: 'open' });
+            this._checked = false;
+        }
+        connectedCallback() {
+            var label = this.getAttribute('label') || 'Toggle';
+            this.shadowRoot.innerHTML = `
+                <style>
+                    :host { display: block; margin: 16px 0; }
+                    .toggle-wrapper { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+                    .track { width: 48px; height: 26px; border-radius: 13px; background: #d2d6dc; position: relative; transition: background 0.2s; }
+                    .track.on { background: #7c3aed; }
+                    .thumb { width: 22px; height: 22px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+                    .track.on .thumb { transform: translateX(22px); }
+                    .label { font-weight: 600; font-size: 14px; color: #4a5568; }
+                    .state { font-size: 12px; color: #94a3b8; margin-left: 4px; }
+                </style>
+                <div class="toggle-wrapper" id="toggleWrapper">
+                    <div class="track" id="track"><div class="thumb"></div></div>
+                    <span class="label">${label}</span>
+                    <span class="state" id="state">OFF</span>
+                </div>
+            `;
+
+            var self = this;
+            var wrapper = this.shadowRoot.getElementById('toggleWrapper');
+            wrapper.addEventListener('click', function() {
+                self._checked = !self._checked;
+                self.shadowRoot.getElementById('track').className = self._checked ? 'track on' : 'track';
+                self.shadowRoot.getElementById('state').textContent = self._checked ? 'ON' : 'OFF';
+                self.dispatchEvent(new CustomEvent('lt-toggle', { detail: { checked: self._checked }, bubbles: true }));
+            });
+        }
+        get checked() { return this._checked; }
+    }
+    customElements.define('lt-toggle-switch', LtToggleSwitch);
+
+    // Listen for events
+    document.addEventListener('lt-input', function(e) {
+        document.getElementById('customElementResult').textContent = 'Custom element input: ' + e.detail.value;
+    });
+    document.addEventListener('lt-toggle', function(e) {
+        document.getElementById('customElementResult').textContent = 'Toggle switched: ' + (e.detail.checked ? 'ON' : 'OFF');
+    });
+})();
+</script>
+</body>
+</html>
