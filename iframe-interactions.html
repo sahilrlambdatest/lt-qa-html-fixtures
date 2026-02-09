@@ -4,50 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iframe Interactions - SmartWait Test</title>
+    <link rel="stylesheet" href="design-system.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #eceff1 100%); min-height: 100vh; color: #2d3748; }
-        .info { background: linear-gradient(135deg, #eceff1, #e8edf2); padding: 16px 20px; border-radius: 12px; border-left: 4px solid #0891b2; margin: 20px 0; font-size: 14px; line-height: 1.6; color: #455a64; }
-        .section { background: white; padding: 28px; border-radius: 16px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); }
-        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
-        h2 { color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #0891b2; padding-bottom: 12px; margin-top: 0; margin-bottom: 20px; }
-        h3 { color: #4a5568; font-size: 16px; margin: 16px 0 8px; }
-        .tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin: 4px 4px 4px 0; }
-        .tag-iframe { background: #cffafe; color: #0891b2; }
-        .tag-nested { background: #fef3c7; color: #d97706; }
-        .tag-network { background: #dbeafe; color: #2563eb; }
-        .tag-cross { background: #fee2e2; color: #dc2626; }
-        .tag-srcdoc { background: #d1fae5; color: #059669; }
-        p { color: #4a5568; line-height: 1.6; margin: 8px 0; }
-        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #0891b2; }
-        .result-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin: 8px 0; font-family: monospace; font-size: 13px; min-height: 20px; }
-        iframe { border: 2px solid #e2e8f0; border-radius: 10px; margin: 12px 0; display: block; }
-        button { padding: 10px 20px; cursor: pointer; margin: 8px 8px 8px 0; background: linear-gradient(135deg, #0891b2, #0e7490); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(8,145,178,0.3); }
-        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(8,145,178,0.4); }
+        /* Page-specific: iframe border styling */
+        iframe {
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            margin: 12px 0;
+            display: block;
+        }
     </style>
 </head>
 <body>
 
-<header style="background: linear-gradient(135deg, #0891b2, #0e7490); padding: 30px 40px; color: white;">
-    <div style="max-width: 900px; margin: auto;">
-        <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Iframe Interactions</h1>
-        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Test SmartWait & input handling across iframe boundaries</p>
+<div class="glow-container"><div class="glow-inner"></div></div>
+<div class="glow-container glow-2"><div class="glow-inner"></div></div>
+<div class="top-bar"></div>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a class="logo" href="index.html">
+            <div class="logo-icon">LT</div>
+            <div class="logo-text">Iframe Tests <span>Test Fixtures</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="index.html" class="header-btn">
+                <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg>
+                <span class="hide-mobile">Home</span>
+            </a>
+        </nav>
     </div>
 </header>
 
-<main style="max-width: 900px; margin: 30px auto; padding: 0 20px 40px;">
+<main class="container-narrow">
 
-    <div class="info">
+    <div class="page-hero">
+        <h1>Iframe Interactions</h1>
+        <p class="subtitle">Same-origin iframes, nested iframes, iframes with fetch/polling, dynamic creation, and assertable content</p>
+    </div>
+
+    <div class="info-box">
         Tests SmartWait behavior with elements inside <strong>same-origin iframes</strong>, <strong>nested iframes (3 deep)</strong>,
         <strong>iframes with network activity</strong>, <strong>srcdoc iframes</strong>, and <strong>dynamically created iframes</strong>.
         Each iframe has its own document context — SmartWait must handle cross-frame network requests correctly.
     </div>
 
     <!-- Section 1: Same-Origin Iframe with Inputs -->
-    <div class="section">
-        <h2>Section 1: Same-Origin Iframe — Inputs</h2>
-        <span class="tag tag-iframe">iframe</span>
-        <span class="tag tag-srcdoc">srcdoc</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 1: Same-Origin Iframe — Inputs</h2>
+        </div>
+        <span class="tag iframe">iframe</span>
+        <span class="tag network">srcdoc</span>
         <p>Inputs inside a same-origin iframe using <code>srcdoc</code>. KaneAI must switch to iframe context to interact.</p>
 
         <iframe id="inputIframe" srcdoc='
@@ -100,10 +108,12 @@
     </div>
 
     <!-- Section 2: Nested Iframes (3 levels) -->
-    <div class="section">
-        <h2>Section 2: Nested Iframes — 3 Levels Deep</h2>
-        <span class="tag tag-iframe">iframe</span>
-        <span class="tag tag-nested">nested</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 2: Nested Iframes — 3 Levels Deep</h2>
+        </div>
+        <span class="tag iframe">iframe</span>
+        <span class="tag spa">nested</span>
         <p>An iframe inside an iframe inside an iframe. Input at the deepest level: <code>parent → iframe1 → iframe2 → iframe3 → input</code></p>
 
         <iframe id="nestedIframe1" srcdoc='
@@ -164,10 +174,12 @@
     </div>
 
     <!-- Section 3: Iframe with Network Activity -->
-    <div class="section">
-        <h2>Section 3: Iframe with Network Activity</h2>
-        <span class="tag tag-iframe">iframe</span>
-        <span class="tag tag-network">network</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 3: Iframe with Network Activity</h2>
+        </div>
+        <span class="tag iframe">iframe</span>
+        <span class="tag network">network</span>
         <p>Iframe that makes its own fetch calls. Tests whether SmartWait detects network activity originating from within an iframe's document context.</p>
 
         <iframe id="networkIframe" srcdoc='
@@ -234,10 +246,12 @@
     </div>
 
     <!-- Section 4: Iframe with Form (Fix 5 testing) -->
-    <div class="section">
-        <h2>Section 4: Iframe Form — Sequential Inputs (Fix 5)</h2>
-        <span class="tag tag-iframe">iframe</span>
-        <span class="tag tag-srcdoc">form</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 4: Iframe Form — Sequential Inputs (Fix 5)</h2>
+        </div>
+        <span class="tag iframe">iframe</span>
+        <span class="tag network">form</span>
         <p>Complete form inside an iframe. Tests Fix 5 (redundant SmartWait removal in <code>input_value()</code>) — filling multiple fields sequentially inside an iframe context.</p>
 
         <iframe id="formIframe" srcdoc='
@@ -313,23 +327,27 @@
     </div>
 
     <!-- Section 5: Dynamic Iframe Creation -->
-    <div class="section">
-        <h2>Section 5: Dynamically Created Iframe</h2>
-        <span class="tag tag-iframe">iframe</span>
-        <span class="tag tag-network">dynamic</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 5: Dynamically Created Iframe</h2>
+        </div>
+        <span class="tag iframe">iframe</span>
+        <span class="tag network">dynamic</span>
         <p>Iframe created at runtime via JavaScript. Tests SmartWait when new iframe appears in DOM after page load.</p>
 
         <button id="createIframeBtn" onclick="createDynamicIframe()">Create Iframe Now</button>
-        <button id="removeIframeBtn" onclick="removeDynamicIframe()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 2px 6px rgba(220,38,38,0.3);">Remove Iframe</button>
+        <button id="removeIframeBtn" onclick="removeDynamicIframe()" class="danger">Remove Iframe</button>
         <div id="dynamicIframeContainer"></div>
         <div class="result-box" id="dynamicIframeResult">Click "Create Iframe Now" to dynamically inject an iframe</div>
     </div>
 
     <!-- Section 6: Iframe with Polling/Continuous Requests -->
-    <div class="section">
-        <h2>Section 6: Iframe with Continuous Polling</h2>
-        <span class="tag tag-iframe">iframe</span>
-        <span class="tag tag-network">polling</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 6: Iframe with Continuous Polling</h2>
+        </div>
+        <span class="tag iframe">iframe</span>
+        <span class="tag network">polling</span>
         <p>Iframe that continuously polls an API (every 3s). Tests SmartWait's activity-based exit when network never goes idle inside an iframe.</p>
 
         <iframe id="pollingIframe" srcdoc='
@@ -410,10 +428,12 @@
     </div>
 
     <!-- Section 7: Assertable Content in Iframe -->
-    <div class="section">
-        <h2>Section 7: Assertable Content Inside Iframe (Fix 4)</h2>
-        <span class="tag tag-iframe">iframe</span>
-        <span class="tag tag-srcdoc">assertions</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 7: Assertable Content Inside Iframe (Fix 4)</h2>
+        </div>
+        <span class="tag iframe">iframe</span>
+        <span class="tag network">assertions</span>
         <p>Static content inside an iframe for assertion testing. SmartWait should be <strong>skipped</strong> for assertions (Fix 4) — even when asserting content inside an iframe context.</p>
 
         <iframe id="assertIframe" srcdoc='
@@ -457,8 +477,8 @@
 
 </main>
 
-<footer style="background: #164e63; color: rgba(255,255,255,0.7); text-align: center; padding: 20px 40px; font-size: 13px;">
-    <p style="color: rgba(255,255,255,0.7); margin: 0;">Iframe Test Page &mdash; KaneAI SmartWait Test Suite</p>
+<footer class="site-footer">
+    Iframe Test Page &mdash; KaneAI SmartWait Test Suite
 </footer>
 
 <script>

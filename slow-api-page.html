@@ -2,156 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Wait — Slow & Stale Requests</title>
+    <link rel="stylesheet" href="design-system.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #faf5ff 0%, #f0e6f6 100%); margin: 0; padding: 0; min-height: 100vh; color: #2d3748; }
-        h2 { color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #9C27B0; padding-bottom: 12px; margin-top: 0; margin-bottom: 20px; }
-        button { padding: 11px 22px; cursor: pointer; margin: 5px 6px 5px 0; background: linear-gradient(135deg, #9C27B0, #7B1FA2); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(156,39,176,0.3); }
-        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(156,39,176,0.4); opacity: 0.95; }
-        button.danger { background: linear-gradient(135deg, #f44336, #d32f2f); box-shadow: 0 2px 6px rgba(244,67,54,0.3); }
-        button.green { background: linear-gradient(135deg, #4CAF50, #388E3C); box-shadow: 0 2px 6px rgba(76,175,80,0.3); }
-        button.blue { background: linear-gradient(135deg, #2196F3, #1565C0); box-shadow: 0 2px 6px rgba(33,150,243,0.3); }
-        input { padding: 10px 14px; width: 100%; max-width: 400px; margin: 8px 0; border: 1.5px solid #e2e8f0; border-radius: 10px; display: block; font-size: 14px; font-family: inherit; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
-        input:focus { border-color: #9C27B0; box-shadow: 0 0 0 3px rgba(156,39,176,0.15); }
-        .info { background: linear-gradient(135deg, #f3e5f5, #ede0f3); padding: 16px 20px; border-radius: 12px; border-left: 4px solid #9C27B0; margin: 12px 0; font-size: 13px; line-height: 1.6; color: #4a148c; }
-        .section { background: white; padding: 28px; border-radius: 16px; margin: 20px 0; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); transition: box-shadow 0.2s; }
-        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
-        .log { background: #fafafa; padding: 12px; max-height: 140px; overflow-y: auto; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; border-radius: 10px; margin-top: 10px; border: 1px solid #e2e8f0; }
-        .pending { color: #FF9800; font-weight: 500; }
-        .completed { color: #4CAF50; font-weight: 500; }
-        .error { color: #f44336; font-weight: 500; }
-        .aborted { color: #9E9E9E; font-weight: 500; }
-        label { font-weight: 600; display: block; margin-top: 10px; font-size: 14px; color: #4a5568; }
-        #globalStatus { padding: 14px; background: #f7fafc; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; border-radius: 10px; margin: 12px 0; border: 1.5px solid #e2e8f0; }
-        footer { background: linear-gradient(135deg, #9C27B0, #6A1B9A); color: white; text-align: center; padding: 24px 20px; margin-top: 40px; font-size: 13px; opacity: 0.95; }
-        footer a { color: #e1bee7; text-decoration: none; }
-        footer a:hover { text-decoration: underline; }
-        /* ===== INPUT VALUE MONITOR BAR ===== */
-        #inputMonitorBar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            color: #e2e8f0;
-            z-index: 99999;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.15);
-            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
-            padding: 0 16px;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
-            font-size: 12px;
-            height: 40px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-        }
-        #inputMonitorBar .monitor-title {
-            color: #a5b4fc;
-            font-weight: 700;
-            white-space: nowrap;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 4px 10px;
-            background: rgba(99, 102, 241, 0.15);
-            border-radius: 6px;
-            border: 1px solid rgba(99, 102, 241, 0.25);
-            margin-right: 4px;
-        }
-        #inputMonitorBar .monitor-divider {
-            width: 1px;
-            height: 20px;
-            background: rgba(148, 163, 184, 0.2);
-            margin: 0 4px;
-            flex-shrink: 0;
-        }
-        #inputMonitorBar .monitor-field {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: background 0.15s ease;
-        }
-        #inputMonitorBar .monitor-field:hover {
-            background: rgba(148, 163, 184, 0.08);
-        }
-        #inputMonitorBar .monitor-label {
-            color: #94a3b8;
-            font-size: 10px;
-            white-space: nowrap;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        #inputMonitorBar .monitor-value {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(51, 65, 85, 0.8);
-            padding: 2px 8px;
-            border-radius: 4px;
-            color: #34d399;
-            min-width: 80px;
-            max-width: 220px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 11px;
-            font-weight: 500;
-            transition: all 0.15s ease;
-        }
-        #inputMonitorBar .monitor-value.js-injected {
-            color: #f87171;
-            border-color: rgba(248, 113, 113, 0.3);
-            background: rgba(127, 29, 29, 0.2);
-        }
-        #inputMonitorBar .monitor-value.match {
-            color: #34d399;
-        }
-        #inputMonitorBar .monitor-source {
-            font-size: 9px;
-            padding: 2px 7px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.15s ease;
-        }
-        #inputMonitorBar .source-real {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.25);
-        }
-        #inputMonitorBar .source-js {
-            background: rgba(239, 68, 68, 0.12);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.25);
-        }
-        #inputMonitorBar .monitor-element-id {
-            color: #fbbf24;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        #inputMonitorBar .monitor-value.group-val {
-            color: #fbbf24;
-            border-color: rgba(251, 191, 36, 0.3);
-            background: rgba(120, 53, 15, 0.2);
+        .pending { color: var(--warning); font-weight: 500; }
+        .completed { color: var(--success); font-weight: 500; }
+        .error { color: var(--error); font-weight: 500; }
+        .aborted { color: var(--text-tertiary); font-weight: 500; }
+        #globalStatus {
+            padding: 14px;
+            background: var(--bg-secondary);
+            font-family: var(--font-mono);
             font-size: 13px;
-            letter-spacing: 3px;
-            font-weight: 700;
-        }
-        #inputMonitorBar .monitor-group-label {
-            color: #fbbf24;
-            font-size: 10px;
-            font-weight: 600;
+            border-radius: var(--radius-md);
+            margin: 12px 0;
+            box-shadow: inset 0 0 0 1px var(--border-default);
+            color: var(--text-secondary);
         }
     </style>
 </head>
-<body>
+<body class="has-monitor">
 <!-- INPUT VALUE MONITOR BAR -->
 <div id="inputMonitorBar">
     <span class="monitor-title">Input Monitor</span>
@@ -186,137 +57,146 @@
         <span class="monitor-value group-val" id="monitorGroupValue">—</span>
     </div>
 </div>
-    <header style="background: linear-gradient(135deg, #9C27B0, #6A1B9A); padding: 30px 40px; margin-top: 48px; color: white;">
-        <div style="max-width: 800px; margin: auto;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Smart Wait &mdash; Slow &amp; Stale Requests</h1>
-            <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Cascading chains, aborted requests, redirects, retries &amp; overlapping requests</p>
-        </div>
-    </header>
-    <main style="max-width: 800px; margin: 30px auto; padding: 0 20px 40px;">
-        <div id="globalStatus">Status: Ready</div>
 
-        <!-- ===================== SECTION 1: Slow Single Request ===================== -->
-        <div class="section">
-            <h2>1. Single Slow Request (Stale Cleanup)</h2>
-            <div class="info">
-                Fires a single 10s delayed API. Smart wait should clean it up as stale after 5s
-                and allow the next action to proceed.
-            </div>
-            <button id="slowSingleBtn" onclick="triggerSlowSingle()">Trigger 10s API</button>
-            <label for="afterSlowInput">Type here after triggering:</label>
-            <input type="text" id="afterSlowInput" placeholder="Should work within ~5s, not 10s">
-            <div class="log" id="log1"></div>
-        </div>
+<div class="glow-container"><div class="glow-inner"></div></div>
+<div class="glow-container glow-2"><div class="glow-inner"></div></div>
 
-        <!-- ===================== SECTION 2: Multiple Slow Requests ===================== -->
-        <div class="section">
-            <h2>2. Multiple Slow Requests (Batch Stale)</h2>
-            <div class="info">
-                Fires 3 concurrent requests (6s, 10s, 15s). All should be cleaned as stale
-                after 5s. Smart wait should not wait for any of them.
-            </div>
-            <button id="multiSlowBtn" onclick="triggerMultipleSlow()">Trigger 3 Slow APIs</button>
-            <label for="afterMultiInput">Type here after triggering:</label>
-            <input type="text" id="afterMultiInput" placeholder="Should work within ~5s">
-            <div class="log" id="log2"></div>
-        </div>
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="logo"><div class="logo-icon">LT</div><div class="logo-text">Slow API</div></a>
+        <nav class="header-nav"><a href="index.html" class="header-btn"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10H5M5 10l4-4M5 10l4 4"/></svg><span class="hide-mobile">All Pages</span></a></nav>
+    </div>
+</header>
 
-        <!-- ===================== SECTION 3: Cascading Chain ===================== -->
-        <div class="section">
-            <h2>3. Cascading API Chain</h2>
-            <div class="info">
-                Request A (2s) → on complete, fires Request B (2s) → on complete, fires Request C (2s).
-                Total chain: ~6s. Smart wait should track the full chain, not just the first request.
-            </div>
-            <button id="cascadeBtn" onclick="triggerCascade()">Start Cascade</button>
-            <label for="afterCascadeInput">Type here after cascade completes:</label>
-            <input type="text" id="afterCascadeInput" placeholder="Should work after chain completes (~6s)">
-            <div class="log" id="log3"></div>
-        </div>
+<main class="container-narrow">
+    <div class="page-hero">
+        <h1>Smart Wait &mdash; Slow &amp; Stale Requests</h1>
+        <p class="subtitle">Cascading chains, aborted requests, redirects, retries &amp; overlapping requests</p>
+    </div>
 
-        <!-- ===================== SECTION 4: Mixed Fast + Slow ===================== -->
-        <div class="section">
-            <h2>4. Mixed Fast + Slow Requests</h2>
-            <div class="info">
-                Fires 5 fast requests (instant) + 1 slow request (10s) simultaneously.
-                Smart wait should proceed after fast ones complete; slow one cleaned as stale.
-            </div>
-            <button id="mixedBtn" onclick="triggerMixed()">Trigger Mixed</button>
-            <label for="afterMixedInput">Type here:</label>
-            <input type="text" id="afterMixedInput" placeholder="Should not wait 10s">
-            <div class="log" id="log4"></div>
-        </div>
+    <div id="globalStatus">Status: Ready</div>
 
-        <!-- ===================== SECTION 5: Aborted Requests ===================== -->
-        <div class="section">
-            <h2>5. Aborted Requests (AbortController)</h2>
-            <div class="info">
-                Fires a 10s request, then aborts it after 2s using AbortController.
-                Smart wait should recognize the abort and not keep waiting.
-            </div>
-            <button id="abortBtn" onclick="triggerAbort()">Trigger & Abort (2s)</button>
-            <label for="afterAbortInput">Type here after abort:</label>
-            <input type="text" id="afterAbortInput" placeholder="Should work right after abort">
-            <div class="log" id="log5"></div>
+    <!-- ===================== SECTION 1: Slow Single Request ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>1. Single Slow Request (Stale Cleanup)</h2></div>
+        <div class="info-box">
+            Fires a single 10s delayed API. Smart wait should clean it up as stale after 5s
+            and allow the next action to proceed.
         </div>
+        <button id="slowSingleBtn" onclick="triggerSlowSingle()">Trigger 10s API</button>
+        <label for="afterSlowInput">Type here after triggering:</label>
+        <input type="text" id="afterSlowInput" placeholder="Should work within ~5s, not 10s">
+        <div class="log-box" id="log1"></div>
+    </div>
 
-        <!-- ===================== SECTION 6: Failed Requests ===================== -->
-        <div class="section">
-            <h2>6. Failed Requests (404, CORS, Network Error)</h2>
-            <div class="info">
-                Fires requests that fail: 404 Not Found, CORS blocked, invalid URL.
-                Smart wait should handle failures gracefully — not hang waiting for response.
-            </div>
-            <button id="fail404Btn" onclick="triggerFail404()">Trigger 404</button>
-            <button id="failCorsBtn" class="danger" onclick="triggerFailCors()">Trigger CORS Fail</button>
-            <button id="failNetworkBtn" class="danger" onclick="triggerFailNetwork()">Invalid URL</button>
-            <label for="afterFailInput">Type here after failures:</label>
-            <input type="text" id="afterFailInput" placeholder="Should work immediately after failures">
-            <div class="log" id="log6"></div>
+    <!-- ===================== SECTION 2: Multiple Slow Requests ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>2. Multiple Slow Requests (Batch Stale)</h2></div>
+        <div class="info-box">
+            Fires 3 concurrent requests (6s, 10s, 15s). All should be cleaned as stale
+            after 5s. Smart wait should not wait for any of them.
         </div>
+        <button id="multiSlowBtn" onclick="triggerMultipleSlow()">Trigger 3 Slow APIs</button>
+        <label for="afterMultiInput">Type here after triggering:</label>
+        <input type="text" id="afterMultiInput" placeholder="Should work within ~5s">
+        <div class="log-box" id="log2"></div>
+    </div>
 
-        <!-- ===================== SECTION 7: Redirect Chain ===================== -->
-        <div class="section">
-            <h2>7. Redirect Requests (302 chain)</h2>
-            <div class="info">
-                Fires a request that gets redirected (302). Smart wait should track
-                the final response, not get confused by intermediate redirects.
-            </div>
-            <button id="redirectBtn" onclick="triggerRedirect()">Trigger Redirect</button>
-            <label for="afterRedirectInput">Type here:</label>
-            <input type="text" id="afterRedirectInput" placeholder="Should work after redirect completes">
-            <div class="log" id="log7"></div>
+    <!-- ===================== SECTION 3: Cascading Chain ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>3. Cascading API Chain</h2></div>
+        <div class="info-box">
+            Request A (2s) &rarr; on complete, fires Request B (2s) &rarr; on complete, fires Request C (2s).
+            Total chain: ~6s. Smart wait should track the full chain, not just the first request.
         </div>
+        <button id="cascadeBtn" onclick="triggerCascade()">Start Cascade</button>
+        <label for="afterCascadeInput">Type here after cascade completes:</label>
+        <input type="text" id="afterCascadeInput" placeholder="Should work after chain completes (~6s)">
+        <div class="log-box" id="log3"></div>
+    </div>
 
-        <!-- ===================== SECTION 8: Request During Smart Wait ===================== -->
-        <div class="section">
-            <h2>8. New Request During Smart Wait</h2>
-            <div class="info">
-                Fires a 3s request, then 1.5s later fires another 3s request.
-                Smart wait should handle new requests arriving while already waiting.
-            </div>
-            <button id="duringBtn" onclick="triggerDuringWait()">Trigger Overlapping</button>
-            <label for="afterDuringInput">Type here:</label>
-            <input type="text" id="afterDuringInput" placeholder="Should wait for both to finish">
-            <div class="log" id="log8"></div>
+    <!-- ===================== SECTION 4: Mixed Fast + Slow ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>4. Mixed Fast + Slow Requests</h2></div>
+        <div class="info-box">
+            Fires 5 fast requests (instant) + 1 slow request (10s) simultaneously.
+            Smart wait should proceed after fast ones complete; slow one cleaned as stale.
         </div>
+        <button id="mixedBtn" onclick="triggerMixed()">Trigger Mixed</button>
+        <label for="afterMixedInput">Type here:</label>
+        <input type="text" id="afterMixedInput" placeholder="Should not wait 10s">
+        <div class="log-box" id="log4"></div>
+    </div>
 
-        <!-- ===================== SECTION 9: Retry on Failure ===================== -->
-        <div class="section">
-            <h2>9. Auto-Retry on Failure</h2>
-            <div class="info">
-                Fires a request that fails, then automatically retries (up to 3 times).
-                Smart wait sees multiple request-response cycles.
-            </div>
-            <button id="retryBtn" onclick="triggerRetry()">Trigger Retry</button>
-            <label for="afterRetryInput">Type here:</label>
-            <input type="text" id="afterRetryInput" placeholder="Should work after retries settle">
-            <div class="log" id="log9"></div>
+    <!-- ===================== SECTION 5: Aborted Requests ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>5. Aborted Requests (AbortController)</h2></div>
+        <div class="info-box">
+            Fires a 10s request, then aborts it after 2s using AbortController.
+            Smart wait should recognize the abort and not keep waiting.
         </div>
-    </main>
-    <footer>
-        <p>Smart Wait Test Suite &mdash; LambdaTest QA Automation</p>
-    </footer>
+        <button id="abortBtn" onclick="triggerAbort()">Trigger & Abort (2s)</button>
+        <label for="afterAbortInput">Type here after abort:</label>
+        <input type="text" id="afterAbortInput" placeholder="Should work right after abort">
+        <div class="log-box" id="log5"></div>
+    </div>
+
+    <!-- ===================== SECTION 6: Failed Requests ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>6. Failed Requests (404, CORS, Network Error)</h2></div>
+        <div class="info-box">
+            Fires requests that fail: 404 Not Found, CORS blocked, invalid URL.
+            Smart wait should handle failures gracefully &mdash; not hang waiting for response.
+        </div>
+        <button id="fail404Btn" onclick="triggerFail404()">Trigger 404</button>
+        <button id="failCorsBtn" class="danger" onclick="triggerFailCors()">Trigger CORS Fail</button>
+        <button id="failNetworkBtn" class="danger" onclick="triggerFailNetwork()">Invalid URL</button>
+        <label for="afterFailInput">Type here after failures:</label>
+        <input type="text" id="afterFailInput" placeholder="Should work immediately after failures">
+        <div class="log-box" id="log6"></div>
+    </div>
+
+    <!-- ===================== SECTION 7: Redirect Chain ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>7. Redirect Requests (302 chain)</h2></div>
+        <div class="info-box">
+            Fires a request that gets redirected (302). Smart wait should track
+            the final response, not get confused by intermediate redirects.
+        </div>
+        <button id="redirectBtn" onclick="triggerRedirect()">Trigger Redirect</button>
+        <label for="afterRedirectInput">Type here:</label>
+        <input type="text" id="afterRedirectInput" placeholder="Should work after redirect completes">
+        <div class="log-box" id="log7"></div>
+    </div>
+
+    <!-- ===================== SECTION 8: Request During Smart Wait ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>8. New Request During Smart Wait</h2></div>
+        <div class="info-box">
+            Fires a 3s request, then 1.5s later fires another 3s request.
+            Smart wait should handle new requests arriving while already waiting.
+        </div>
+        <button id="duringBtn" onclick="triggerDuringWait()">Trigger Overlapping</button>
+        <label for="afterDuringInput">Type here:</label>
+        <input type="text" id="afterDuringInput" placeholder="Should wait for both to finish">
+        <div class="log-box" id="log8"></div>
+    </div>
+
+    <!-- ===================== SECTION 9: Retry on Failure ===================== -->
+    <div class="section-card">
+        <div class="section-card-header"><h2>9. Auto-Retry on Failure</h2></div>
+        <div class="info-box">
+            Fires a request that fails, then automatically retries (up to 3 times).
+            Smart wait sees multiple request-response cycles.
+        </div>
+        <button id="retryBtn" onclick="triggerRetry()">Trigger Retry</button>
+        <label for="afterRetryInput">Type here:</label>
+        <input type="text" id="afterRetryInput" placeholder="Should work after retries settle">
+        <div class="log-box" id="log9"></div>
+    </div>
+</main>
+
+<footer class="site-footer">Smart Wait &mdash; Slow &amp; Stale Requests &mdash; KaneAI Test Suite</footer>
 
     <script>
         var reqId = 0;

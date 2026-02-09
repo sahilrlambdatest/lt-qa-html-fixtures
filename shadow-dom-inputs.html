@@ -4,49 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shadow DOM Inputs - SmartWait Test</title>
+    <link rel="stylesheet" href="design-system.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #eceff1 100%); min-height: 100vh; color: #2d3748; }
-        .info { background: linear-gradient(135deg, #eceff1, #e8edf2); padding: 16px 20px; border-radius: 12px; border-left: 4px solid #7c3aed; margin: 20px 0; font-size: 14px; line-height: 1.6; color: #455a64; }
-        .section { background: white; padding: 28px; border-radius: 16px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); }
-        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
-        h2 { color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #7c3aed; padding-bottom: 12px; margin-top: 0; margin-bottom: 20px; }
-        h3 { color: #4a5568; font-size: 16px; margin: 16px 0 8px; }
-        .tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin: 4px 4px 4px 0; }
-        .tag-shadow { background: #ede9fe; color: #7c3aed; }
-        .tag-open { background: #d1fae5; color: #059669; }
-        .tag-closed { background: #fee2e2; color: #dc2626; }
-        .tag-nested { background: #fef3c7; color: #d97706; }
-        .tag-network { background: #dbeafe; color: #2563eb; }
-        p { color: #4a5568; line-height: 1.6; margin: 8px 0; }
-        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #7c3aed; }
-        .result-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin: 8px 0; font-family: monospace; font-size: 13px; min-height: 20px; }
-        button { padding: 10px 20px; cursor: pointer; margin: 8px 8px 8px 0; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(124,58,237,0.3); }
-        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.4); }
+        /* Page-specific: iframe/shadow host styling that can't live in shared CSS */
+        #slotShadowHost [slot="input-slot"] {
+            padding: 10px 14px;
+            width: 100%;
+            max-width: 360px;
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            margin: 8px 0;
+        }
+        #slotShadowHost [slot="label-slot"] {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
 
-<header style="background: linear-gradient(135deg, #7c3aed, #6d28d9); padding: 30px 40px; color: white;">
-    <div style="max-width: 900px; margin: auto;">
-        <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Shadow DOM Inputs</h1>
-        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Test SmartWait & input handling across shadow DOM boundaries</p>
+<div class="glow-container"><div class="glow-inner"></div></div>
+<div class="glow-container glow-2"><div class="glow-inner"></div></div>
+<div class="top-bar"></div>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a class="logo" href="index.html">
+            <div class="logo-icon">LT</div>
+            <div class="logo-text">Shadow DOM <span>Test Fixtures</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="index.html" class="header-btn">
+                <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg>
+                <span class="hide-mobile">Home</span>
+            </a>
+        </nav>
     </div>
 </header>
 
-<main style="max-width: 900px; margin: 30px auto; padding: 0 20px 40px;">
+<main class="container-narrow">
 
-    <div class="info">
+    <div class="page-hero">
+        <h1>Shadow DOM Inputs</h1>
+        <p class="subtitle">Open, closed, and nested shadow DOM with slots, web components, and network activity</p>
+    </div>
+
+    <div class="info-box">
         Tests SmartWait behavior with elements inside <strong>open shadow DOM</strong>, <strong>closed shadow DOM</strong>,
         <strong>nested shadow DOM</strong>, and <strong>shadow DOM with network activity</strong>.
         Each section isolates a different shadow DOM pattern that KaneAI must handle correctly.
     </div>
 
     <!-- Section 1: Open Shadow DOM - Basic Inputs -->
-    <div class="section">
-        <h2>Section 1: Open Shadow DOM — Basic Inputs</h2>
-        <span class="tag tag-shadow">shadow-dom</span>
-        <span class="tag tag-open">open</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 1: Open Shadow DOM — Basic Inputs</h2>
+        </div>
+        <span class="tag shadow">shadow-dom</span>
+        <span class="tag network">open</span>
         <p>Standard inputs inside an open shadow root. KaneAI should be able to pierce and interact.</p>
 
         <div id="openShadowHost1"></div>
@@ -56,10 +75,12 @@
     </div>
 
     <!-- Section 2: Closed Shadow DOM -->
-    <div class="section">
-        <h2>Section 2: Closed Shadow DOM — Inputs</h2>
-        <span class="tag tag-shadow">shadow-dom</span>
-        <span class="tag tag-closed">closed</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 2: Closed Shadow DOM — Inputs</h2>
+        </div>
+        <span class="tag shadow">shadow-dom</span>
+        <span class="tag actions">closed</span>
         <p>Inputs inside a closed shadow root. Standard DOM traversal cannot access these — requires special handling.</p>
 
         <div id="closedShadowHost"></div>
@@ -67,10 +88,12 @@
     </div>
 
     <!-- Section 3: Nested Shadow DOM -->
-    <div class="section">
-        <h2>Section 3: Nested Shadow DOM — 3 Levels Deep</h2>
-        <span class="tag tag-shadow">shadow-dom</span>
-        <span class="tag tag-nested">nested</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 3: Nested Shadow DOM — 3 Levels Deep</h2>
+        </div>
+        <span class="tag shadow">shadow-dom</span>
+        <span class="tag spa">nested</span>
         <p>Input buried 3 shadow roots deep: <code>host → shadow → host → shadow → host → shadow → input</code></p>
 
         <div id="nestedShadowHost"></div>
@@ -78,24 +101,28 @@
     </div>
 
     <!-- Section 4: Shadow DOM with Slots -->
-    <div class="section">
-        <h2>Section 4: Shadow DOM with Slots</h2>
-        <span class="tag tag-shadow">shadow-dom</span>
-        <span class="tag tag-open">slot</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 4: Shadow DOM with Slots</h2>
+        </div>
+        <span class="tag shadow">shadow-dom</span>
+        <span class="tag network">slot</span>
         <p>Light DOM content projected into shadow DOM via <code>&lt;slot&gt;</code>. The input exists in light DOM but renders inside shadow.</p>
 
         <div id="slotShadowHost">
-            <input type="text" id="slottedInput" slot="input-slot" placeholder="I'm in light DOM but rendered in shadow" style="padding:10px 14px;width:100%;max-width:360px;border:1.5px solid #d2d6dc;border-radius:10px;font-size:14px;margin:8px 0;">
-            <span slot="label-slot" style="font-weight:600;color:#4a5568;">Slotted Label:</span>
+            <input type="text" id="slottedInput" slot="input-slot" placeholder="I'm in light DOM but rendered in shadow">
+            <span slot="label-slot">Slotted Label:</span>
         </div>
         <div class="result-box" id="slotResult">Slot output will appear here</div>
     </div>
 
     <!-- Section 5: Shadow DOM with Network Activity -->
-    <div class="section">
-        <h2>Section 5: Shadow DOM with Network Activity</h2>
-        <span class="tag tag-shadow">shadow-dom</span>
-        <span class="tag tag-network">network</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 5: Shadow DOM with Network Activity</h2>
+        </div>
+        <span class="tag shadow">shadow-dom</span>
+        <span class="tag network">network</span>
         <p>Shadow DOM component that makes fetch calls on interaction. Tests SmartWait's network idle detection for requests originating inside shadow DOM.</p>
 
         <div id="networkShadowHost"></div>
@@ -103,10 +130,12 @@
     </div>
 
     <!-- Section 6: Shadow DOM Form (multiple inputs) -->
-    <div class="section">
-        <h2>Section 6: Shadow DOM Form — Multiple Inputs</h2>
-        <span class="tag tag-shadow">shadow-dom</span>
-        <span class="tag tag-open">form</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 6: Shadow DOM Form — Multiple Inputs</h2>
+        </div>
+        <span class="tag shadow">shadow-dom</span>
+        <span class="tag network">form</span>
         <p>A complete form inside shadow DOM. Tests Fix 5 (redundant SmartWait removal) with multiple sequential inputs inside shadow.</p>
 
         <div id="formShadowHost"></div>
@@ -114,10 +143,12 @@
     </div>
 
     <!-- Section 7: Custom Elements with Shadow DOM -->
-    <div class="section">
-        <h2>Section 7: Custom Elements (Web Components)</h2>
-        <span class="tag tag-shadow">shadow-dom</span>
-        <span class="tag tag-open">custom-element</span>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Section 7: Custom Elements (Web Components)</h2>
+        </div>
+        <span class="tag shadow">shadow-dom</span>
+        <span class="tag network">custom-element</span>
         <p>Proper Web Components using <code>customElements.define()</code>. Tests KaneAI interaction with real-world component patterns.</p>
 
         <lt-text-input id="customInput1" label="Username" placeholder="Enter username"></lt-text-input>
@@ -128,8 +159,8 @@
 
 </main>
 
-<footer style="background: #4c1d95; color: rgba(255,255,255,0.7); text-align: center; padding: 20px 40px; font-size: 13px;">
-    <p style="color: rgba(255,255,255,0.7); margin: 0;">Shadow DOM Test Page &mdash; KaneAI SmartWait Test Suite</p>
+<footer class="site-footer">
+    Shadow DOM Test Page &mdash; KaneAI SmartWait Test Suite
 </footer>
 
 <script>

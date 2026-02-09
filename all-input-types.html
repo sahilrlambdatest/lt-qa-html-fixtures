@@ -2,146 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Input Types & States</title>
+    <link rel="stylesheet" href="design-system.css">
     <style>
-        body { font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%); margin: 0; padding: 0; min-height: 100vh; color: #2d3748; }
-        .section { background: white; border: none; padding: 28px; margin: 24px 0; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); transition: box-shadow 0.2s; }
-        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
-        .section h2 { margin-top: 0; color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #4CAF50; padding-bottom: 12px; margin-bottom: 20px; }
-        label { display: block; margin: 16px 0 6px; font-weight: 600; font-size: 14px; color: #4a5568; }
-        input, textarea { padding: 10px 14px; width: 100%; max-width: 400px; display: block; margin-bottom: 4px; border: 1.5px solid #d2d6dc; border-radius: 10px; font-size: 14px; color: #2d3748; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; outline: none; font-family: inherit; box-sizing: border-box; }
-        input:focus, textarea:focus { border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.15); }
-        textarea { width: 100%; max-width: 440px; }
-        .hint { font-size: 12px; color: #a0aec0; margin-bottom: 12px; display: block; }
-        button { padding: 11px 28px; cursor: pointer; margin: 15px 8px 0 0; background: linear-gradient(135deg, #4CAF50, #43A047); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(76,175,80,0.3); }
-        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(76,175,80,0.4); }
-        button:active { transform: translateY(0); }
-        #result { margin-top: 15px; padding: 14px; background: #f7fafc; border: 1.5px solid #e2e8f0; min-height: 30px; border-radius: 10px; font-size: 14px; color: #4a5568; }
-        /* ===== INPUT VALUE MONITOR BAR ===== */
-        #inputMonitorBar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            color: #e2e8f0;
-            z-index: 99999;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.15);
-            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
-            padding: 0 16px;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
-            font-size: 12px;
-            height: 40px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-        }
-        #inputMonitorBar .monitor-title {
-            color: #a5b4fc;
-            font-weight: 700;
-            white-space: nowrap;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 4px 10px;
-            background: rgba(99, 102, 241, 0.15);
-            border-radius: 6px;
-            border: 1px solid rgba(99, 102, 241, 0.25);
-            margin-right: 4px;
-        }
-        #inputMonitorBar .monitor-divider {
-            width: 1px;
-            height: 20px;
-            background: rgba(148, 163, 184, 0.2);
-            margin: 0 4px;
-            flex-shrink: 0;
-        }
-        #inputMonitorBar .monitor-field {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: background 0.15s ease;
-        }
-        #inputMonitorBar .monitor-field:hover {
-            background: rgba(148, 163, 184, 0.08);
-        }
-        #inputMonitorBar .monitor-label {
-            color: #94a3b8;
-            font-size: 10px;
-            white-space: nowrap;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        #inputMonitorBar .monitor-value {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(51, 65, 85, 0.8);
-            padding: 2px 8px;
-            border-radius: 4px;
-            color: #34d399;
-            min-width: 80px;
-            max-width: 220px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 11px;
-            font-weight: 500;
-            transition: all 0.15s ease;
-        }
-        #inputMonitorBar .monitor-value.js-injected {
-            color: #f87171;
-            border-color: rgba(248, 113, 113, 0.3);
-            background: rgba(127, 29, 29, 0.2);
-        }
-        #inputMonitorBar .monitor-value.match {
-            color: #34d399;
-        }
-        #inputMonitorBar .monitor-source {
-            font-size: 9px;
-            padding: 2px 7px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.15s ease;
-        }
-        #inputMonitorBar .source-real {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.25);
-        }
-        #inputMonitorBar .source-js {
-            background: rgba(239, 68, 68, 0.12);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.25);
-        }
-        #inputMonitorBar .monitor-element-id {
-            color: #fbbf24;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        #inputMonitorBar .monitor-value.group-val {
-            color: #fbbf24;
-            border-color: rgba(251, 191, 36, 0.3);
-            background: rgba(120, 53, 15, 0.2);
-            font-size: 13px;
-            letter-spacing: 3px;
-            font-weight: 700;
-        }
-        #inputMonitorBar .monitor-group-label {
-            color: #fbbf24;
-            font-size: 10px;
-            font-weight: 600;
-        }
+        /* Page-specific overrides only */
     </style>
 </head>
-<body>
+<body class="has-monitor">
 <!-- INPUT VALUE MONITOR BAR -->
 <div id="inputMonitorBar">
     <span class="monitor-title">Input Monitor</span>
@@ -177,18 +45,37 @@
     </div>
 </div>
 
-<header style="background: linear-gradient(135deg, #4CAF50, #2E7D32); padding: 30px 40px; margin-top: 48px; color: white;">
-    <div style="max-width: 800px; margin: auto;">
-        <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">All Input Types & States</h1>
-        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Comprehensive test page for every HTML input type, element type, and field state</p>
+<div class="glow-container"><div class="glow-inner"></div></div>
+<div class="glow-container glow-2"><div class="glow-inner"></div></div>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">LT</div>
+            <div class="logo-text">All Input Types</div>
+        </a>
+        <nav class="header-nav">
+            <a href="index.html" class="header-btn">
+                <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10H5M5 10l4-4M5 10l4 4"/></svg>
+                <span class="hide-mobile">All Pages</span>
+            </a>
+        </nav>
     </div>
 </header>
 
-<main style="max-width: 800px; margin: 30px auto; padding: 0 20px 40px;">
+<main class="container-narrow">
+
+<div class="page-hero">
+    <h1>All Input Types & States</h1>
+    <p class="subtitle">Comprehensive test page for every HTML input type, element type, and field state</p>
+</div>
 
     <!-- SECTION: Input Type Attributes (C2) -->
-    <div class="section">
-        <h2>Input Type Attributes</h2>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Input Type Attributes</h2>
+            <span class="badge">INPUT TYPES</span>
+        </div>
 
         <label for="text">Standard Text (type="text")</label>
         <input type="text" id="text" placeholder="Enter any text">
@@ -232,8 +119,11 @@
     </div>
 
     <!-- SECTION: Element Types (C1) -->
-    <div class="section">
-        <h2>Element Types</h2>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Element Types</h2>
+            <span class="badge">ELEMENTS</span>
+        </div>
 
         <label for="textarea">Comments (textarea)</label>
         <textarea id="textarea" rows="4" placeholder="Multi-line text..."></textarea>
@@ -256,8 +146,11 @@
     </div>
 
     <!-- SECTION: Field States (C5) -->
-    <div class="section">
-        <h2>Field States</h2>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Field States</h2>
+            <span class="badge">STATES</span>
+        </div>
 
         <label for="prefilled">Prefilled</label>
         <input type="text" id="prefilled" value="Pre-existing value">
@@ -301,8 +194,11 @@
     </div>
 
     <!-- SECTION: Complete Form (for consecutive input testing) -->
-    <div class="section">
-        <h2>Complete Form (for consecutive input testing)</h2>
+    <div class="section-card">
+        <div class="section-card-header">
+            <h2>Complete Form (for consecutive input testing)</h2>
+            <span class="badge">FORM</span>
+        </div>
         <form id="testForm" onsubmit="handleSubmit(event)">
             <label for="firstName">First Name</label>
             <input type="text" id="firstName" name="firstName" placeholder="John">
@@ -317,7 +213,7 @@
 
 </main>
 
-<footer style="text-align: center; padding: 30px 20px; color: #a0aec0; font-size: 13px; border-top: 1px solid #e2e8f0; margin-top: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+<footer class="site-footer">
     KaneAI Test Suite &mdash; All Input Types & States &mdash; Smart Wait & Input Optimization Testing
 </footer>
 

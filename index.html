@@ -4,95 +4,203 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LT QA HTML Test Fixtures</title>
+    <link rel="stylesheet" href="design-system.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { font-size: 2rem; margin-bottom: 0.5rem; color: #f8fafc; }
-        .subtitle { color: #94a3b8; margin-bottom: 2rem; font-size: 0.95rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.5rem; transition: all 0.2s; text-decoration: none; color: inherit; display: block; }
-        .card:hover { border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.15); }
-        .card h3 { color: #f1f5f9; margin-bottom: 0.5rem; font-size: 1.05rem; }
-        .card p { color: #94a3b8; font-size: 0.85rem; line-height: 1.5; }
-        .tag { display: inline-block; background: #1e3a5f; color: #60a5fa; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-top: 0.75rem; margin-right: 4px; }
-        .tag.network { background: #1e3a2f; color: #4ade80; }
-        .tag.input { background: #3b1e5f; color: #c084fc; }
-        .tag.spa { background: #5f3b1e; color: #fb923c; }
-        .tag.shadow { background: #2e1065; color: #c084fc; }
-        .tag.iframe { background: #083344; color: #22d3ee; }
-        .section-label { color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #334155; }
+        .hero-title {
+            background: linear-gradient(135deg, #ededef 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-row {
+            display: flex;
+            gap: 24px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-num {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 14px;
+            background: var(--bg-secondary);
+            box-shadow: inset 0 0 0 1px var(--border-subtle);
+        }
+        .card-arrow {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 20px;
+            height: 20px;
+            color: var(--text-muted);
+            transition: all var(--transition-fast);
+        }
+        .card:hover .card-arrow {
+            color: var(--accent);
+            transform: translate(2px, -2px);
+        }
+        @media (max-width: 640px) {
+            .stat-row { gap: 16px; }
+            .stat-num { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>LT QA HTML Test Fixtures</h1>
-        <p class="subtitle">KaneAI SmartWait & Input testing pages. Use these with KaneAI test authoring for validation.</p>
-        <p class="section-label">All Interactions</p>
-        <div class="grid">
-            <a href="all-interaction-types.html" class="card">
-                <h3>All Interaction Types</h3>
-                <p>Every KaneAI action: click (single/double/right/hold), hover (tooltips/menus), drag-and-drop, scroll, keyboard shortcuts, file upload, date pickers, toggles, contenteditable.</p>
-                <span class="tag" style="background:#4c0519;color:#fda4af;">all-actions</span><span class="tag">SmartWait</span><span class="tag input">input</span>
-            </a>
-        </div>
 
-        <p class="section-label">Input Testing</p>
-        <div class="grid">
-            <a href="all-input-types.html" class="card">
-                <h3>All Input Types</h3>
-                <p>Every HTML5 input type: text, email, password, number, date, range, color, file, checkbox, radio, select, textarea, and more.</p>
-                <span class="tag input">input</span><span class="tag">SmartWait</span>
-            </a>
-            <a href="special-input-patterns.html" class="card">
-                <h3>Special Input Patterns</h3>
-                <p>Autocomplete, masked inputs, debounced search, OTP fields, contenteditable, drag-to-set values, and other non-standard patterns.</p>
-                <span class="tag input">input</span><span class="tag">edge-case</span>
-            </a>
-            <a href="input-behaviors.html" class="card">
-                <h3>Input Behaviors</h3>
-                <p>Dynamic validation, conditional fields, character counters, auto-formatting, dependent dropdowns, and input state machines.</p>
-                <span class="tag input">input</span><span class="tag">dynamic</span>
-            </a>
-        </div>
+<div class="top-bar"></div>
+<div class="glow-container"><div class="glow-inner"></div></div>
+<div class="glow-container glow-2"><div class="glow-inner"></div></div>
 
-        <p class="section-label">SmartWait & Network</p>
-        <div class="grid">
-            <a href="static-no-network.html" class="card">
-                <h3>Static (No Network)</h3>
-                <p>Pure static page with zero network requests after load. Ideal baseline for SmartWait idle detection testing.</p>
-                <span class="tag">SmartWait</span><span class="tag network">no-network</span>
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">LT</div>
+            <div class="logo-text">QA Fixtures <span>v1.0</span></div>
+        </a>
+        <nav class="header-nav">
+            <a href="https://github.com/sahilrlambdatest/lt-qa-html-fixtures" target="_blank" class="header-btn">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                <span class="hide-mobile">GitHub</span>
             </a>
-            <a href="continuous-pings.html" class="card">
-                <h3>Continuous Pings</h3>
-                <p>Page that continuously sends network requests (polling, heartbeats). Tests SmartWait behavior with never-idle networks.</p>
-                <span class="tag">SmartWait</span><span class="tag network">network</span>
-            </a>
-            <a href="slow-api-page.html" class="card">
-                <h3>Slow API Page</h3>
-                <p>Simulates slow API responses with configurable delays. Tests SmartWait timeout and stale request handling.</p>
-                <span class="tag">SmartWait</span><span class="tag network">slow-network</span>
-            </a>
-            <a href="dynamic-content-spa.html" class="card">
-                <h3>Dynamic Content SPA</h3>
-                <p>Single Page Application with client-side routing, lazy-loaded content, and route transitions. Tests SmartWait across SPA navigation.</p>
-                <span class="tag spa">SPA</span><span class="tag">SmartWait</span><span class="tag network">network</span>
-            </a>
-        </div>
+        </nav>
+    </div>
+</header>
 
-        <p class="section-label">DOM Boundaries (Shadow DOM & Iframes)</p>
-        <div class="grid">
-            <a href="shadow-dom-inputs.html" class="card">
-                <h3>Shadow DOM Inputs</h3>
-                <p>Open, closed, and nested shadow DOM (3 levels deep). Slots, web components, and shadow DOM with network activity.</p>
-                <span class="tag shadow">shadow-dom</span><span class="tag input">input</span><span class="tag">SmartWait</span>
-            </a>
-            <a href="iframe-interactions.html" class="card">
-                <h3>Iframe Interactions</h3>
-                <p>Same-origin iframes, nested iframes (3 deep), iframes with fetch/polling, dynamic iframe creation, and assertable iframe content.</p>
-                <span class="tag iframe">iframe</span><span class="tag input">input</span><span class="tag network">network</span>
-            </a>
+<main class="container">
+    <div class="page-hero fade-in">
+        <h1 class="hero-title">LT QA HTML Test Fixtures</h1>
+        <p class="subtitle">KaneAI SmartWait & Input testing pages. Purpose-built HTML surfaces for validating browser automation across every interaction pattern, DOM boundary, and network condition.</p>
+        <div class="stat-row">
+            <div class="stat">
+                <div class="stat-num">11</div>
+                <div class="stat-label">Test<br>Pages</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">50+</div>
+                <div class="stat-label">Input<br>Types</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">10</div>
+                <div class="stat-label">Interaction<br>Patterns</div>
+            </div>
         </div>
     </div>
+
+    <div class="section-label">All Interactions</div>
+    <div class="card-grid">
+        <a href="all-interaction-types.html" class="card fade-in">
+            <div class="card-icon">&#9881;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>All Interaction Types</h3>
+            <p>Every KaneAI action: click (single/double/right/hold), hover (tooltips/menus), drag-and-drop, scroll, keyboard shortcuts, file upload, date pickers, toggles, contenteditable.</p>
+            <span class="tag actions">all-actions</span><span class="tag">SmartWait</span><span class="tag input">input</span>
+        </a>
+    </div>
+
+    <div class="section-label">Input Testing</div>
+    <div class="card-grid">
+        <a href="all-input-types.html" class="card fade-in">
+            <div class="card-icon">&#9000;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>All Input Types</h3>
+            <p>Every HTML5 input type: text, email, password, number, date, range, color, file, checkbox, radio, select, textarea, and more.</p>
+            <span class="tag input">input</span><span class="tag">SmartWait</span>
+        </a>
+        <a href="special-input-patterns.html" class="card fade-in">
+            <div class="card-icon">&#10022;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>Special Input Patterns</h3>
+            <p>Autocomplete, masked inputs, debounced search, OTP fields, contenteditable, drag-to-set values, and other non-standard patterns.</p>
+            <span class="tag input">input</span><span class="tag">edge-case</span>
+        </a>
+        <a href="input-behaviors.html" class="card fade-in">
+            <div class="card-icon">&#8644;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>Input Behaviors</h3>
+            <p>Dynamic validation, conditional fields, character counters, auto-formatting, dependent dropdowns, and input state machines.</p>
+            <span class="tag input">input</span><span class="tag">dynamic</span>
+        </a>
+    </div>
+
+    <div class="section-label">SmartWait & Network</div>
+    <div class="card-grid">
+        <a href="static-no-network.html" class="card fade-in">
+            <div class="card-icon">&#9898;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>Static (No Network)</h3>
+            <p>Pure static page with zero network requests after load. Ideal baseline for SmartWait idle detection testing.</p>
+            <span class="tag">SmartWait</span><span class="tag network">no-network</span>
+        </a>
+        <a href="continuous-pings.html" class="card fade-in">
+            <div class="card-icon">&#8635;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>Continuous Pings</h3>
+            <p>Page that continuously sends network requests (polling, heartbeats). Tests SmartWait behavior with never-idle networks.</p>
+            <span class="tag">SmartWait</span><span class="tag network">network</span>
+        </a>
+        <a href="slow-api-page.html" class="card fade-in">
+            <div class="card-icon">&#9201;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>Slow API Page</h3>
+            <p>Simulates slow API responses with configurable delays. Tests SmartWait timeout and stale request handling.</p>
+            <span class="tag">SmartWait</span><span class="tag network">slow-network</span>
+        </a>
+        <a href="dynamic-content-spa.html" class="card fade-in">
+            <div class="card-icon">&#9672;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>Dynamic Content SPA</h3>
+            <p>Single Page Application with client-side routing, lazy-loaded content, and route transitions. Tests SmartWait across SPA navigation.</p>
+            <span class="tag spa">SPA</span><span class="tag">SmartWait</span><span class="tag network">network</span>
+        </a>
+    </div>
+
+    <div class="section-label">DOM Boundaries</div>
+    <div class="card-grid">
+        <a href="shadow-dom-inputs.html" class="card fade-in">
+            <div class="card-icon">&#9670;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>Shadow DOM Inputs</h3>
+            <p>Open, closed, and nested shadow DOM (3 levels deep). Slots, web components, and shadow DOM with network activity.</p>
+            <span class="tag shadow">shadow-dom</span><span class="tag input">input</span><span class="tag">SmartWait</span>
+        </a>
+        <a href="iframe-interactions.html" class="card fade-in">
+            <div class="card-icon">&#9634;</div>
+            <svg class="card-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H8M15 5v7"/></svg>
+            <h3>Iframe Interactions</h3>
+            <p>Same-origin iframes, nested iframes (3 deep), iframes with fetch/polling, dynamic iframe creation, and assertable iframe content.</p>
+            <span class="tag iframe">iframe</span><span class="tag input">input</span><span class="tag network">network</span>
+        </a>
+    </div>
+</main>
+
+<footer class="site-footer">
+    LT QA HTML Test Fixtures &mdash; Built for <a href="#">KaneAI</a> SmartWait & Input Testing
+</footer>
+
 </body>
 </html>
