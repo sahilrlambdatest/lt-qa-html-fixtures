@@ -23,7 +23,7 @@
     </style>
 </head>
 <body class="has-monitor">
-<script>(function(){var t=localStorage.getItem('lt-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>(function(){var t=localStorage.getItem('lt-theme')||(window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();</script>
 <!-- INPUT VALUE MONITOR BAR -->
 <div id="inputMonitorBar">
     <span class="monitor-title">Input Monitor</span>
@@ -536,6 +536,27 @@ document.getElementById('themeToggle').addEventListener('click', function() {
     html.setAttribute('data-theme', next);
     localStorage.setItem('lt-theme', next);
 });
+</script>
+<script>
+(function() {
+    var g1 = document.querySelector('.glow-container:not(.glow-2)');
+    var g2 = document.querySelector('.glow-container.glow-2');
+    if (!g1) return;
+    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    var cx = mx, cy = my, cx2 = mx, cy2 = my;
+    g1.style.transform = 'translate(' + (mx - 400) + 'px,' + (my - 400) + 'px)';
+    if (g2) g2.style.transform = 'translate(' + (mx - 300) + 'px,' + (my - 300) + 'px)';
+    document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
+    (function loop() {
+        cx += (mx - cx) * 0.08;
+        cy += (my - cy) * 0.08;
+        cx2 += (mx - cx2) * 0.035;
+        cy2 += (my - cy2) * 0.035;
+        g1.style.transform = 'translate(' + (cx - 400) + 'px,' + (cy - 400) + 'px)';
+        if (g2) g2.style.transform = 'translate(' + (cx2 - 300) + 'px,' + (cy2 - 300) + 'px)';
+        requestAnimationFrame(loop);
+    })();
+})();
 </script>
 </body>
 </html>
