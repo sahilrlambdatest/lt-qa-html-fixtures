@@ -761,7 +761,7 @@ button.danger {
 /* --- Input Value Monitor — Dynamic Island Capsule --- */
 #inputMonitorBar {
     position: fixed;
-    top: 8px;
+    top: 72px;
     left: 50%;
     transform: translateX(-50%);
     background: rgb(24, 24, 27);
@@ -916,8 +916,8 @@ button.danger {
     box-shadow: 0 4px 24px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06);
 }
 
-/* Monitor capsule sits above header — push header below it */
-body.has-monitor .site-header { top: 52px; }
+/* Monitor capsule sits below header */
+body.has-monitor .site-header { top: 0; }
 body.has-monitor .top-bar { display: none; }
 body.has-monitor .page-hero { padding-top: 56px; }
 
