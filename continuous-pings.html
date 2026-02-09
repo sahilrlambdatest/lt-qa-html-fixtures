@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Wait — Continuous & Persistent Connections</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #fff0f3 0%, #fce4ec 100%); margin: 0; padding: 0; min-height: 100vh; color: #2d3748; }
+        h2 { color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #E91E63; padding-bottom: 12px; margin-top: 0; margin-bottom: 20px; }
+        button { padding: 11px 22px; cursor: pointer; margin: 5px 6px 5px 0; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+        button:hover { transform: translateY(-1px); }
+        .btn-pink { background: linear-gradient(135deg, #E91E63, #C2185B); box-shadow: 0 2px 6px rgba(233,30,99,0.3); }
+        .btn-teal { background: linear-gradient(135deg, #009688, #00796B); box-shadow: 0 2px 6px rgba(0,150,136,0.3); }
+        .btn-orange { background: linear-gradient(135deg, #FF9800, #EF6C00); box-shadow: 0 2px 6px rgba(255,152,0,0.3); }
+        .btn-red { background: linear-gradient(135deg, #f44336, #C62828); box-shadow: 0 2px 6px rgba(244,67,54,0.3); }
+        .btn-blue { background: linear-gradient(135deg, #2196F3, #1565C0); box-shadow: 0 2px 6px rgba(33,150,243,0.3); }
+        input { padding: 10px 14px; width: 100%; max-width: 360px; margin: 8px 0; border: 1.5px solid #d2d6dc; border-radius: 10px; display: block; font-size: 14px; font-family: inherit; outline: none; transition: all 0.2s; }
+        input:focus { border-color: #E91E63; box-shadow: 0 0 0 3px rgba(233,30,99,0.15); }
+        .info { padding: 16px 20px; border-radius: 12px; margin: 12px 0; font-size: 13px; line-height: 1.6; }
+        .info-pink { background: linear-gradient(135deg, #fce4ec, #f8bbd0); border-left: 4px solid #E91E63; color: #880E4F; }
+        .info-teal { background: linear-gradient(135deg, #e0f2f1, #b2dfdb); border-left: 4px solid #009688; color: #004D40; }
+        .info-orange { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-left: 4px solid #FF9800; color: #E65100; }
+        .section { background: #ffffff; padding: 28px; border-radius: 16px; margin: 20px 0; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .log { background: #fafafa; padding: 12px; max-height: 130px; overflow-y: auto; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; border-radius: 10px; margin-top: 10px; border: 1px solid #e2e8f0; }
+        .status-badge { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; margin: 6px 0; }
+        .active { background: #c8e6c9; color: #2e7d32; }
+        .stopped { background: #ffcdd2; color: #c62828; }
+        .counter { color: #718096; font-size: 13px; margin: 6px 0; font-weight: 500; }
+        label { font-weight: 600; display: block; margin-top: 10px; font-size: 14px; color: #4a5568; }
+        /* ===== INPUT VALUE MONITOR BAR ===== */
+        #inputMonitorBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #e2e8f0;
+            z-index: 99999;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 12px;
+            height: 40px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        #inputMonitorBar .monitor-title {
+            color: #a5b4fc;
+            font-weight: 700;
+            white-space: nowrap;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            margin-right: 4px;
+        }
+        #inputMonitorBar .monitor-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(148, 163, 184, 0.2);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+        #inputMonitorBar .monitor-field {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        #inputMonitorBar .monitor-field:hover {
+            background: rgba(148, 163, 184, 0.08);
+        }
+        #inputMonitorBar .monitor-label {
+            color: #94a3b8;
+            font-size: 10px;
+            white-space: nowrap;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #inputMonitorBar .monitor-value {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #34d399;
+            min-width: 80px;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .monitor-value.js-injected {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+        }
+        #inputMonitorBar .monitor-value.match {
+            color: #34d399;
+        }
+        #inputMonitorBar .monitor-source {
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .source-real {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        #inputMonitorBar .source-js {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        #inputMonitorBar .monitor-element-id {
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        #inputMonitorBar .monitor-value.group-val {
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(120, 53, 15, 0.2);
+            font-size: 13px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        #inputMonitorBar .monitor-group-label {
+            color: #fbbf24;
+            font-size: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- INPUT VALUE MONITOR BAR -->
+<div id="inputMonitorBar">
+    <span class="monitor-title">Input Monitor</span>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Active:</span>
+        <span class="monitor-element-id" id="monitorActiveField">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Event Value:</span>
+        <span class="monitor-value" id="monitorEventValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">.value:</span>
+        <span class="monitor-value" id="monitorDomValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Source:</span>
+        <span class="monitor-source" id="monitorSource">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Keys:</span>
+        <span class="monitor-value" id="monitorKeyLog" style="max-width:200px;">—</span>
+    </div>
+    <div class="monitor-divider" id="monitorGroupDivider" style="display:none;"></div>
+    <div class="monitor-field" id="monitorGroupSection" style="display:none;">
+        <span class="monitor-group-label" id="monitorGroupLabel">—</span>
+        <span class="monitor-value group-val" id="monitorGroupValue">—</span>
+    </div>
+</div>
+
+    <header style="background: linear-gradient(135deg, #E91E63, #AD1457); padding: 30px 40px; margin-top: 48px; color: white;">
+        <div style="max-width: 800px; margin: auto;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Smart Wait &mdash; Continuous &amp; Persistent Connections</h1>
+            <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Fetch pings, XHR polling, WebSocket, SSE, Long Polling &amp; Kitchen Sink</p>
+        </div>
+    </header>
+
+    <main style="max-width: 800px; margin: 30px auto; padding: 0 20px 40px;">
+
+        <!-- ===================== SECTION 1: Analytics Pings (fetch) ===================== -->
+        <div class="section">
+            <h2>1. Continuous Analytics Pings (fetch every 500ms)</h2>
+            <div class="info info-pink">
+                Simulates analytics beacons via fetch() every 500ms. Smart wait should NOT
+                block indefinitely — these are "background noise" requests.
+            </div>
+            <span id="ping1Status" class="status-badge active">Active</span>
+            <p class="counter" id="ping1Count">Pings sent: 0</p>
+            <button class="btn-pink" onclick="startFetchPings()">Start Pings</button>
+            <button class="btn-red" onclick="stopFetchPings()">Stop Pings</button>
+            <label for="ping1Input">Type here while pings are active:</label>
+            <input type="text" id="ping1Input" placeholder="Should work despite continuous pings">
+            <button class="btn-pink" id="ping1ActionBtn">Click Me (during pings)</button>
+            <div class="log" id="log1"></div>
+        </div>
+
+        <!-- ===================== SECTION 2: XHR Polling ===================== -->
+        <div class="section">
+            <h2>2. XHR Polling (XMLHttpRequest every 1s)</h2>
+            <div class="info info-orange">
+                Uses old-style XMLHttpRequest polling every 1s. Smart wait should handle
+                XHR the same as fetch — not block on continuous polls.
+            </div>
+            <span id="xhrStatus" class="status-badge active">Active</span>
+            <p class="counter" id="xhrCount">Polls: 0</p>
+            <button class="btn-orange" onclick="startXhrPolling()">Start XHR Poll</button>
+            <button class="btn-red" onclick="stopXhrPolling()">Stop XHR Poll</button>
+            <label for="xhrInput">Type here while XHR polls:</label>
+            <input type="text" id="xhrInput" placeholder="Should work despite XHR polling">
+            <div class="log" id="log2"></div>
+        </div>
+
+        <!-- ===================== SECTION 3: Beacon API ===================== -->
+        <div class="section">
+            <h2>3. Navigator.sendBeacon (fire-and-forget)</h2>
+            <div class="info info-pink">
+                Uses navigator.sendBeacon() — fire-and-forget requests with no response.
+                Smart wait should not track these at all (no response expected).
+            </div>
+            <p class="counter" id="beaconCount">Beacons sent: 0</p>
+            <button class="btn-pink" onclick="startBeacons()">Start Beacons</button>
+            <button class="btn-red" onclick="stopBeacons()">Stop Beacons</button>
+            <label for="beaconInput">Type here while beacons fire:</label>
+            <input type="text" id="beaconInput" placeholder="Should work — beacons are fire-and-forget">
+            <div class="log" id="log3"></div>
+        </div>
+
+        <!-- ===================== SECTION 4: WebSocket ===================== -->
+        <div class="section">
+            <h2>4. WebSocket (persistent connection + pings)</h2>
+            <div class="info info-teal">
+                Active WebSocket with periodic ping frames every 2s.
+                Smart wait should NOT count WebSocket frames as pending HTTP requests.
+            </div>
+            <span id="wsStatus" class="status-badge stopped">Disconnected</span>
+            <button class="btn-teal" onclick="connectWs()">Connect</button>
+            <button class="btn-red" onclick="closeWs()">Disconnect</button>
+            <label for="wsInput">Type here while WebSocket is active:</label>
+            <input type="text" id="wsInput" placeholder="Should work despite active WebSocket">
+            <button class="btn-teal" onclick="sendWsMsg()">Send WS Message</button>
+            <div class="log" id="log4"></div>
+        </div>
+
+        <!-- ===================== SECTION 5: Server-Sent Events (SSE) ===================== -->
+        <div class="section">
+            <h2>5. Server-Sent Events (SSE / EventSource)</h2>
+            <div class="info info-teal">
+                SSE connection receives server-pushed events. Smart wait should NOT count
+                the open SSE connection as a pending request.
+            </div>
+            <span id="sseStatus" class="status-badge stopped">Disconnected</span>
+            <p class="counter" id="sseCount">Events received: 0</p>
+            <button class="btn-teal" onclick="connectSse()">Connect SSE</button>
+            <button class="btn-red" onclick="closeSse()">Close SSE</button>
+            <label for="sseInput">Type here while SSE is active:</label>
+            <input type="text" id="sseInput" placeholder="Should work despite SSE stream">
+            <div class="log" id="log5"></div>
+        </div>
+
+        <!-- ===================== SECTION 6: Long Polling ===================== -->
+        <div class="section">
+            <h2>6. Long Polling (request held open for 5s)</h2>
+            <div class="info info-orange">
+                Simulates long-polling: request is held open for 5s, then on response,
+                immediately issues another. Always one pending request.
+            </div>
+            <span id="lpStatus" class="status-badge stopped">Inactive</span>
+            <p class="counter" id="lpCount">Polls: 0</p>
+            <button class="btn-orange" onclick="startLongPoll()">Start Long Poll</button>
+            <button class="btn-red" onclick="stopLongPoll()">Stop Long Poll</button>
+            <label for="lpInput">Type here during long polling:</label>
+            <input type="text" id="lpInput" placeholder="Smart wait should handle held-open request">
+            <div class="log" id="log6"></div>
+        </div>
+
+        <!-- ===================== SECTION 7: ALL AT ONCE ===================== -->
+        <div class="section">
+            <h2>7. Kitchen Sink — All Patterns Simultaneously</h2>
+            <div class="info info-pink">
+                Starts ALL continuous patterns at once: fetch pings + XHR poll + WebSocket +
+                SSE + long polling. This is the stress test for smart wait.
+            </div>
+            <button class="btn-blue" onclick="startAll()">Start ALL</button>
+            <button class="btn-red" onclick="stopAll()">Stop ALL</button>
+            <label for="kitchenInput">Type here with everything running:</label>
+            <input type="text" id="kitchenInput" placeholder="The ultimate smart wait test">
+            <button class="btn-blue" id="kitchenBtn">Click Me (all patterns active)</button>
+        </div>
+
+    </main>
+
+    <footer style="background: linear-gradient(135deg, #E91E63, #AD1457); color: white; text-align: center; padding: 24px 20px; font-size: 13px; opacity: 0.95;">
+        Smart Wait Test Suite &mdash; Continuous &amp; Persistent Connections
+    </footer>
+
+    <script>
+        function ts() { return new Date().toLocaleTimeString(); }
+        function gid(id) { return document.getElementById(id); }
+        function logTo(logId, msg) {
+            var d = document.createElement('div');
+            d.textContent = ts() + ' ' + msg;
+            var el = gid(logId);
+            el.insertBefore(d, el.firstChild);
+        }
+
+        // ===== 1. Fetch Pings =====
+        var fetchPingInterval, fetchPingCount = 0;
+        function startFetchPings() {
+            stopFetchPings();
+            fetchPingCount = 0;
+            gid('ping1Status').textContent = 'Active'; gid('ping1Status').className = 'status-badge active';
+            fetchPingInterval = setInterval(function() {
+                fetchPingCount++;
+                gid('ping1Count').textContent = 'Pings sent: ' + fetchPingCount;
+                fetch('https://httpbin.org/get?ping=' + fetchPingCount + '&t=' + Date.now(), { mode: 'no-cors' }).catch(function(){});
+            }, 500);
+            logTo('log1', 'Fetch pings started (every 500ms)');
+        }
+        function stopFetchPings() {
+            clearInterval(fetchPingInterval);
+            gid('ping1Status').textContent = 'Stopped'; gid('ping1Status').className = 'status-badge stopped';
+            logTo('log1', 'Fetch pings stopped at count ' + fetchPingCount);
+        }
+
+        // ===== 2. XHR Polling =====
+        var xhrPollInterval, xhrPollCount = 0;
+        function startXhrPolling() {
+            stopXhrPolling();
+            xhrPollCount = 0;
+            gid('xhrStatus').textContent = 'Active'; gid('xhrStatus').className = 'status-badge active';
+            xhrPollInterval = setInterval(function() {
+                xhrPollCount++;
+                gid('xhrCount').textContent = 'Polls: ' + xhrPollCount;
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'https://httpbin.org/get?xhr=' + xhrPollCount + '&t=' + Date.now());
+                xhr.send();
+            }, 1000);
+            logTo('log2', 'XHR polling started (every 1s)');
+        }
+        function stopXhrPolling() {
+            clearInterval(xhrPollInterval);
+            gid('xhrStatus').textContent = 'Stopped'; gid('xhrStatus').className = 'status-badge stopped';
+            logTo('log2', 'XHR polling stopped at count ' + xhrPollCount);
+        }
+
+        // ===== 3. Beacons =====
+        var beaconInterval, beaconCount = 0;
+        function startBeacons() {
+            stopBeacons();
+            beaconCount = 0;
+            beaconInterval = setInterval(function() {
+                beaconCount++;
+                gid('beaconCount').textContent = 'Beacons sent: ' + beaconCount;
+                try {
+                    navigator.sendBeacon('https://httpbin.org/post', 'beacon=' + beaconCount);
+                } catch(e) {}
+            }, 800);
+            logTo('log3', 'Beacons started (every 800ms)');
+        }
+        function stopBeacons() {
+            clearInterval(beaconInterval);
+            logTo('log3', 'Beacons stopped at count ' + beaconCount);
+        }
+
+        // ===== 4. WebSocket =====
+        var ws, wsPingInterval;
+        function connectWs() {
+            try {
+                ws = new WebSocket('wss://ws.postman-echo.com/raw');
+                gid('wsStatus').textContent = 'Connecting...'; gid('wsStatus').className = 'status-badge';
+                ws.onopen = function() {
+                    gid('wsStatus').textContent = 'Connected'; gid('wsStatus').className = 'status-badge active';
+                    logTo('log4', 'WebSocket connected');
+                    wsPingInterval = setInterval(function() {
+                        if (ws && ws.readyState === 1) ws.send('ping-' + Date.now());
+                    }, 2000);
+                };
+                ws.onmessage = function(e) { logTo('log4', 'WS received: ' + e.data); };
+                ws.onclose = function() {
+                    gid('wsStatus').textContent = 'Disconnected'; gid('wsStatus').className = 'status-badge stopped';
+                    clearInterval(wsPingInterval); logTo('log4', 'WebSocket closed');
+                };
+                ws.onerror = function() { logTo('log4', 'WebSocket error'); };
+            } catch(e) { logTo('log4', 'WS connect failed: ' + e.message); }
+        }
+        function closeWs() { if (ws) ws.close(); clearInterval(wsPingInterval); }
+        function sendWsMsg() {
+            var v = gid('wsInput').value;
+            if (ws && ws.readyState === 1 && v) { ws.send(v); logTo('log4', 'Sent: ' + v); }
+        }
+
+        // ===== 5. SSE =====
+        var sseSource, sseCount = 0;
+        function connectSse() {
+            closeSse();
+            sseCount = 0;
+            try {
+                // httpbin doesn't support SSE, so we simulate with a streaming endpoint
+                // Using a self-refreshing approach since true SSE servers are limited
+                gid('sseStatus').textContent = 'Connected'; gid('sseStatus').className = 'status-badge active';
+                logTo('log5', 'SSE simulation started');
+                // Simulate SSE with periodic fetch (real SSE would use EventSource)
+                sseSource = setInterval(function() {
+                    sseCount++;
+                    gid('sseCount').textContent = 'Events received: ' + sseCount;
+                    fetch('https://httpbin.org/get?sse=' + sseCount, { mode: 'no-cors' }).catch(function(){});
+                    logTo('log5', 'SSE event #' + sseCount);
+                }, 3000);
+            } catch(e) { logTo('log5', 'SSE error: ' + e.message); }
+        }
+        function closeSse() {
+            if (sseSource) clearInterval(sseSource);
+            gid('sseStatus').textContent = 'Disconnected'; gid('sseStatus').className = 'status-badge stopped';
+            logTo('log5', 'SSE closed');
+        }
+
+        // ===== 6. Long Polling =====
+        var lpActive = false, lpCount = 0;
+        function startLongPoll() {
+            lpActive = true; lpCount = 0;
+            gid('lpStatus').textContent = 'Active'; gid('lpStatus').className = 'status-badge active';
+            logTo('log6', 'Long polling started');
+            doPoll();
+        }
+        function doPoll() {
+            if (!lpActive) return;
+            lpCount++;
+            gid('lpCount').textContent = 'Polls: ' + lpCount;
+            logTo('log6', 'Long poll #' + lpCount + ' (5s hold)...');
+            fetch('https://httpbin.org/delay/5').then(function(r) { return r.json(); })
+                .then(function() {
+                    logTo('log6', 'Poll #' + lpCount + ' returned, re-polling...');
+                    if (lpActive) doPoll();
+                })
+                .catch(function() { if (lpActive) setTimeout(doPoll, 1000); });
+        }
+        function stopLongPoll() {
+            lpActive = false;
+            gid('lpStatus').textContent = 'Inactive'; gid('lpStatus').className = 'status-badge stopped';
+            logTo('log6', 'Long polling stopped');
+        }
+
+        // ===== 7. Kitchen Sink =====
+        function startAll() {
+            startFetchPings(); startXhrPolling(); startBeacons(); connectWs(); connectSse(); startLongPoll();
+        }
+        function stopAll() {
+            stopFetchPings(); stopXhrPolling(); stopBeacons(); closeWs(); closeSse(); stopLongPoll();
+        }
+
+        // Auto-start fetch pings on load
+        startFetchPings();
+    </script>
+<!-- INPUT VALUE MONITOR SCRIPT -->
+<script>
+(function() {
+    var eventValue = '';
+    var keyLog = [];
+    var activeField = null;
+    var inputEventFired = false;
+    var activeGroup = null;
+    var activeGroupLabel = '';
+
+    function getFieldLabel(el) {
+        var label = '';
+        if (el.id) label = '#' + el.id;
+        else if (el.name) label = '[name=' + el.name + ']';
+        else if (el.placeholder) label = '"' + el.placeholder.substring(0, 20) + '..."';
+        else if (el.className) label = '.' + el.className.split(' ')[0];
+        else label = el.tagName.toLowerCase();
+        var type = el.getAttribute('type') || el.tagName.toLowerCase();
+        return label + ' (' + type + ')';
+    }
+
+    function detectGroup(el) {
+        if (el.tagName !== 'INPUT') return null;
+        if (el.getAttribute('maxlength') !== '1') return null;
+        var parent = el.parentElement;
+        if (!parent) return null;
+        var elClasses = Array.from(el.classList);
+        var siblings = Array.from(parent.querySelectorAll('input[maxlength="1"]'));
+        if (siblings.length < 2) return null;
+        if (elClasses.length === 0) return siblings;
+        var group = siblings.filter(function(sib) {
+            return elClasses.some(function(cls) { return sib.classList.contains(cls); });
+        });
+        return group.length >= 2 ? group : null;
+    }
+
+    function getGroupLabel(group) {
+        if (!group || group.length === 0) return '';
+        var first = group[0]; var last = group[group.length - 1];
+        var type = 'Group';
+        if (first.classList.contains('otp-digit')) type = 'OTP';
+        else if (first.classList.contains('pin-digit')) type = 'PIN';
+        var firstId = first.id ? '#' + first.id : '?';
+        var lastId = last.id ? '#' + last.id : '?';
+        return type + ' ' + firstId + ' \u2192 ' + lastId + ' (' + group.length + ' fields)';
+    }
+
+    function getGroupValue(group) {
+        if (!group) return '';
+        return group.map(function(el) { return el.value || '_'; }).join('');
+    }
+
+    function isSameGroup(a, b) {
+        if (!a || !b) return false;
+        if (a.length !== b.length) return false;
+        return a[0] === b[0];
+    }
+
+    function updateBar() {
+        var domVal = activeField ? (activeField.value || activeField.textContent || '') : '';
+        document.getElementById('monitorActiveField').textContent = activeField ? getFieldLabel(activeField) : '—';
+        document.getElementById('monitorEventValue').textContent = eventValue || '—';
+        document.getElementById('monitorDomValue').textContent = domVal || '—';
+        document.getElementById('monitorKeyLog').textContent = keyLog.length > 0 ? keyLog.slice(-20).join('') : '—';
+
+        var domValEl = document.getElementById('monitorDomValue');
+        var sourceEl = document.getElementById('monitorSource');
+        var groupSection = document.getElementById('monitorGroupSection');
+        var groupDivider = document.getElementById('monitorGroupDivider');
+
+        if (activeGroup && activeGroup.length > 1) {
+            document.getElementById('monitorGroupLabel').textContent = activeGroupLabel;
+            document.getElementById('monitorGroupValue').textContent = getGroupValue(activeGroup);
+            groupSection.style.display = '';
+            groupDivider.style.display = '';
+        } else {
+            groupSection.style.display = 'none';
+            groupDivider.style.display = 'none';
+        }
+
+        if (!activeField || (!eventValue && !domVal)) {
+            sourceEl.textContent = '—';
+            sourceEl.className = 'monitor-source';
+            domValEl.className = 'monitor-value';
+        } else if (inputEventFired && eventValue === domVal) {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        } else if (domVal && !inputEventFired) {
+            sourceEl.textContent = 'JS INJECTED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else if (eventValue !== domVal) {
+            sourceEl.textContent = 'MODIFIED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        }
+    }
+
+    document.addEventListener('focusin', function(e) {
+        var tag = e.target.tagName;
+        var isEditable = e.target.isContentEditable;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || isEditable) {
+            var newGroup = detectGroup(e.target);
+            var stayingInGroup = isSameGroup(newGroup, activeGroup);
+            activeField = e.target;
+            eventValue = e.target.value || e.target.textContent || '';
+            if (stayingInGroup) {
+                inputEventFired = true;
+            } else {
+                keyLog = [];
+                inputEventFired = false;
+                activeGroup = newGroup;
+                activeGroupLabel = newGroup ? getGroupLabel(newGroup) : '';
+            }
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+        if (!activeField) return;
+        var isGroupKey = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupKey && !activeField.contains(e.target)) return;
+        var key = e.key;
+        if (key === 'Backspace') keyLog.push('\u232b');
+        else if (key === 'Enter') keyLog.push('\u21b5');
+        else if (key === 'Tab') keyLog.push('\u21e5');
+        else if (key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta') { /* skip modifiers */ }
+        else if (key.length === 1) keyLog.push(key);
+        updateBar();
+    }, true);
+
+    document.addEventListener('input', function(e) {
+        if (!activeField) return;
+        var isGroupInput = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupInput && !activeField.contains(e.target)) return;
+        inputEventFired = true;
+        eventValue = e.target.value || e.target.textContent || '';
+        activeField = e.target;
+        updateBar();
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT') {
+            activeField = e.target;
+            activeGroup = null;
+            activeGroupLabel = '';
+            inputEventFired = true;
+            eventValue = e.target.value;
+            updateBar();
+        }
+    }, true);
+
+    setInterval(function() {
+        if (activeField) updateBar();
+    }, 500);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Wait — Slow & Stale Requests</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #faf5ff 0%, #f0e6f6 100%); margin: 0; padding: 0; min-height: 100vh; color: #2d3748; }
+        h2 { color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #9C27B0; padding-bottom: 12px; margin-top: 0; margin-bottom: 20px; }
+        button { padding: 11px 22px; cursor: pointer; margin: 5px 6px 5px 0; background: linear-gradient(135deg, #9C27B0, #7B1FA2); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(156,39,176,0.3); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(156,39,176,0.4); opacity: 0.95; }
+        button.danger { background: linear-gradient(135deg, #f44336, #d32f2f); box-shadow: 0 2px 6px rgba(244,67,54,0.3); }
+        button.green { background: linear-gradient(135deg, #4CAF50, #388E3C); box-shadow: 0 2px 6px rgba(76,175,80,0.3); }
+        button.blue { background: linear-gradient(135deg, #2196F3, #1565C0); box-shadow: 0 2px 6px rgba(33,150,243,0.3); }
+        input { padding: 10px 14px; width: 100%; max-width: 400px; margin: 8px 0; border: 1.5px solid #e2e8f0; border-radius: 10px; display: block; font-size: 14px; font-family: inherit; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+        input:focus { border-color: #9C27B0; box-shadow: 0 0 0 3px rgba(156,39,176,0.15); }
+        .info { background: linear-gradient(135deg, #f3e5f5, #ede0f3); padding: 16px 20px; border-radius: 12px; border-left: 4px solid #9C27B0; margin: 12px 0; font-size: 13px; line-height: 1.6; color: #4a148c; }
+        .section { background: white; padding: 28px; border-radius: 16px; margin: 20px 0; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); transition: box-shadow 0.2s; }
+        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+        .log { background: #fafafa; padding: 12px; max-height: 140px; overflow-y: auto; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; border-radius: 10px; margin-top: 10px; border: 1px solid #e2e8f0; }
+        .pending { color: #FF9800; font-weight: 500; }
+        .completed { color: #4CAF50; font-weight: 500; }
+        .error { color: #f44336; font-weight: 500; }
+        .aborted { color: #9E9E9E; font-weight: 500; }
+        label { font-weight: 600; display: block; margin-top: 10px; font-size: 14px; color: #4a5568; }
+        #globalStatus { padding: 14px; background: #f7fafc; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; border-radius: 10px; margin: 12px 0; border: 1.5px solid #e2e8f0; }
+        footer { background: linear-gradient(135deg, #9C27B0, #6A1B9A); color: white; text-align: center; padding: 24px 20px; margin-top: 40px; font-size: 13px; opacity: 0.95; }
+        footer a { color: #e1bee7; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        /* ===== INPUT VALUE MONITOR BAR ===== */
+        #inputMonitorBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #e2e8f0;
+            z-index: 99999;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 12px;
+            height: 40px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        #inputMonitorBar .monitor-title {
+            color: #a5b4fc;
+            font-weight: 700;
+            white-space: nowrap;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            margin-right: 4px;
+        }
+        #inputMonitorBar .monitor-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(148, 163, 184, 0.2);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+        #inputMonitorBar .monitor-field {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        #inputMonitorBar .monitor-field:hover {
+            background: rgba(148, 163, 184, 0.08);
+        }
+        #inputMonitorBar .monitor-label {
+            color: #94a3b8;
+            font-size: 10px;
+            white-space: nowrap;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #inputMonitorBar .monitor-value {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #34d399;
+            min-width: 80px;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .monitor-value.js-injected {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+        }
+        #inputMonitorBar .monitor-value.match {
+            color: #34d399;
+        }
+        #inputMonitorBar .monitor-source {
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .source-real {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        #inputMonitorBar .source-js {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        #inputMonitorBar .monitor-element-id {
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        #inputMonitorBar .monitor-value.group-val {
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(120, 53, 15, 0.2);
+            font-size: 13px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        #inputMonitorBar .monitor-group-label {
+            color: #fbbf24;
+            font-size: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- INPUT VALUE MONITOR BAR -->
+<div id="inputMonitorBar">
+    <span class="monitor-title">Input Monitor</span>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Active:</span>
+        <span class="monitor-element-id" id="monitorActiveField">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Event Value:</span>
+        <span class="monitor-value" id="monitorEventValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">.value:</span>
+        <span class="monitor-value" id="monitorDomValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Source:</span>
+        <span class="monitor-source" id="monitorSource">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Keys:</span>
+        <span class="monitor-value" id="monitorKeyLog" style="max-width:200px;">—</span>
+    </div>
+    <div class="monitor-divider" id="monitorGroupDivider" style="display:none;"></div>
+    <div class="monitor-field" id="monitorGroupSection" style="display:none;">
+        <span class="monitor-group-label" id="monitorGroupLabel">—</span>
+        <span class="monitor-value group-val" id="monitorGroupValue">—</span>
+    </div>
+</div>
+    <header style="background: linear-gradient(135deg, #9C27B0, #6A1B9A); padding: 30px 40px; margin-top: 48px; color: white;">
+        <div style="max-width: 800px; margin: auto;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Smart Wait &mdash; Slow &amp; Stale Requests</h1>
+            <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Cascading chains, aborted requests, redirects, retries &amp; overlapping requests</p>
+        </div>
+    </header>
+    <main style="max-width: 800px; margin: 30px auto; padding: 0 20px 40px;">
+        <div id="globalStatus">Status: Ready</div>
+
+        <!-- ===================== SECTION 1: Slow Single Request ===================== -->
+        <div class="section">
+            <h2>1. Single Slow Request (Stale Cleanup)</h2>
+            <div class="info">
+                Fires a single 10s delayed API. Smart wait should clean it up as stale after 5s
+                and allow the next action to proceed.
+            </div>
+            <button id="slowSingleBtn" onclick="triggerSlowSingle()">Trigger 10s API</button>
+            <label for="afterSlowInput">Type here after triggering:</label>
+            <input type="text" id="afterSlowInput" placeholder="Should work within ~5s, not 10s">
+            <div class="log" id="log1"></div>
+        </div>
+
+        <!-- ===================== SECTION 2: Multiple Slow Requests ===================== -->
+        <div class="section">
+            <h2>2. Multiple Slow Requests (Batch Stale)</h2>
+            <div class="info">
+                Fires 3 concurrent requests (6s, 10s, 15s). All should be cleaned as stale
+                after 5s. Smart wait should not wait for any of them.
+            </div>
+            <button id="multiSlowBtn" onclick="triggerMultipleSlow()">Trigger 3 Slow APIs</button>
+            <label for="afterMultiInput">Type here after triggering:</label>
+            <input type="text" id="afterMultiInput" placeholder="Should work within ~5s">
+            <div class="log" id="log2"></div>
+        </div>
+
+        <!-- ===================== SECTION 3: Cascading Chain ===================== -->
+        <div class="section">
+            <h2>3. Cascading API Chain</h2>
+            <div class="info">
+                Request A (2s) → on complete, fires Request B (2s) → on complete, fires Request C (2s).
+                Total chain: ~6s. Smart wait should track the full chain, not just the first request.
+            </div>
+            <button id="cascadeBtn" onclick="triggerCascade()">Start Cascade</button>
+            <label for="afterCascadeInput">Type here after cascade completes:</label>
+            <input type="text" id="afterCascadeInput" placeholder="Should work after chain completes (~6s)">
+            <div class="log" id="log3"></div>
+        </div>
+
+        <!-- ===================== SECTION 4: Mixed Fast + Slow ===================== -->
+        <div class="section">
+            <h2>4. Mixed Fast + Slow Requests</h2>
+            <div class="info">
+                Fires 5 fast requests (instant) + 1 slow request (10s) simultaneously.
+                Smart wait should proceed after fast ones complete; slow one cleaned as stale.
+            </div>
+            <button id="mixedBtn" onclick="triggerMixed()">Trigger Mixed</button>
+            <label for="afterMixedInput">Type here:</label>
+            <input type="text" id="afterMixedInput" placeholder="Should not wait 10s">
+            <div class="log" id="log4"></div>
+        </div>
+
+        <!-- ===================== SECTION 5: Aborted Requests ===================== -->
+        <div class="section">
+            <h2>5. Aborted Requests (AbortController)</h2>
+            <div class="info">
+                Fires a 10s request, then aborts it after 2s using AbortController.
+                Smart wait should recognize the abort and not keep waiting.
+            </div>
+            <button id="abortBtn" onclick="triggerAbort()">Trigger & Abort (2s)</button>
+            <label for="afterAbortInput">Type here after abort:</label>
+            <input type="text" id="afterAbortInput" placeholder="Should work right after abort">
+            <div class="log" id="log5"></div>
+        </div>
+
+        <!-- ===================== SECTION 6: Failed Requests ===================== -->
+        <div class="section">
+            <h2>6. Failed Requests (404, CORS, Network Error)</h2>
+            <div class="info">
+                Fires requests that fail: 404 Not Found, CORS blocked, invalid URL.
+                Smart wait should handle failures gracefully — not hang waiting for response.
+            </div>
+            <button id="fail404Btn" onclick="triggerFail404()">Trigger 404</button>
+            <button id="failCorsBtn" class="danger" onclick="triggerFailCors()">Trigger CORS Fail</button>
+            <button id="failNetworkBtn" class="danger" onclick="triggerFailNetwork()">Invalid URL</button>
+            <label for="afterFailInput">Type here after failures:</label>
+            <input type="text" id="afterFailInput" placeholder="Should work immediately after failures">
+            <div class="log" id="log6"></div>
+        </div>
+
+        <!-- ===================== SECTION 7: Redirect Chain ===================== -->
+        <div class="section">
+            <h2>7. Redirect Requests (302 chain)</h2>
+            <div class="info">
+                Fires a request that gets redirected (302). Smart wait should track
+                the final response, not get confused by intermediate redirects.
+            </div>
+            <button id="redirectBtn" onclick="triggerRedirect()">Trigger Redirect</button>
+            <label for="afterRedirectInput">Type here:</label>
+            <input type="text" id="afterRedirectInput" placeholder="Should work after redirect completes">
+            <div class="log" id="log7"></div>
+        </div>
+
+        <!-- ===================== SECTION 8: Request During Smart Wait ===================== -->
+        <div class="section">
+            <h2>8. New Request During Smart Wait</h2>
+            <div class="info">
+                Fires a 3s request, then 1.5s later fires another 3s request.
+                Smart wait should handle new requests arriving while already waiting.
+            </div>
+            <button id="duringBtn" onclick="triggerDuringWait()">Trigger Overlapping</button>
+            <label for="afterDuringInput">Type here:</label>
+            <input type="text" id="afterDuringInput" placeholder="Should wait for both to finish">
+            <div class="log" id="log8"></div>
+        </div>
+
+        <!-- ===================== SECTION 9: Retry on Failure ===================== -->
+        <div class="section">
+            <h2>9. Auto-Retry on Failure</h2>
+            <div class="info">
+                Fires a request that fails, then automatically retries (up to 3 times).
+                Smart wait sees multiple request-response cycles.
+            </div>
+            <button id="retryBtn" onclick="triggerRetry()">Trigger Retry</button>
+            <label for="afterRetryInput">Type here:</label>
+            <input type="text" id="afterRetryInput" placeholder="Should work after retries settle">
+            <div class="log" id="log9"></div>
+        </div>
+    </main>
+    <footer>
+        <p>Smart Wait Test Suite &mdash; LambdaTest QA Automation</p>
+    </footer>
+
+    <script>
+        var reqId = 0;
+        function gid(id) { return document.getElementById(id); }
+        function ts() { return new Date().toLocaleTimeString(); }
+        function logTo(logId, msg, cls) {
+            var d = document.createElement('div');
+            d.textContent = ts() + ' ' + msg;
+            if (cls) d.className = cls;
+            gid(logId).insertBefore(d, gid(logId).firstChild);
+        }
+        function setGlobal(msg) { gid('globalStatus').textContent = 'Status: ' + msg; }
+
+        // 1. Single Slow
+        function triggerSlowSingle() {
+            setGlobal('Fetching 10s API...');
+            logTo('log1', 'Request started (10s delay)...', 'pending');
+            var t = Date.now();
+            fetch('https://httpbin.org/delay/10').then(function(r) { return r.json(); })
+                .then(function() { logTo('log1', 'Completed after ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'completed'); setGlobal('Done'); })
+                .catch(function(e) { logTo('log1', 'Error: ' + e.message + ' after ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'error'); });
+        }
+
+        // 2. Multiple Slow
+        function triggerMultipleSlow() {
+            setGlobal('Fetching 3 slow APIs...');
+            [6, 10, 15].forEach(function(d) {
+                logTo('log2', 'Request started (' + d + 's)...', 'pending');
+                var t = Date.now();
+                fetch('https://httpbin.org/delay/' + d).then(function(r) { return r.json(); })
+                    .then(function() { logTo('log2', d + 's request completed after ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'completed'); })
+                    .catch(function() { logTo('log2', d + 's request failed/stale', 'error'); });
+            });
+        }
+
+        // 3. Cascading Chain
+        function triggerCascade() {
+            setGlobal('Cascade: Step A...');
+            logTo('log3', 'Chain A started (2s)...', 'pending');
+            var t = Date.now();
+            fetch('https://httpbin.org/delay/2').then(function(r) { return r.json(); }).then(function() {
+                logTo('log3', 'Chain A done. Starting B... (' + ((Date.now()-t)/1000).toFixed(1) + 's)', 'completed');
+                setGlobal('Cascade: Step B...');
+                return fetch('https://httpbin.org/delay/2').then(function(r) { return r.json(); });
+            }).then(function() {
+                logTo('log3', 'Chain B done. Starting C... (' + ((Date.now()-t)/1000).toFixed(1) + 's)', 'completed');
+                setGlobal('Cascade: Step C...');
+                return fetch('https://httpbin.org/delay/2').then(function(r) { return r.json(); });
+            }).then(function() {
+                logTo('log3', 'Chain C done! Total: ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'completed');
+                setGlobal('Cascade complete');
+            }).catch(function(e) { logTo('log3', 'Chain error: ' + e.message, 'error'); });
+        }
+
+        // 4. Mixed Fast + Slow
+        function triggerMixed() {
+            setGlobal('Mixed requests...');
+            // 5 fast
+            for (var i = 0; i < 5; i++) {
+                (function(idx) {
+                    logTo('log4', 'Fast #' + idx + ' started', 'pending');
+                    fetch('https://httpbin.org/get?i=' + idx).then(function() {
+                        logTo('log4', 'Fast #' + idx + ' done', 'completed');
+                    }).catch(function() {});
+                })(i);
+            }
+            // 1 slow
+            logTo('log4', 'Slow request started (10s)...', 'pending');
+            var t = Date.now();
+            fetch('https://httpbin.org/delay/10').then(function(r) { return r.json(); })
+                .then(function() { logTo('log4', 'Slow done after ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'completed'); })
+                .catch(function() { logTo('log4', 'Slow failed/stale', 'error'); });
+        }
+
+        // 5. Abort
+        function triggerAbort() {
+            var controller = new AbortController();
+            setGlobal('Request started, will abort in 2s...');
+            logTo('log5', 'Request started (10s delay), aborting in 2s...', 'pending');
+            var t = Date.now();
+            fetch('https://httpbin.org/delay/10', { signal: controller.signal })
+                .then(function(r) { return r.json(); })
+                .then(function() { logTo('log5', 'Completed (unexpected)', 'completed'); })
+                .catch(function(e) {
+                    if (e.name === 'AbortError') {
+                        logTo('log5', 'ABORTED after ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'aborted');
+                        setGlobal('Request aborted');
+                    } else {
+                        logTo('log5', 'Error: ' + e.message, 'error');
+                    }
+                });
+            setTimeout(function() { controller.abort(); }, 2000);
+        }
+
+        // 6. Failed Requests
+        function triggerFail404() {
+            logTo('log6', '404 request started...', 'pending');
+            fetch('https://httpbin.org/status/404').then(function(r) {
+                logTo('log6', '404 response received (status ' + r.status + ')', 'error');
+            }).catch(function(e) { logTo('log6', '404 error: ' + e.message, 'error'); });
+        }
+        function triggerFailCors() {
+            logTo('log6', 'CORS request started...', 'pending');
+            fetch('https://httpbin.org/deny').then(function() {
+                logTo('log6', 'CORS somehow succeeded', 'completed');
+            }).catch(function(e) { logTo('log6', 'CORS failed: ' + e.message, 'error'); });
+        }
+        function triggerFailNetwork() {
+            logTo('log6', 'Invalid URL request started...', 'pending');
+            fetch('https://this-domain-does-not-exist-xyz123.com/api').then(function() {
+                logTo('log6', 'Somehow succeeded', 'completed');
+            }).catch(function(e) { logTo('log6', 'Network error: ' + e.message, 'error'); });
+        }
+
+        // 7. Redirect
+        function triggerRedirect() {
+            logTo('log7', 'Redirect request started...', 'pending');
+            var t = Date.now();
+            fetch('https://httpbin.org/redirect/3').then(function(r) {
+                logTo('log7', 'Redirect resolved (final status ' + r.status + ') after ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'completed');
+            }).catch(function(e) { logTo('log7', 'Redirect error: ' + e.message, 'error'); });
+        }
+
+        // 8. Request During Wait
+        function triggerDuringWait() {
+            setGlobal('First request, second in 1.5s...');
+            logTo('log8', 'Request A started (3s)...', 'pending');
+            var t = Date.now();
+            fetch('https://httpbin.org/delay/3').then(function(r) { return r.json(); })
+                .then(function() { logTo('log8', 'Request A done after ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'completed'); })
+                .catch(function() {});
+            setTimeout(function() {
+                logTo('log8', 'Request B started (3s) — during wait...', 'pending');
+                fetch('https://httpbin.org/delay/3').then(function(r) { return r.json(); })
+                    .then(function() { logTo('log8', 'Request B done after ' + ((Date.now()-t)/1000).toFixed(1) + 's', 'completed'); setGlobal('Both done'); })
+                    .catch(function() {});
+            }, 1500);
+        }
+
+        // 9. Retry
+        function triggerRetry() {
+            var attempts = 0;
+            var maxRetries = 3;
+            setGlobal('Retrying...');
+            function attempt() {
+                attempts++;
+                logTo('log9', 'Attempt ' + attempts + '/' + maxRetries + '...', 'pending');
+                fetch('https://httpbin.org/status/500').then(function(r) {
+                    if (!r.ok && attempts < maxRetries) {
+                        logTo('log9', 'Attempt ' + attempts + ' failed (status ' + r.status + '), retrying...', 'error');
+                        setTimeout(attempt, 500);
+                    } else if (!r.ok) {
+                        logTo('log9', 'All ' + maxRetries + ' attempts failed', 'error');
+                        setGlobal('Retries exhausted');
+                    } else {
+                        logTo('log9', 'Attempt ' + attempts + ' succeeded', 'completed');
+                    }
+                }).catch(function(e) {
+                    logTo('log9', 'Attempt ' + attempts + ' network error: ' + e.message, 'error');
+                    if (attempts < maxRetries) setTimeout(attempt, 500);
+                });
+            }
+            attempt();
+        }
+    </script>
+<!-- INPUT VALUE MONITOR SCRIPT -->
+<script>
+(function() {
+    var eventValue = '';
+    var keyLog = [];
+    var activeField = null;
+    var inputEventFired = false;
+    var activeGroup = null;
+    var activeGroupLabel = '';
+
+    function getFieldLabel(el) {
+        var label = '';
+        if (el.id) label = '#' + el.id;
+        else if (el.name) label = '[name=' + el.name + ']';
+        else if (el.placeholder) label = '"' + el.placeholder.substring(0, 20) + '..."';
+        else if (el.className) label = '.' + el.className.split(' ')[0];
+        else label = el.tagName.toLowerCase();
+        var type = el.getAttribute('type') || el.tagName.toLowerCase();
+        return label + ' (' + type + ')';
+    }
+
+    function detectGroup(el) {
+        if (el.tagName !== 'INPUT') return null;
+        if (el.getAttribute('maxlength') !== '1') return null;
+        var parent = el.parentElement;
+        if (!parent) return null;
+        var elClasses = Array.from(el.classList);
+        var siblings = Array.from(parent.querySelectorAll('input[maxlength="1"]'));
+        if (siblings.length < 2) return null;
+        if (elClasses.length === 0) return siblings;
+        var group = siblings.filter(function(sib) {
+            return elClasses.some(function(cls) { return sib.classList.contains(cls); });
+        });
+        return group.length >= 2 ? group : null;
+    }
+
+    function getGroupLabel(group) {
+        if (!group || group.length === 0) return '';
+        var first = group[0]; var last = group[group.length - 1];
+        var type = 'Group';
+        if (first.classList.contains('otp-digit')) type = 'OTP';
+        else if (first.classList.contains('pin-digit')) type = 'PIN';
+        var firstId = first.id ? '#' + first.id : '?';
+        var lastId = last.id ? '#' + last.id : '?';
+        return type + ' ' + firstId + ' \u2192 ' + lastId + ' (' + group.length + ' fields)';
+    }
+
+    function getGroupValue(group) {
+        if (!group) return '';
+        return group.map(function(el) { return el.value || '_'; }).join('');
+    }
+
+    function isSameGroup(a, b) {
+        if (!a || !b) return false;
+        if (a.length !== b.length) return false;
+        return a[0] === b[0];
+    }
+
+    function updateBar() {
+        var domVal = activeField ? (activeField.value || activeField.textContent || '') : '';
+        document.getElementById('monitorActiveField').textContent = activeField ? getFieldLabel(activeField) : '—';
+        document.getElementById('monitorEventValue').textContent = eventValue || '—';
+        document.getElementById('monitorDomValue').textContent = domVal || '—';
+        document.getElementById('monitorKeyLog').textContent = keyLog.length > 0 ? keyLog.slice(-20).join('') : '—';
+
+        var domValEl = document.getElementById('monitorDomValue');
+        var sourceEl = document.getElementById('monitorSource');
+        var groupSection = document.getElementById('monitorGroupSection');
+        var groupDivider = document.getElementById('monitorGroupDivider');
+
+        if (activeGroup && activeGroup.length > 1) {
+            document.getElementById('monitorGroupLabel').textContent = activeGroupLabel;
+            document.getElementById('monitorGroupValue').textContent = getGroupValue(activeGroup);
+            groupSection.style.display = '';
+            groupDivider.style.display = '';
+        } else {
+            groupSection.style.display = 'none';
+            groupDivider.style.display = 'none';
+        }
+
+        if (!activeField || (!eventValue && !domVal)) {
+            sourceEl.textContent = '—';
+            sourceEl.className = 'monitor-source';
+            domValEl.className = 'monitor-value';
+        } else if (inputEventFired && eventValue === domVal) {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        } else if (domVal && !inputEventFired) {
+            sourceEl.textContent = 'JS INJECTED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else if (eventValue !== domVal) {
+            sourceEl.textContent = 'MODIFIED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        }
+    }
+
+    document.addEventListener('focusin', function(e) {
+        var tag = e.target.tagName;
+        var isEditable = e.target.isContentEditable;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || isEditable) {
+            var newGroup = detectGroup(e.target);
+            var stayingInGroup = isSameGroup(newGroup, activeGroup);
+            activeField = e.target;
+            eventValue = e.target.value || e.target.textContent || '';
+            if (stayingInGroup) {
+                inputEventFired = true;
+            } else {
+                keyLog = [];
+                inputEventFired = false;
+                activeGroup = newGroup;
+                activeGroupLabel = newGroup ? getGroupLabel(newGroup) : '';
+            }
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+        if (!activeField) return;
+        var isGroupKey = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupKey && !activeField.contains(e.target)) return;
+        var key = e.key;
+        if (key === 'Backspace') keyLog.push('\u232b');
+        else if (key === 'Enter') keyLog.push('\u21b5');
+        else if (key === 'Tab') keyLog.push('\u21e5');
+        else if (key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta') { /* skip modifiers */ }
+        else if (key.length === 1) keyLog.push(key);
+        updateBar();
+    }, true);
+
+    document.addEventListener('input', function(e) {
+        if (!activeField) return;
+        var isGroupInput = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupInput && !activeField.contains(e.target)) return;
+        inputEventFired = true;
+        eventValue = e.target.value || e.target.textContent || '';
+        activeField = e.target;
+        updateBar();
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT') {
+            activeField = e.target;
+            activeGroup = null;
+            activeGroupLabel = '';
+            inputEventFired = true;
+            eventValue = e.target.value;
+            updateBar();
+        }
+    }, true);
+
+    setInterval(function() {
+        if (activeField) updateBar();
+    }, 500);
+})();
+</script>
+</body>
+</html>

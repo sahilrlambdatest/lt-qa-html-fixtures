@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LT QA HTML Test Fixtures</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2rem; margin-bottom: 0.5rem; color: #f8fafc; }
+        .subtitle { color: #94a3b8; margin-bottom: 2rem; font-size: 0.95rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.5rem; transition: all 0.2s; text-decoration: none; color: inherit; display: block; }
+        .card:hover { border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.15); }
+        .card h3 { color: #f1f5f9; margin-bottom: 0.5rem; font-size: 1.05rem; }
+        .card p { color: #94a3b8; font-size: 0.85rem; line-height: 1.5; }
+        .tag { display: inline-block; background: #1e3a5f; color: #60a5fa; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-top: 0.75rem; margin-right: 4px; }
+        .tag.network { background: #1e3a2f; color: #4ade80; }
+        .tag.input { background: #3b1e5f; color: #c084fc; }
+        .tag.spa { background: #5f3b1e; color: #fb923c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LT QA HTML Test Fixtures</h1>
+        <p class="subtitle">KaneAI SmartWait & Input testing pages. Use these with KaneAI test authoring for validation.</p>
+        <div class="grid">
+            <a href="all-input-types.html" class="card">
+                <h3>All Input Types</h3>
+                <p>Every HTML5 input type: text, email, password, number, date, range, color, file, checkbox, radio, select, textarea, and more.</p>
+                <span class="tag input">input</span><span class="tag">SmartWait</span>
+            </a>
+            <a href="special-input-patterns.html" class="card">
+                <h3>Special Input Patterns</h3>
+                <p>Autocomplete, masked inputs, debounced search, OTP fields, contenteditable, drag-to-set values, and other non-standard patterns.</p>
+                <span class="tag input">input</span><span class="tag">edge-case</span>
+            </a>
+            <a href="input-behaviors.html" class="card">
+                <h3>Input Behaviors</h3>
+                <p>Dynamic validation, conditional fields, character counters, auto-formatting, dependent dropdowns, and input state machines.</p>
+                <span class="tag input">input</span><span class="tag">dynamic</span>
+            </a>
+            <a href="static-no-network.html" class="card">
+                <h3>Static (No Network)</h3>
+                <p>Pure static page with zero network requests after load. Ideal baseline for SmartWait idle detection testing.</p>
+                <span class="tag">SmartWait</span><span class="tag network">no-network</span>
+            </a>
+            <a href="continuous-pings.html" class="card">
+                <h3>Continuous Pings</h3>
+                <p>Page that continuously sends network requests (polling, heartbeats). Tests SmartWait behavior with never-idle networks.</p>
+                <span class="tag">SmartWait</span><span class="tag network">network</span>
+            </a>
+            <a href="slow-api-page.html" class="card">
+                <h3>Slow API Page</h3>
+                <p>Simulates slow API responses with configurable delays. Tests SmartWait timeout and stale request handling.</p>
+                <span class="tag">SmartWait</span><span class="tag network">slow-network</span>
+            </a>
+            <a href="dynamic-content-spa.html" class="card">
+                <h3>Dynamic Content SPA</h3>
+                <p>Single Page Application with client-side routing, lazy-loaded content, and route transitions. Tests SmartWait across SPA navigation.</p>
+                <span class="tag spa">SPA</span><span class="tag">SmartWait</span><span class="tag network">network</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

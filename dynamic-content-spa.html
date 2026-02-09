@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Wait — Dynamic Content & SPA Navigation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f0faf8 0%, #e0f2f1 100%); margin: 0; padding: 0; min-height: 100vh; color: #2d3748; }
+        h2 { color: #00796B; border-bottom: 3px solid #009688; padding-bottom: 10px; margin-top: 0; margin-bottom: 16px; font-size: 18px; font-weight: 700; }
+        button { padding: 11px 22px; cursor: pointer; margin: 5px 6px 5px 0; background: linear-gradient(135deg, #009688, #00796B); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,150,136,0.3); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,150,136,0.4); opacity: 0.95; }
+        button.blue { background: linear-gradient(135deg, #2196F3, #1565C0); box-shadow: 0 2px 6px rgba(33,150,243,0.3); }
+        button.blue:hover { box-shadow: 0 4px 12px rgba(33,150,243,0.4); }
+        button.orange { background: linear-gradient(135deg, #FF9800, #EF6C00); box-shadow: 0 2px 6px rgba(255,152,0,0.3); }
+        button.orange:hover { box-shadow: 0 4px 12px rgba(255,152,0,0.4); }
+        input { padding: 10px 14px; width: 300px; margin: 8px 0; border: 1.5px solid #e2e8f0; border-radius: 10px; display: block; font-size: 13px; font-family: inherit; transition: all 0.2s; background: white; }
+        input:focus { border-color: #009688; box-shadow: 0 0 0 3px rgba(0,150,136,0.15); outline: none; }
+        label { font-weight: 600; display: block; margin-top: 12px; font-size: 13px; color: #4a5568; }
+        .info { background: linear-gradient(135deg, #e0f2f1, #b2dfdb); padding: 16px 20px; border-radius: 12px; border-left: 4px solid #009688; margin: 12px 0; font-size: 13px; line-height: 1.6; color: #004D40; }
+        .section { background: white; padding: 28px; border-radius: 16px; margin: 20px 0; border: 1px solid #e2e8f0; box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03); transition: box-shadow 0.2s; }
+        .section:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.05); }
+        .log { background: #fafafa; padding: 12px; max-height: 130px; overflow-y: auto; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; border-radius: 10px; margin-top: 10px; border: 1px solid #e2e8f0; }
+        .dynamic-content { border: 2px dashed #b2dfdb; padding: 20px; margin: 12px 0; min-height: 60px; border-radius: 12px; background: #fafffe; transition: all 0.3s; }
+        .loaded { border-color: #4CAF50; border-style: solid; background: #f1f8e9; }
+        .nav-links { display: flex; gap: 10px; margin: 12px 0; flex-wrap: wrap; }
+        .nav-links a { padding: 10px 20px; background: linear-gradient(135deg, #009688, #00796B); color: white; border-radius: 10px; text-decoration: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,150,136,0.2); }
+        .nav-links a:hover { transform: translateY(-1px); }
+        .nav-links a.active { background: linear-gradient(135deg, #00695C, #004D40); box-shadow: 0 2px 8px rgba(0,105,92,0.4); }
+        .page-view { border: 1.5px solid #e2e8f0; padding: 20px; margin: 12px 0; border-radius: 12px; min-height: 100px; background: white; }
+        .scroll-container { max-height: 200px; overflow-y: auto; border: 1.5px solid #e2e8f0; padding: 12px; margin: 12px 0; border-radius: 12px; background: #fafafa; }
+        .scroll-item { padding: 12px; margin: 6px 0; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .loading-spinner { color: #FF9800; font-weight: 600; }
+        /* ===== INPUT VALUE MONITOR BAR ===== */
+        #inputMonitorBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #e2e8f0;
+            z-index: 99999;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 12px;
+            height: 40px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        #inputMonitorBar .monitor-title {
+            color: #a5b4fc;
+            font-weight: 700;
+            white-space: nowrap;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            margin-right: 4px;
+        }
+        #inputMonitorBar .monitor-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(148, 163, 184, 0.2);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+        #inputMonitorBar .monitor-field {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        #inputMonitorBar .monitor-field:hover {
+            background: rgba(148, 163, 184, 0.08);
+        }
+        #inputMonitorBar .monitor-label {
+            color: #94a3b8;
+            font-size: 10px;
+            white-space: nowrap;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #inputMonitorBar .monitor-value {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #34d399;
+            min-width: 80px;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .monitor-value.js-injected {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+        }
+        #inputMonitorBar .monitor-value.match {
+            color: #34d399;
+        }
+        #inputMonitorBar .monitor-source {
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .source-real {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        #inputMonitorBar .source-js {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        #inputMonitorBar .monitor-element-id {
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        #inputMonitorBar .monitor-value.group-val {
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(120, 53, 15, 0.2);
+            font-size: 13px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        #inputMonitorBar .monitor-group-label {
+            color: #fbbf24;
+            font-size: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- INPUT VALUE MONITOR BAR -->
+<div id="inputMonitorBar">
+    <span class="monitor-title">Input Monitor</span>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Active:</span>
+        <span class="monitor-element-id" id="monitorActiveField">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Event Value:</span>
+        <span class="monitor-value" id="monitorEventValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">.value:</span>
+        <span class="monitor-value" id="monitorDomValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Source:</span>
+        <span class="monitor-source" id="monitorSource">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Keys:</span>
+        <span class="monitor-value" id="monitorKeyLog" style="max-width:200px;">—</span>
+    </div>
+    <div class="monitor-divider" id="monitorGroupDivider" style="display:none;"></div>
+    <div class="monitor-field" id="monitorGroupSection" style="display:none;">
+        <span class="monitor-group-label" id="monitorGroupLabel">—</span>
+        <span class="monitor-value group-val" id="monitorGroupValue">—</span>
+    </div>
+</div>
+
+<header style="background: linear-gradient(135deg, #009688, #00695C); padding: 30px 40px; margin-top: 48px; color: white;">
+    <div style="max-width: 800px; margin: auto;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Smart Wait &mdash; Dynamic Content &amp; SPA Navigation</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">AJAX forms, cascading DOM, lazy loading, script injection, SPA routes &amp; infinite scroll</p>
+    </div>
+</header>
+
+<main style="max-width: 800px; margin: 30px auto; padding: 0 20px 40px;">
+
+        <!-- ===================== SECTION 1: AJAX-loaded form ===================== -->
+        <div class="section">
+            <h2>1. AJAX-Loaded Form (delayed DOM injection)</h2>
+            <div class="info">
+                Click button → 2s API delay → form HTML injected into DOM → form triggers its own API.
+                Smart wait should wait for the form to be loaded AND its initialization API to complete.
+            </div>
+            <button id="loadFormBtn" onclick="loadAjaxForm()">Load Form</button>
+            <div id="ajaxFormContainer" class="dynamic-content">
+                <em>Form will load here after clicking the button...</em>
+            </div>
+            <div class="log" id="log1"></div>
+        </div>
+
+        <!-- ===================== SECTION 2: Cascading DOM + Network ===================== -->
+        <div class="section">
+            <h2>2. Cascading DOM Load (content loads more content)</h2>
+            <div class="info">
+                Load Level 1 → that content contains a script that loads Level 2 → which loads Level 3.
+                Each level triggers a new network request. Smart wait must track the full cascade.
+            </div>
+            <button id="cascadeDomBtn" onclick="startCascadeDom()">Start Cascade Load</button>
+            <div id="cascadeContainer" class="dynamic-content">
+                <em>Cascade will load here...</em>
+            </div>
+            <div class="log" id="log2"></div>
+        </div>
+
+        <!-- ===================== SECTION 3: Lazy Loading (IntersectionObserver) ===================== -->
+        <div class="section">
+            <h2>3. Lazy Loading (scroll-triggered API calls)</h2>
+            <div class="info">
+                Content loads as you scroll. Each item becoming visible triggers a fetch().
+                Smart wait should handle scroll-triggered network activity.
+            </div>
+            <button id="initLazyBtn" onclick="initLazyLoad()">Initialize Lazy List</button>
+            <div class="scroll-container" id="lazyContainer"></div>
+            <label for="afterLazyInput">Type here after scrolling:</label>
+            <input type="text" id="afterLazyInput" placeholder="Should work after visible items load">
+            <div class="log" id="log3"></div>
+        </div>
+
+        <!-- ===================== SECTION 4: Dynamic Script Injection ===================== -->
+        <div class="section">
+            <h2>4. Dynamic Script & Resource Injection</h2>
+            <div class="info">
+                Dynamically injects a &lt;script&gt; tag and an &lt;img&gt; tag into the page.
+                These create new network requests. Smart wait should detect dynamically added resources.
+            </div>
+            <button id="injectScriptBtn" onclick="injectScript()">Inject Script Tag</button>
+            <button id="injectImgBtn" class="orange" onclick="injectImage()">Inject Image</button>
+            <button id="injectBothBtn" class="blue" onclick="injectBoth()">Inject Both</button>
+            <div id="injectionTarget" class="dynamic-content">
+                <em>Injected resources appear here...</em>
+            </div>
+            <label for="afterInjectInput">Type here after injection:</label>
+            <input type="text" id="afterInjectInput" placeholder="Should work after injected resources load">
+            <div class="log" id="log4"></div>
+        </div>
+
+        <!-- ===================== SECTION 5: SPA Navigation (History API) ===================== -->
+        <div class="section">
+            <h2>5. SPA Navigation (client-side routing)</h2>
+            <div class="info">
+                Simulates single-page app navigation using History API.
+                Each "route" fetches different data. Old route's pending requests become stale.
+            </div>
+            <div class="nav-links" id="spaNav">
+                <a onclick="spaNavigate('home')" id="nav-home" class="active">Home</a>
+                <a onclick="spaNavigate('products')" id="nav-products">Products</a>
+                <a onclick="spaNavigate('about')" id="nav-about">About</a>
+                <a onclick="spaNavigate('slow')" id="nav-slow">Slow Page</a>
+            </div>
+            <div class="page-view" id="spaContent">
+                <h3>Home</h3>
+                <p>Welcome! Navigate to other pages to trigger data fetching.</p>
+            </div>
+            <label for="spaInput">Type here after navigation:</label>
+            <input type="text" id="spaInput" placeholder="Should work after route data loads">
+            <div class="log" id="log5"></div>
+        </div>
+
+        <!-- ===================== SECTION 6: Infinite Scroll ===================== -->
+        <div class="section">
+            <h2>6. Infinite Scroll (load more on scroll bottom)</h2>
+            <div class="info">
+                Scroll to bottom → triggers API → appends new items → repeat.
+                Smart wait should handle the continuous load-on-scroll pattern.
+            </div>
+            <button id="initInfiniteBtn" onclick="initInfiniteScroll()">Initialize Infinite Scroll</button>
+            <div class="scroll-container" id="infiniteContainer" style="position: relative;"></div>
+            <label for="afterScrollInput">Type here between scrolls:</label>
+            <input type="text" id="afterScrollInput" placeholder="Should work between scroll loads">
+            <div class="log" id="log6"></div>
+        </div>
+
+        <!-- ===================== SECTION 7: Iframe with Network ===================== -->
+        <div class="section">
+            <h2>7. Iframe with Independent Network Activity</h2>
+            <div class="info">
+                Parent page is idle, but the iframe loads its own content and makes API calls.
+                Tests whether smart wait monitors iframe network activity.
+            </div>
+            <button id="loadIframeBtn" onclick="loadIframe()">Load Iframe</button>
+            <iframe id="testIframe" style="width:100%; height:150px; border:1px solid #ccc; border-radius:4px; margin:10px 0;" srcdoc="<p style='padding:20px;color:#999;'>Iframe will load here...</p>"></iframe>
+            <label for="afterIframeInput">Type here (parent page):</label>
+            <input type="text" id="afterIframeInput" placeholder="Parent input while iframe has network activity">
+            <div class="log" id="log7"></div>
+        </div>
+
+</main>
+
+<footer style="background: linear-gradient(135deg, #00695C, #004D40); color: rgba(255,255,255,0.85); text-align: center; padding: 24px 20px; font-size: 13px;">
+    <p style="margin: 0;">Smart Wait Test Suite &mdash; Dynamic Content &amp; SPA Navigation</p>
+    <p style="margin: 6px 0 0; opacity: 0.6; font-size: 12px;">Built for automated testing validation</p>
+</footer>
+
+    <script>
+        function ts() { return new Date().toLocaleTimeString(); }
+        function gid(id) { return document.getElementById(id); }
+        function logTo(logId, msg) {
+            var d = document.createElement('div');
+            d.textContent = ts() + ' ' + msg;
+            gid(logId).insertBefore(d, gid(logId).firstChild);
+        }
+
+        // ===== 1. AJAX-Loaded Form =====
+        function loadAjaxForm() {
+            gid('ajaxFormContainer').innerHTML = '<span class="loading-spinner">Loading form...</span>';
+            logTo('log1', 'Fetching form data (2s delay)...');
+            fetch('https://httpbin.org/delay/2').then(function(r) { return r.json(); }).then(function() {
+                logTo('log1', 'Form data received, injecting HTML...');
+                gid('ajaxFormContainer').className = 'dynamic-content loaded';
+                gid('ajaxFormContainer').innerHTML =
+                    '<h4>Registration Form (AJAX Loaded)</h4>' +
+                    '<label>Name: <input type="text" id="ajaxName" placeholder="Enter name"></label><br>' +
+                    '<label>Email: <input type="email" id="ajaxEmail" placeholder="email@test.com"></label><br>' +
+                    '<label>Phone: <input type="tel" id="ajaxPhone" placeholder="+1-555-0000"></label><br>' +
+                    '<button onclick="submitAjaxForm()" style="margin-top:10px;padding:8px 16px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;">Submit</button>' +
+                    '<span id="ajaxFormStatus" style="margin-left:10px;"></span>';
+                // Simulate form initialization API
+                logTo('log1', 'Form init API call...');
+                fetch('https://httpbin.org/get?init=form').then(function() {
+                    logTo('log1', 'Form fully initialized');
+                });
+            }).catch(function(e) { logTo('log1', 'Error: ' + e.message); });
+        }
+        function submitAjaxForm() {
+            gid('ajaxFormStatus').textContent = 'Submitting...';
+            fetch('https://httpbin.org/post', { method: 'POST', body: JSON.stringify({name: gid('ajaxName').value}) })
+                .then(function() { gid('ajaxFormStatus').textContent = 'Submitted!'; logTo('log1', 'Form submitted'); });
+        }
+
+        // ===== 2. Cascading DOM =====
+        function startCascadeDom() {
+            gid('cascadeContainer').innerHTML = '<span class="loading-spinner">Loading Level 1...</span>';
+            logTo('log2', 'Loading Level 1 (1.5s)...');
+            fetch('https://httpbin.org/delay/1').then(function(r) { return r.json(); }).then(function() {
+                logTo('log2', 'Level 1 loaded, injecting → triggers Level 2');
+                gid('cascadeContainer').innerHTML =
+                    '<div style="padding:8px;background:#e3f2fd;border-radius:4px;margin:4px 0;">' +
+                    '<strong>Level 1:</strong> User profile loaded ✓</div>' +
+                    '<div id="level2Container"><span class="loading-spinner">Loading Level 2...</span></div>';
+                return fetch('https://httpbin.org/delay/1').then(function(r) { return r.json(); });
+            }).then(function() {
+                logTo('log2', 'Level 2 loaded, injecting → triggers Level 3');
+                gid('level2Container').innerHTML =
+                    '<div style="padding:8px;background:#e8f5e9;border-radius:4px;margin:4px 0;">' +
+                    '<strong>Level 2:</strong> User orders loaded ✓</div>' +
+                    '<div id="level3Container"><span class="loading-spinner">Loading Level 3...</span></div>';
+                return fetch('https://httpbin.org/delay/1').then(function(r) { return r.json(); });
+            }).then(function() {
+                logTo('log2', 'Level 3 loaded — cascade complete');
+                gid('level3Container').innerHTML =
+                    '<div style="padding:8px;background:#fff3e0;border-radius:4px;margin:4px 0;">' +
+                    '<strong>Level 3:</strong> Order details loaded ✓</div>';
+                gid('cascadeContainer').className = 'dynamic-content loaded';
+            }).catch(function(e) { logTo('log2', 'Cascade error: ' + e.message); });
+        }
+
+        // ===== 3. Lazy Loading =====
+        function initLazyLoad() {
+            var container = gid('lazyContainer');
+            container.innerHTML = '';
+            for (var i = 1; i <= 20; i++) {
+                var item = document.createElement('div');
+                item.className = 'scroll-item';
+                item.setAttribute('data-index', i);
+                item.id = 'lazy-item-' + i;
+                item.textContent = 'Item ' + i + ' — scroll to load data';
+                item.style.opacity = '0.5';
+                container.appendChild(item);
+            }
+            logTo('log3', '20 items created, lazy loading initialized');
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting && !entry.target.getAttribute('data-loaded')) {
+                        entry.target.setAttribute('data-loaded', 'true');
+                        var idx = entry.target.getAttribute('data-index');
+                        fetch('https://httpbin.org/get?lazy=' + idx, { mode: 'no-cors' }).then(function() {
+                            entry.target.textContent = 'Item ' + idx + ' — DATA LOADED ✓';
+                            entry.target.style.opacity = '1';
+                            entry.target.style.background = '#e8f5e9';
+                            logTo('log3', 'Lazy item ' + idx + ' loaded');
+                        }).catch(function() {});
+                    }
+                });
+            }, { root: container, threshold: 0.5 });
+            container.querySelectorAll('.scroll-item').forEach(function(el) { observer.observe(el); });
+        }
+
+        // ===== 4. Dynamic Script/Resource Injection =====
+        function injectScript() {
+            logTo('log4', 'Injecting <script> tag...');
+            var s = document.createElement('script');
+            s.src = 'https://httpbin.org/get?script=injected&t=' + Date.now();
+            s.onload = function() { logTo('log4', 'Injected script loaded'); };
+            s.onerror = function() {
+                logTo('log4', 'Script loaded (response parsed)');
+                gid('injectionTarget').innerHTML += '<div style="color:green;">✓ Script resource fetched</div>';
+            };
+            document.body.appendChild(s);
+        }
+        function injectImage() {
+            logTo('log4', 'Injecting <img> tag...');
+            var img = document.createElement('img');
+            img.src = 'https://httpbin.org/image/png';
+            img.width = 100; img.height = 100;
+            img.onload = function() {
+                logTo('log4', 'Injected image loaded');
+                gid('injectionTarget').innerHTML += '<div style="color:green;">✓ Image resource loaded</div>';
+            };
+            img.onerror = function() { logTo('log4', 'Image load error'); };
+            gid('injectionTarget').appendChild(img);
+        }
+        function injectBoth() { injectScript(); injectImage(); }
+
+        // ===== 5. SPA Navigation =====
+        var currentRoute = 'home';
+        var spaAbort = null;
+        function spaNavigate(route) {
+            // Cancel any pending request from previous route
+            if (spaAbort) { spaAbort.abort(); logTo('log5', 'Aborted pending request from /' + currentRoute); }
+            spaAbort = new AbortController();
+            currentRoute = route;
+            // Update nav
+            document.querySelectorAll('#spaNav a').forEach(function(a) { a.className = ''; });
+            gid('nav-' + route).className = 'active';
+            history.pushState({route: route}, '', '#/' + route);
+            gid('spaContent').innerHTML = '<span class="loading-spinner">Loading /' + route + '...</span>';
+            logTo('log5', 'Navigating to /' + route);
+
+            var delays = { home: 0, products: 2, about: 1, slow: 6 };
+            var delay = delays[route] || 1;
+            fetch('https://httpbin.org/delay/' + delay, { signal: spaAbort.signal })
+                .then(function(r) { return r.json(); })
+                .then(function() {
+                    logTo('log5', '/' + route + ' data loaded');
+                    var pages = {
+                        home: '<h3>Home</h3><p>Welcome back!</p><input type="text" id="spaHomeInput" placeholder="Home input">',
+                        products: '<h3>Products</h3><p>10 products loaded.</p><input type="text" id="spaProductSearch" placeholder="Search products"><ul><li>Product A</li><li>Product B</li><li>Product C</li></ul>',
+                        about: '<h3>About</h3><p>Company info loaded.</p><input type="text" id="spaAboutInput" placeholder="Feedback">',
+                        slow: '<h3>Slow Page</h3><p>This took 6s to load. If navigated away before completion, the request should have been aborted.</p><input type="text" id="spaSlowInput" placeholder="Type after slow load">'
+                    };
+                    gid('spaContent').innerHTML = pages[route] || '<p>Unknown route</p>';
+                })
+                .catch(function(e) {
+                    if (e.name === 'AbortError') {
+                        logTo('log5', '/' + route + ' request aborted (navigated away)');
+                    } else {
+                        logTo('log5', '/' + route + ' error: ' + e.message);
+                    }
+                });
+        }
+
+        // ===== 6. Infinite Scroll =====
+        var infinitePage = 0;
+        var infiniteLoading = false;
+        function initInfiniteScroll() {
+            infinitePage = 0;
+            gid('infiniteContainer').innerHTML = '';
+            loadMoreItems();
+            gid('infiniteContainer').addEventListener('scroll', function() {
+                var el = gid('infiniteContainer');
+                if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20 && !infiniteLoading) {
+                    loadMoreItems();
+                }
+            });
+            logTo('log6', 'Infinite scroll initialized');
+        }
+        function loadMoreItems() {
+            infiniteLoading = true;
+            infinitePage++;
+            var loader = document.createElement('div');
+            loader.id = 'infinite-loader';
+            loader.className = 'loading-spinner';
+            loader.textContent = 'Loading page ' + infinitePage + '...';
+            gid('infiniteContainer').appendChild(loader);
+            logTo('log6', 'Loading page ' + infinitePage + '...');
+            fetch('https://httpbin.org/delay/1').then(function(r) { return r.json(); }).then(function() {
+                var l = gid('infinite-loader');
+                if (l) l.remove();
+                for (var i = 1; i <= 5; i++) {
+                    var item = document.createElement('div');
+                    item.className = 'scroll-item';
+                    item.textContent = 'Page ' + infinitePage + ', Item ' + i;
+                    gid('infiniteContainer').appendChild(item);
+                }
+                logTo('log6', 'Page ' + infinitePage + ' loaded (5 items)');
+                infiniteLoading = false;
+            }).catch(function() { infiniteLoading = false; });
+        }
+
+        // ===== 7. Iframe =====
+        function loadIframe() {
+            logTo('log7', 'Loading iframe with network activity...');
+            var iframeHtml = '<!DOCTYPE html><html><head><style>body{font-family:Arial;padding:15px;font-size:13px;} button{padding:6px 12px;background:#009688;color:white;border:none;border-radius:3px;cursor:pointer;margin:5px;} input{padding:6px;width:200px;border:1px solid #ccc;border-radius:3px;}</style></head><body>' +
+                '<h4>Iframe Content (independent network)</h4>' +
+                '<p id="iframeStatus">Loading data...</p>' +
+                '<input type="text" id="iframeInput" placeholder="Type inside iframe">' +
+                '<button onclick="loadData()">Reload Data</button>' +
+                '<script>' +
+                'function loadData(){document.getElementById("iframeStatus").textContent="Fetching...";' +
+                'fetch("https://httpbin.org/delay/2").then(function(r){return r.json()}).then(function(){' +
+                'document.getElementById("iframeStatus").textContent="Data loaded at "+new Date().toLocaleTimeString();' +
+                '}).catch(function(e){document.getElementById("iframeStatus").textContent="Error: "+e.message;});}' +
+                'loadData();' +
+                '<\/script></body></html>';
+            gid('testIframe').srcdoc = iframeHtml;
+        }
+    </script>
+<!-- INPUT VALUE MONITOR SCRIPT -->
+<script>
+(function() {
+    var eventValue = '';
+    var keyLog = [];
+    var activeField = null;
+    var inputEventFired = false;
+    var activeGroup = null;
+    var activeGroupLabel = '';
+
+    function getFieldLabel(el) {
+        var label = '';
+        if (el.id) label = '#' + el.id;
+        else if (el.name) label = '[name=' + el.name + ']';
+        else if (el.placeholder) label = '"' + el.placeholder.substring(0, 20) + '..."';
+        else if (el.className) label = '.' + el.className.split(' ')[0];
+        else label = el.tagName.toLowerCase();
+        var type = el.getAttribute('type') || el.tagName.toLowerCase();
+        return label + ' (' + type + ')';
+    }
+
+    function detectGroup(el) {
+        if (el.tagName !== 'INPUT') return null;
+        if (el.getAttribute('maxlength') !== '1') return null;
+        var parent = el.parentElement;
+        if (!parent) return null;
+        var elClasses = Array.from(el.classList);
+        var siblings = Array.from(parent.querySelectorAll('input[maxlength="1"]'));
+        if (siblings.length < 2) return null;
+        if (elClasses.length === 0) return siblings;
+        var group = siblings.filter(function(sib) {
+            return elClasses.some(function(cls) { return sib.classList.contains(cls); });
+        });
+        return group.length >= 2 ? group : null;
+    }
+
+    function getGroupLabel(group) {
+        if (!group || group.length === 0) return '';
+        var first = group[0]; var last = group[group.length - 1];
+        var type = 'Group';
+        if (first.classList.contains('otp-digit')) type = 'OTP';
+        else if (first.classList.contains('pin-digit')) type = 'PIN';
+        var firstId = first.id ? '#' + first.id : '?';
+        var lastId = last.id ? '#' + last.id : '?';
+        return type + ' ' + firstId + ' \u2192 ' + lastId + ' (' + group.length + ' fields)';
+    }
+
+    function getGroupValue(group) {
+        if (!group) return '';
+        return group.map(function(el) { return el.value || '_'; }).join('');
+    }
+
+    function isSameGroup(a, b) {
+        if (!a || !b) return false;
+        if (a.length !== b.length) return false;
+        return a[0] === b[0];
+    }
+
+    function updateBar() {
+        var domVal = activeField ? (activeField.value || activeField.textContent || '') : '';
+        document.getElementById('monitorActiveField').textContent = activeField ? getFieldLabel(activeField) : '—';
+        document.getElementById('monitorEventValue').textContent = eventValue || '—';
+        document.getElementById('monitorDomValue').textContent = domVal || '—';
+        document.getElementById('monitorKeyLog').textContent = keyLog.length > 0 ? keyLog.slice(-20).join('') : '—';
+
+        var domValEl = document.getElementById('monitorDomValue');
+        var sourceEl = document.getElementById('monitorSource');
+        var groupSection = document.getElementById('monitorGroupSection');
+        var groupDivider = document.getElementById('monitorGroupDivider');
+
+        if (activeGroup && activeGroup.length > 1) {
+            document.getElementById('monitorGroupLabel').textContent = activeGroupLabel;
+            document.getElementById('monitorGroupValue').textContent = getGroupValue(activeGroup);
+            groupSection.style.display = '';
+            groupDivider.style.display = '';
+        } else {
+            groupSection.style.display = 'none';
+            groupDivider.style.display = 'none';
+        }
+
+        if (!activeField || (!eventValue && !domVal)) {
+            sourceEl.textContent = '—';
+            sourceEl.className = 'monitor-source';
+            domValEl.className = 'monitor-value';
+        } else if (inputEventFired && eventValue === domVal) {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        } else if (domVal && !inputEventFired) {
+            sourceEl.textContent = 'JS INJECTED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else if (eventValue !== domVal) {
+            sourceEl.textContent = 'MODIFIED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        }
+    }
+
+    document.addEventListener('focusin', function(e) {
+        var tag = e.target.tagName;
+        var isEditable = e.target.isContentEditable;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || isEditable) {
+            var newGroup = detectGroup(e.target);
+            var stayingInGroup = isSameGroup(newGroup, activeGroup);
+            activeField = e.target;
+            eventValue = e.target.value || e.target.textContent || '';
+            if (stayingInGroup) {
+                inputEventFired = true;
+            } else {
+                keyLog = [];
+                inputEventFired = false;
+                activeGroup = newGroup;
+                activeGroupLabel = newGroup ? getGroupLabel(newGroup) : '';
+            }
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+        if (!activeField) return;
+        var isGroupKey = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupKey && !activeField.contains(e.target)) return;
+        var key = e.key;
+        if (key === 'Backspace') keyLog.push('\u232b');
+        else if (key === 'Enter') keyLog.push('\u21b5');
+        else if (key === 'Tab') keyLog.push('\u21e5');
+        else if (key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta') { /* skip modifiers */ }
+        else if (key.length === 1) keyLog.push(key);
+        updateBar();
+    }, true);
+
+    document.addEventListener('input', function(e) {
+        if (!activeField) return;
+        var isGroupInput = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupInput && !activeField.contains(e.target)) return;
+        inputEventFired = true;
+        eventValue = e.target.value || e.target.textContent || '';
+        activeField = e.target;
+        updateBar();
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT') {
+            activeField = e.target;
+            activeGroup = null;
+            activeGroupLabel = '';
+            inputEventFired = true;
+            eventValue = e.target.value;
+            updateBar();
+        }
+    }, true);
+
+    setInterval(function() {
+        if (activeField) updateBar();
+    }, 500);
+})();
+</script>
+</body>
+</html>

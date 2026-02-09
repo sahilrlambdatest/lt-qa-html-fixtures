@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Input Types & States</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%); margin: 0; padding: 0; min-height: 100vh; color: #2d3748; }
+        .section { background: white; border: none; padding: 28px; margin: 24px 0; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); transition: box-shadow 0.2s; }
+        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+        .section h2 { margin-top: 0; color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #4CAF50; padding-bottom: 12px; margin-bottom: 20px; }
+        label { display: block; margin: 16px 0 6px; font-weight: 600; font-size: 14px; color: #4a5568; }
+        input, textarea { padding: 10px 14px; width: 100%; max-width: 400px; display: block; margin-bottom: 4px; border: 1.5px solid #d2d6dc; border-radius: 10px; font-size: 14px; color: #2d3748; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; outline: none; font-family: inherit; box-sizing: border-box; }
+        input:focus, textarea:focus { border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.15); }
+        textarea { width: 100%; max-width: 440px; }
+        .hint { font-size: 12px; color: #a0aec0; margin-bottom: 12px; display: block; }
+        button { padding: 11px 28px; cursor: pointer; margin: 15px 8px 0 0; background: linear-gradient(135deg, #4CAF50, #43A047); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(76,175,80,0.3); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(76,175,80,0.4); }
+        button:active { transform: translateY(0); }
+        #result { margin-top: 15px; padding: 14px; background: #f7fafc; border: 1.5px solid #e2e8f0; min-height: 30px; border-radius: 10px; font-size: 14px; color: #4a5568; }
+        /* ===== INPUT VALUE MONITOR BAR ===== */
+        #inputMonitorBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #e2e8f0;
+            z-index: 99999;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 12px;
+            height: 40px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        #inputMonitorBar .monitor-title {
+            color: #a5b4fc;
+            font-weight: 700;
+            white-space: nowrap;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            margin-right: 4px;
+        }
+        #inputMonitorBar .monitor-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(148, 163, 184, 0.2);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+        #inputMonitorBar .monitor-field {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        #inputMonitorBar .monitor-field:hover {
+            background: rgba(148, 163, 184, 0.08);
+        }
+        #inputMonitorBar .monitor-label {
+            color: #94a3b8;
+            font-size: 10px;
+            white-space: nowrap;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #inputMonitorBar .monitor-value {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #34d399;
+            min-width: 80px;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .monitor-value.js-injected {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+        }
+        #inputMonitorBar .monitor-value.match {
+            color: #34d399;
+        }
+        #inputMonitorBar .monitor-source {
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .source-real {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        #inputMonitorBar .source-js {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        #inputMonitorBar .monitor-element-id {
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        #inputMonitorBar .monitor-value.group-val {
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(120, 53, 15, 0.2);
+            font-size: 13px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        #inputMonitorBar .monitor-group-label {
+            color: #fbbf24;
+            font-size: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- INPUT VALUE MONITOR BAR -->
+<div id="inputMonitorBar">
+    <span class="monitor-title">Input Monitor</span>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Active:</span>
+        <span class="monitor-element-id" id="monitorActiveField">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Event Value:</span>
+        <span class="monitor-value" id="monitorEventValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">.value:</span>
+        <span class="monitor-value" id="monitorDomValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Source:</span>
+        <span class="monitor-source" id="monitorSource">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Keys:</span>
+        <span class="monitor-value" id="monitorKeyLog" style="max-width:200px;">—</span>
+    </div>
+    <div class="monitor-divider" id="monitorGroupDivider" style="display:none;"></div>
+    <div class="monitor-field" id="monitorGroupSection" style="display:none;">
+        <span class="monitor-group-label" id="monitorGroupLabel">—</span>
+        <span class="monitor-value group-val" id="monitorGroupValue">—</span>
+    </div>
+</div>
+
+<header style="background: linear-gradient(135deg, #4CAF50, #2E7D32); padding: 30px 40px; margin-top: 48px; color: white;">
+    <div style="max-width: 800px; margin: auto;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">All Input Types & States</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Comprehensive test page for every HTML input type, element type, and field state</p>
+    </div>
+</header>
+
+<main style="max-width: 800px; margin: 30px auto; padding: 0 20px 40px;">
+
+    <!-- SECTION: Input Type Attributes (C2) -->
+    <div class="section">
+        <h2>Input Type Attributes</h2>
+
+        <label for="text">Standard Text (type="text")</label>
+        <input type="text" id="text" placeholder="Enter any text">
+        <span class="hint">Standard text input — baseline</span>
+
+        <label for="password">Password (type="password")</label>
+        <input type="password" id="password" placeholder="Enter password">
+        <span class="hint">Masked characters</span>
+
+        <label for="email">Email (type="email")</label>
+        <input type="email" id="email" placeholder="user@example.com">
+        <span class="hint">Browser validates email format on submit</span>
+
+        <label for="number">Number (type="number")</label>
+        <input type="number" id="number" placeholder="0" step="any">
+        <span class="hint">Accepts numbers only, has spinner buttons</span>
+
+        <label for="tel">Phone (type="tel")</label>
+        <input type="tel" id="tel" placeholder="+1-555-123-4567">
+        <span class="hint">Accepts any chars, mobile shows phone keyboard</span>
+
+        <label for="url">URL (type="url")</label>
+        <input type="url" id="url" placeholder="https://example.com">
+        <span class="hint">Browser validates URL format on submit</span>
+
+        <label for="search">Search (type="search")</label>
+        <input type="search" id="search" placeholder="Search...">
+        <span class="hint">Has browser clear button</span>
+
+        <label for="date">Date (type="date")</label>
+        <input type="date" id="date">
+        <span class="hint">Date picker — format varies by locale</span>
+
+        <label for="time">Time (type="time")</label>
+        <input type="time" id="time">
+        <span class="hint">Time picker — HH:MM format</span>
+
+        <label for="datetime">DateTime-Local (type="datetime-local")</label>
+        <input type="datetime-local" id="datetime">
+        <span class="hint">Combined date + time picker</span>
+    </div>
+
+    <!-- SECTION: Element Types (C1) -->
+    <div class="section">
+        <h2>Element Types</h2>
+
+        <label for="textarea">Comments (textarea)</label>
+        <textarea id="textarea" rows="4" placeholder="Multi-line text..."></textarea>
+        <span class="hint">Multi-line text area</span>
+
+        <label for="longtext">Long Text (textarea)</label>
+        <textarea id="longtext" rows="6" placeholder="Enter very long text here..."></textarea>
+        <span class="hint">For testing long text input performance</span>
+
+        <label>Rich Text Editor (contenteditable)</label>
+        <div id="contenteditable" contenteditable="true"
+             style="border: 1.5px solid #d2d6dc; padding: 12px 14px; width: 100%; max-width: 400px; min-height: 60px; border-radius: 10px; background: white; font-family: inherit; font-size: 14px; box-sizing: border-box;">
+            Click here to edit...
+        </div>
+        <span class="hint">contenteditable div — not a form element</span>
+
+        <label>Shadow DOM Input (web component)</label>
+        <shadow-input id="shadow-host"></shadow-input>
+        <span class="hint">Input inside shadow DOM</span>
+    </div>
+
+    <!-- SECTION: Field States (C5) -->
+    <div class="section">
+        <h2>Field States</h2>
+
+        <label for="prefilled">Prefilled</label>
+        <input type="text" id="prefilled" value="Pre-existing value">
+        <span class="hint">Has existing value — clear() must remove it</span>
+
+        <label for="readonly">Readonly</label>
+        <input type="text" id="readonly" value="Cannot edit this" readonly>
+        <span class="hint">readonly attribute — click works, typing ignored</span>
+
+        <label for="disabled">Disabled</label>
+        <input type="text" id="disabled" value="Disabled field" disabled>
+        <span class="hint">disabled attribute — not interactable</span>
+
+        <label for="required">Required *</label>
+        <input type="text" id="required" required placeholder="This field is required">
+        <span class="hint">required attribute — form won't submit if empty</span>
+
+        <label for="maxlen">Maxlength 10</label>
+        <input type="text" id="maxlen" maxlength="10" placeholder="Max 10 chars">
+        <span class="hint">maxlength=10 — browser truncates at 10 characters</span>
+
+        <label for="minlen">Minlength 3</label>
+        <input type="text" id="minlen" minlength="3" placeholder="Min 3 chars">
+        <span class="hint">minlength=3 — validation on submit</span>
+
+        <label for="pattern">Zip Code (5 digits) [pattern]</label>
+        <input type="text" id="pattern" pattern="[0-9]{5}" placeholder="12345">
+        <span class="hint">pattern="[0-9]{5}" — regex validation on submit</span>
+
+        <label for="autofocus">Autofocused</label>
+        <input type="text" id="autofocus" autofocus placeholder="This field auto-focuses on page load">
+        <span class="hint">autofocus attribute — has focus on load</span>
+
+        <label for="placeholder-only">Placeholder Only</label>
+        <input type="text" id="placeholder-only" placeholder="I have a long placeholder text that describes what to enter">
+        <span class="hint">Only has placeholder, no value</span>
+
+        <label for="hidden-field">Hidden Field</label>
+        <input type="hidden" id="hidden-field" value="hidden_value_123">
+        <span class="hint">type="hidden" — not visible, not interactable</span>
+    </div>
+
+    <!-- SECTION: Complete Form (for consecutive input testing) -->
+    <div class="section">
+        <h2>Complete Form (for consecutive input testing)</h2>
+        <form id="testForm" onsubmit="handleSubmit(event)">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="firstName" placeholder="John">
+
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="lastName" placeholder="Doe">
+
+            <button type="submit">Submit Form</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+</main>
+
+<footer style="text-align: center; padding: 30px 20px; color: #a0aec0; font-size: 13px; border-top: 1px solid #e2e8f0; margin-top: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+    KaneAI Test Suite &mdash; All Input Types & States &mdash; Smart Wait & Input Optimization Testing
+</footer>
+
+    <script>
+        // Shadow DOM component
+        class ShadowInput extends HTMLElement {
+            constructor() {
+                super();
+                const shadow = this.attachShadow({ mode: 'open' });
+                shadow.innerHTML = `
+                    <style>
+                        input { padding: 8px; width: 350px; border: 1px solid #ccc; border-radius: 4px; }
+                        label { display: block; margin-bottom: 4px; font-weight: bold; }
+                    </style>
+                    <label for="shadowInput">Shadow Input</label>
+                    <input type="text" id="shadowInput" placeholder="Inside shadow DOM">
+                `;
+            }
+        }
+        customElements.define('shadow-input', ShadowInput);
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const entries = [...formData.entries()].map(([k, v]) => k + ': ' + v).join(', ');
+            document.getElementById('result').textContent = 'Submitted: ' + entries;
+        }
+    </script>
+<!-- INPUT VALUE MONITOR SCRIPT -->
+<script>
+(function() {
+    var eventValue = '';
+    var keyLog = [];
+    var activeField = null;
+    var inputEventFired = false;
+    var activeGroup = null;
+    var activeGroupLabel = '';
+
+    function getFieldLabel(el) {
+        var label = '';
+        if (el.id) label = '#' + el.id;
+        else if (el.name) label = '[name=' + el.name + ']';
+        else if (el.placeholder) label = '"' + el.placeholder.substring(0, 20) + '..."';
+        else if (el.className) label = '.' + el.className.split(' ')[0];
+        else label = el.tagName.toLowerCase();
+        var type = el.getAttribute('type') || el.tagName.toLowerCase();
+        return label + ' (' + type + ')';
+    }
+
+    function detectGroup(el) {
+        if (el.tagName !== 'INPUT') return null;
+        if (el.getAttribute('maxlength') !== '1') return null;
+        var parent = el.parentElement;
+        if (!parent) return null;
+        var elClasses = Array.from(el.classList);
+        var siblings = Array.from(parent.querySelectorAll('input[maxlength="1"]'));
+        if (siblings.length < 2) return null;
+        if (elClasses.length === 0) return siblings;
+        var group = siblings.filter(function(sib) {
+            return elClasses.some(function(cls) { return sib.classList.contains(cls); });
+        });
+        return group.length >= 2 ? group : null;
+    }
+
+    function getGroupLabel(group) {
+        if (!group || group.length === 0) return '';
+        var first = group[0]; var last = group[group.length - 1];
+        var type = 'Group';
+        if (first.classList.contains('otp-digit')) type = 'OTP';
+        else if (first.classList.contains('pin-digit')) type = 'PIN';
+        var firstId = first.id ? '#' + first.id : '?';
+        var lastId = last.id ? '#' + last.id : '?';
+        return type + ' ' + firstId + ' \u2192 ' + lastId + ' (' + group.length + ' fields)';
+    }
+
+    function getGroupValue(group) {
+        if (!group) return '';
+        return group.map(function(el) { return el.value || '_'; }).join('');
+    }
+
+    function isSameGroup(a, b) {
+        if (!a || !b) return false;
+        if (a.length !== b.length) return false;
+        return a[0] === b[0];
+    }
+
+    function updateBar() {
+        var domVal = activeField ? (activeField.value || activeField.textContent || '') : '';
+        document.getElementById('monitorActiveField').textContent = activeField ? getFieldLabel(activeField) : '—';
+        document.getElementById('monitorEventValue').textContent = eventValue || '—';
+        document.getElementById('monitorDomValue').textContent = domVal || '—';
+        document.getElementById('monitorKeyLog').textContent = keyLog.length > 0 ? keyLog.slice(-20).join('') : '—';
+
+        var domValEl = document.getElementById('monitorDomValue');
+        var sourceEl = document.getElementById('monitorSource');
+        var groupSection = document.getElementById('monitorGroupSection');
+        var groupDivider = document.getElementById('monitorGroupDivider');
+
+        if (activeGroup && activeGroup.length > 1) {
+            document.getElementById('monitorGroupLabel').textContent = activeGroupLabel;
+            document.getElementById('monitorGroupValue').textContent = getGroupValue(activeGroup);
+            groupSection.style.display = '';
+            groupDivider.style.display = '';
+        } else {
+            groupSection.style.display = 'none';
+            groupDivider.style.display = 'none';
+        }
+
+        if (!activeField || (!eventValue && !domVal)) {
+            sourceEl.textContent = '—';
+            sourceEl.className = 'monitor-source';
+            domValEl.className = 'monitor-value';
+        } else if (inputEventFired && eventValue === domVal) {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        } else if (domVal && !inputEventFired) {
+            sourceEl.textContent = 'JS INJECTED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else if (eventValue !== domVal) {
+            sourceEl.textContent = 'MODIFIED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        }
+    }
+
+    document.addEventListener('focusin', function(e) {
+        var tag = e.target.tagName;
+        var isEditable = e.target.isContentEditable;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || isEditable) {
+            var newGroup = detectGroup(e.target);
+            var stayingInGroup = isSameGroup(newGroup, activeGroup);
+            activeField = e.target;
+            eventValue = e.target.value || e.target.textContent || '';
+            if (stayingInGroup) {
+                inputEventFired = true;
+            } else {
+                keyLog = [];
+                inputEventFired = false;
+                activeGroup = newGroup;
+                activeGroupLabel = newGroup ? getGroupLabel(newGroup) : '';
+            }
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+        if (!activeField) return;
+        var isGroupKey = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupKey && !activeField.contains(e.target)) return;
+        var key = e.key;
+        if (key === 'Backspace') keyLog.push('\u232b');
+        else if (key === 'Enter') keyLog.push('\u21b5');
+        else if (key === 'Tab') keyLog.push('\u21e5');
+        else if (key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta') { /* skip modifiers */ }
+        else if (key.length === 1) keyLog.push(key);
+        updateBar();
+    }, true);
+
+    document.addEventListener('input', function(e) {
+        if (!activeField) return;
+        var isGroupInput = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupInput && !activeField.contains(e.target)) return;
+        inputEventFired = true;
+        eventValue = e.target.value || e.target.textContent || '';
+        activeField = e.target;
+        updateBar();
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT') {
+            activeField = e.target;
+            activeGroup = null;
+            activeGroupLabel = '';
+            inputEventFired = true;
+            eventValue = e.target.value;
+            updateBar();
+        }
+    }, true);
+
+    setInterval(function() {
+        if (activeField) updateBar();
+    }, 500);
+})();
+</script>
+</body>
+</html>

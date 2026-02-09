@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Input Behaviors</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #fff8f0 0%, #f5ede4 100%); margin: 0; padding: 0; min-height: 100vh; color: #2d3748; }
+        .section { background: white; border: none; padding: 28px; margin: 24px 0; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); transition: box-shadow 0.2s ease; }
+        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+        .section h2 { margin-top: 0; color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #FF9800; padding-bottom: 12px; margin-bottom: 20px; }
+        label { display: block; margin: 14px 0 6px; font-weight: 600; color: #4a5568; font-size: 14px; }
+        input, textarea { padding: 10px 14px; width: 350px; display: block; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; color: #2d3748; background: #fff; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        input:focus, textarea:focus { border-color: #FF9800; box-shadow: 0 0 0 3px rgba(255,152,0,0.15); outline: none; }
+        .hint { font-size: 12px; color: #a0aec0; display: block; margin-top: 6px; margin-bottom: 8px; font-weight: 500; }
+        button { padding: 10px 22px; cursor: pointer; margin: 10px 5px 10px 0; background: linear-gradient(135deg, #FF9800, #F57C00); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: inherit; box-shadow: 0 2px 6px rgba(255,152,0,0.3); transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,152,0,0.4); }
+        button:active { transform: translateY(0); }
+        .error { color: #e53e3e; font-size: 13px; margin-top: 6px; font-weight: 500; }
+        .success { color: #38a169; font-size: 13px; margin-top: 6px; font-weight: 500; }
+        .results-box { margin-top: 10px; padding: 14px; background: #fffbf5; border: 1.5px solid #feebc8; min-height: 36px; border-radius: 10px; font-size: 14px; color: #744210; }
+        .counter { font-size: 13px; color: #a0aec0; margin-top: 6px; font-weight: 500; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 100; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 32px; border-radius: 20px; width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .modal-overlay.active { display: flex; }
+        #ajax-form-container { min-height: 50px; border: 2px dashed #e2e8f0; padding: 20px; margin: 12px 0; border-radius: 12px; background: #fafafa; }
+        iframe { border: 1.5px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        /* ===== INPUT VALUE MONITOR BAR ===== */
+        #inputMonitorBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #e2e8f0;
+            z-index: 99999;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 12px;
+            height: 40px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        #inputMonitorBar .monitor-title {
+            color: #a5b4fc;
+            font-weight: 700;
+            white-space: nowrap;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            margin-right: 4px;
+        }
+        #inputMonitorBar .monitor-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(148, 163, 184, 0.2);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+        #inputMonitorBar .monitor-field {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        #inputMonitorBar .monitor-field:hover {
+            background: rgba(148, 163, 184, 0.08);
+        }
+        #inputMonitorBar .monitor-label {
+            color: #94a3b8;
+            font-size: 10px;
+            white-space: nowrap;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #inputMonitorBar .monitor-value {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #34d399;
+            min-width: 80px;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .monitor-value.js-injected {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+        }
+        #inputMonitorBar .monitor-value.match {
+            color: #34d399;
+        }
+        #inputMonitorBar .monitor-source {
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .source-real {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        #inputMonitorBar .source-js {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        #inputMonitorBar .monitor-element-id {
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        #inputMonitorBar .monitor-value.group-val {
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(120, 53, 15, 0.2);
+            font-size: 13px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        #inputMonitorBar .monitor-group-label {
+            color: #fbbf24;
+            font-size: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- INPUT VALUE MONITOR BAR -->
+<div id="inputMonitorBar">
+    <span class="monitor-title">Input Monitor</span>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Active:</span>
+        <span class="monitor-element-id" id="monitorActiveField">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Event Value:</span>
+        <span class="monitor-value" id="monitorEventValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">.value:</span>
+        <span class="monitor-value" id="monitorDomValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Source:</span>
+        <span class="monitor-source" id="monitorSource">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Keys:</span>
+        <span class="monitor-value" id="monitorKeyLog" style="max-width:200px;">—</span>
+    </div>
+    <div class="monitor-divider" id="monitorGroupDivider" style="display:none;"></div>
+    <div class="monitor-field" id="monitorGroupSection" style="display:none;">
+        <span class="monitor-group-label" id="monitorGroupLabel">—</span>
+        <span class="monitor-value group-val" id="monitorGroupValue">—</span>
+    </div>
+</div>
+
+<header style="background: linear-gradient(135deg, #FF9800, #E65100); padding: 30px 40px; margin-top: 48px; color: white;">
+    <div style="max-width: 800px; margin: auto;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Input Behaviors</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">Live Search, Debounce, Blur Validation, Modal, AJAX Forms &amp; iFrame</p>
+    </div>
+</header>
+
+<main style="max-width: 800px; margin: 30px auto; padding: 0 20px 40px;">
+
+    <!-- Live Search (API on each keystroke) -->
+    <div class="section">
+        <h2>Live Search (API on Each Keystroke)</h2>
+        <label for="liveSearch">Live Search</label>
+        <input type="text" id="liveSearch" placeholder="Type to search..." autocomplete="off">
+        <span class="hint">Fires fetch() on every keystroke</span>
+        <div class="results-box" id="liveSearchResults">Search results will appear here...</div>
+    </div>
+
+    <!-- Debounced Search -->
+    <div class="section">
+        <h2>Debounced Search (300ms Delay)</h2>
+        <label for="debouncedSearch">Debounced Search</label>
+        <input type="text" id="debouncedSearch" placeholder="Type to search (300ms debounce)..." autocomplete="off">
+        <span class="hint">Waits 300ms after last keystroke before firing API</span>
+        <div class="results-box" id="debouncedResults">Results for: (waiting for input...)</div>
+    </div>
+
+    <!-- Validate on Blur -->
+    <div class="section">
+        <h2>Email Validation on Blur</h2>
+        <label for="blurEmail">Email (validate on blur)</label>
+        <input type="text" id="blurEmail" placeholder="Enter email, then click away">
+        <span class="hint">Validation API fires when you leave the field (blur event)</span>
+        <div id="blurResult"></div>
+
+        <label for="otherField">Other Field (click here to trigger blur)</label>
+        <input type="text" id="otherField" placeholder="Click here to trigger email blur">
+    </div>
+
+    <!-- Real-time Validation -->
+    <div class="section">
+        <h2>Real-time Inline Validation</h2>
+        <label for="username">Username (min 3 chars)</label>
+        <input type="text" id="username" placeholder="Choose a username" autocomplete="off">
+        <div id="usernameValidation"></div>
+        <span class="hint">Validates in real-time as you type</span>
+    </div>
+
+    <!-- Character Counter -->
+    <div class="section">
+        <h2>Character Counter (Tweet-style)</h2>
+        <label for="tweet">Tweet</label>
+        <textarea id="tweet" rows="3" maxlength="280" placeholder="What's happening?"></textarea>
+        <div class="counter" id="tweetCounter">0/280</div>
+        <span class="hint">Shows character count updating in real-time</span>
+    </div>
+
+    <!-- Modal Input -->
+    <div class="section">
+        <h2>Input Inside Modal</h2>
+        <button onclick="openModal()">Open Modal</button>
+        <span class="hint">Opens a modal dialog with an input field</span>
+    </div>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <h3>Modal Form</h3>
+            <label for="modalInput">Modal Input</label>
+            <input type="text" id="modalInput" placeholder="Type inside modal">
+            <label for="modalEmail">Modal Email</label>
+            <input type="email" id="modalEmail" placeholder="email@modal.com">
+            <br>
+            <button onclick="closeModal()">Close</button>
+            <button onclick="submitModal()">Submit</button>
+            <div id="modalResult"></div>
+        </div>
+    </div>
+
+    <!-- AJAX Loaded Form -->
+    <div class="section">
+        <h2>AJAX Loaded Form</h2>
+        <button onclick="loadForm()">Load Form</button>
+        <span class="hint">Loads a form via AJAX (simulated 1.5s delay)</span>
+        <div id="ajax-form-container">Form will be loaded here...</div>
+    </div>
+
+    <!-- Iframe Input -->
+    <div class="section">
+        <h2>Input Inside Iframe</h2>
+        <iframe id="inputIframe" srcdoc='<!DOCTYPE html>
+<html>
+<head><style>
+    body { font-family: Arial, sans-serif; padding: 15px; margin: 0; }
+    input { padding: 8px; width: 280px; border: 1px solid #ccc; border-radius: 4px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+</style></head>
+<body>
+    <label for="iframeInput">Iframe Input</label>
+    <input type="text" id="iframeInput" placeholder="Type inside iframe">
+    <label for="iframePassword" style="margin-top:10px;">Iframe Password</label>
+    <input type="password" id="iframePassword" placeholder="Password in iframe">
+</body>
+</html>' width="400" height="130"></iframe>
+        <span class="hint">Input elements inside an iframe</span>
+    </div>
+
+</main>
+
+<footer style="background: linear-gradient(135deg, #FF9800, #E65100); padding: 24px 40px; color: white; text-align: center;">
+    <div style="max-width: 800px; margin: auto;">
+        <p style="margin: 0; font-size: 14px; opacity: 0.9;">Input Behaviors Test Page &mdash; Built for automated testing of dynamic input interactions.</p>
+    </div>
+</footer>
+
+    <script>
+        // --- Live Search (keystroke API) ---
+        document.getElementById('liveSearch').addEventListener('input', function() {
+            var query = this.value;
+            if (query.length < 1) {
+                document.getElementById('liveSearchResults').textContent = 'Search results will appear here...';
+                return;
+            }
+            document.getElementById('liveSearchResults').textContent = 'Searching...';
+            fetch('https://httpbin.org/get?q=' + encodeURIComponent(query), { mode: 'cors' })
+                .then(function(r) { return r.json(); })
+                .then(function() {
+                    document.getElementById('liveSearchResults').textContent =
+                        'Search results for: "' + query + '" (found ' + Math.floor(Math.random() * 100) + ' results)';
+                })
+                .catch(function() {
+                    document.getElementById('liveSearchResults').textContent =
+                        'Search results for: "' + query + '"';
+                });
+        });
+
+        // --- Debounced Search ---
+        var debounceTimer;
+        document.getElementById('debouncedSearch').addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            var query = this.value;
+            document.getElementById('debouncedResults').textContent = 'Typing... (waiting for 300ms pause)';
+            debounceTimer = setTimeout(function() {
+                fetch('https://httpbin.org/get?q=' + encodeURIComponent(query), { mode: 'cors' })
+                    .then(function(r) { return r.json(); })
+                    .then(function() {
+                        document.getElementById('debouncedResults').textContent = 'Results for: ' + query;
+                    })
+                    .catch(function() {
+                        document.getElementById('debouncedResults').textContent = 'Results for: ' + query;
+                    });
+            }, 300);
+        });
+
+        // --- Blur Validation ---
+        document.getElementById('blurEmail').addEventListener('blur', function() {
+            var email = this.value;
+            var isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            var resultDiv = document.getElementById('blurResult');
+            fetch('https://httpbin.org/get?email=' + encodeURIComponent(email), { mode: 'cors' })
+                .then(function() {
+                    if (isValid) {
+                        resultDiv.innerHTML = '<span class="success">Email valid</span>';
+                    } else {
+                        resultDiv.innerHTML = '<span class="error">Invalid email format</span>';
+                    }
+                })
+                .catch(function() {
+                    if (isValid) {
+                        resultDiv.innerHTML = '<span class="success">Email valid</span>';
+                    } else {
+                        resultDiv.innerHTML = '<span class="error">Invalid email format</span>';
+                    }
+                });
+        });
+
+        // --- Real-time Validation ---
+        document.getElementById('username').addEventListener('input', function() {
+            var val = this.value;
+            var div = document.getElementById('usernameValidation');
+            if (val.length === 0) {
+                div.innerHTML = '';
+            } else if (val.length < 3) {
+                div.innerHTML = '<span class="error">Too short (min 3 characters)</span>';
+            } else if (val.length > 20) {
+                div.innerHTML = '<span class="error">Too long (max 20 characters)</span>';
+            } else {
+                div.innerHTML = '<span class="success">Valid username</span>';
+            }
+        });
+
+        // --- Character Counter ---
+        document.getElementById('tweet').addEventListener('input', function() {
+            document.getElementById('tweetCounter').textContent = this.value.length + '/280';
+        });
+
+        // --- Modal ---
+        function openModal() {
+            document.getElementById('modalOverlay').classList.add('active');
+            setTimeout(function() {
+                document.getElementById('modalInput').focus();
+            }, 100);
+        }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+        function submitModal() {
+            var val = document.getElementById('modalInput').value;
+            document.getElementById('modalResult').textContent = 'Submitted: ' + val;
+        }
+
+        // --- AJAX Form Load ---
+        function loadForm() {
+            var container = document.getElementById('ajax-form-container');
+            container.innerHTML = '<p>Loading form...</p>';
+            setTimeout(function() {
+                container.innerHTML =
+                    '<label for="ajaxName" style="font-weight:bold;">Name (loaded via AJAX)</label>' +
+                    '<input type="text" id="ajaxName" placeholder="Enter your name" style="padding:8px; width:350px; border:1px solid #ccc; border-radius:4px;">' +
+                    '<br><br>' +
+                    '<label for="ajaxComment" style="font-weight:bold;">Comment</label>' +
+                    '<textarea id="ajaxComment" rows="3" placeholder="Your comment..." style="padding:8px; width:350px; border:1px solid #ccc; border-radius:4px;"></textarea>' +
+                    '<br><br>' +
+                    '<button onclick="document.getElementById(\'ajax-form-container\').innerHTML=\'Submitted: \' + document.getElementById(\'ajaxName\').value" ' +
+                    'style="padding:8px 16px; background:#FF9800; color:white; border:none; border-radius:4px; cursor:pointer;">Submit</button>';
+            }, 1500);
+        }
+    </script>
+<!-- INPUT VALUE MONITOR SCRIPT -->
+<script>
+(function() {
+    var eventValue = '';
+    var keyLog = [];
+    var activeField = null;
+    var inputEventFired = false;
+    var activeGroup = null;
+    var activeGroupLabel = '';
+
+    function getFieldLabel(el) {
+        var label = '';
+        if (el.id) label = '#' + el.id;
+        else if (el.name) label = '[name=' + el.name + ']';
+        else if (el.placeholder) label = '"' + el.placeholder.substring(0, 20) + '..."';
+        else if (el.className) label = '.' + el.className.split(' ')[0];
+        else label = el.tagName.toLowerCase();
+        var type = el.getAttribute('type') || el.tagName.toLowerCase();
+        return label + ' (' + type + ')';
+    }
+
+    function detectGroup(el) {
+        if (el.tagName !== 'INPUT') return null;
+        if (el.getAttribute('maxlength') !== '1') return null;
+        var parent = el.parentElement;
+        if (!parent) return null;
+        var elClasses = Array.from(el.classList);
+        var siblings = Array.from(parent.querySelectorAll('input[maxlength="1"]'));
+        if (siblings.length < 2) return null;
+        if (elClasses.length === 0) return siblings;
+        var group = siblings.filter(function(sib) {
+            return elClasses.some(function(cls) { return sib.classList.contains(cls); });
+        });
+        return group.length >= 2 ? group : null;
+    }
+
+    function getGroupLabel(group) {
+        if (!group || group.length === 0) return '';
+        var first = group[0]; var last = group[group.length - 1];
+        var type = 'Group';
+        if (first.classList.contains('otp-digit')) type = 'OTP';
+        else if (first.classList.contains('pin-digit')) type = 'PIN';
+        var firstId = first.id ? '#' + first.id : '?';
+        var lastId = last.id ? '#' + last.id : '?';
+        return type + ' ' + firstId + ' \u2192 ' + lastId + ' (' + group.length + ' fields)';
+    }
+
+    function getGroupValue(group) {
+        if (!group) return '';
+        return group.map(function(el) { return el.value || '_'; }).join('');
+    }
+
+    function isSameGroup(a, b) {
+        if (!a || !b) return false;
+        if (a.length !== b.length) return false;
+        return a[0] === b[0];
+    }
+
+    function updateBar() {
+        var domVal = activeField ? (activeField.value || activeField.textContent || '') : '';
+        document.getElementById('monitorActiveField').textContent = activeField ? getFieldLabel(activeField) : '—';
+        document.getElementById('monitorEventValue').textContent = eventValue || '—';
+        document.getElementById('monitorDomValue').textContent = domVal || '—';
+        document.getElementById('monitorKeyLog').textContent = keyLog.length > 0 ? keyLog.slice(-20).join('') : '—';
+
+        var domValEl = document.getElementById('monitorDomValue');
+        var sourceEl = document.getElementById('monitorSource');
+        var groupSection = document.getElementById('monitorGroupSection');
+        var groupDivider = document.getElementById('monitorGroupDivider');
+
+        if (activeGroup && activeGroup.length > 1) {
+            document.getElementById('monitorGroupLabel').textContent = activeGroupLabel;
+            document.getElementById('monitorGroupValue').textContent = getGroupValue(activeGroup);
+            groupSection.style.display = '';
+            groupDivider.style.display = '';
+        } else {
+            groupSection.style.display = 'none';
+            groupDivider.style.display = 'none';
+        }
+
+        if (!activeField || (!eventValue && !domVal)) {
+            sourceEl.textContent = '—';
+            sourceEl.className = 'monitor-source';
+            domValEl.className = 'monitor-value';
+        } else if (inputEventFired && eventValue === domVal) {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        } else if (domVal && !inputEventFired) {
+            sourceEl.textContent = 'JS INJECTED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else if (eventValue !== domVal) {
+            sourceEl.textContent = 'MODIFIED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        }
+    }
+
+    document.addEventListener('focusin', function(e) {
+        var tag = e.target.tagName;
+        var isEditable = e.target.isContentEditable;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || isEditable) {
+            var newGroup = detectGroup(e.target);
+            var stayingInGroup = isSameGroup(newGroup, activeGroup);
+            activeField = e.target;
+            eventValue = e.target.value || e.target.textContent || '';
+            if (stayingInGroup) {
+                inputEventFired = true;
+            } else {
+                keyLog = [];
+                inputEventFired = false;
+                activeGroup = newGroup;
+                activeGroupLabel = newGroup ? getGroupLabel(newGroup) : '';
+            }
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+        if (!activeField) return;
+        var isGroupKey = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupKey && !activeField.contains(e.target)) return;
+        var key = e.key;
+        if (key === 'Backspace') keyLog.push('\u232b');
+        else if (key === 'Enter') keyLog.push('\u21b5');
+        else if (key === 'Tab') keyLog.push('\u21e5');
+        else if (key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta') { /* skip modifiers */ }
+        else if (key.length === 1) keyLog.push(key);
+        updateBar();
+    }, true);
+
+    document.addEventListener('input', function(e) {
+        if (!activeField) return;
+        var isGroupInput = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupInput && !activeField.contains(e.target)) return;
+        inputEventFired = true;
+        eventValue = e.target.value || e.target.textContent || '';
+        activeField = e.target;
+        updateBar();
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT') {
+            activeField = e.target;
+            activeGroup = null;
+            activeGroupLabel = '';
+            inputEventFired = true;
+            eventValue = e.target.value;
+            updateBar();
+        }
+    }, true);
+
+    setInterval(function() {
+        if (activeField) updateBar();
+    }, 500);
+})();
+</script>
+</body>
+</html>

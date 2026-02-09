@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Special Input Patterns</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f0f4ff 0%, #e8ecf4 100%); margin: 0; padding: 0; min-height: 100vh; color: #2d3748; }
+        .section { background: white; border: none; padding: 28px; margin: 24px 0; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); transition: box-shadow 0.2s; }
+        .section:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+        .section h2 { margin-top: 0; color: #1a202c; font-size: 20px; font-weight: 600; border-bottom: 3px solid #2196F3; padding-bottom: 12px; margin-bottom: 20px; }
+        label { display: block; margin: 16px 0 6px; font-weight: 600; font-size: 14px; color: #4a5568; }
+        input { padding: 10px 14px; border: 1.5px solid #d2d6dc; border-radius: 10px; font-size: 14px; color: #2d3748; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; outline: none; font-family: inherit; }
+        input:focus { border-color: #2196F3; box-shadow: 0 0 0 3px rgba(33,150,243,0.15); }
+        .hint { font-size: 12px; color: #a0aec0; display: block; margin-bottom: 12px; }
+        button { padding: 11px 24px; cursor: pointer; margin: 5px 4px; background: linear-gradient(135deg, #2196F3, #1976D2); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 6px rgba(33,150,243,0.3); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(33,150,243,0.4); }
+        .otp-container { display: flex; gap: 12px; margin: 12px 0; }
+        .otp-container input { width: 52px; height: 52px; text-align: center; font-size: 22px; font-weight: 600; border-radius: 12px; border: 2px solid #d2d6dc; }
+        .otp-container input:focus { border-color: #2196F3; box-shadow: 0 0 0 3px rgba(33,150,243,0.15); }
+        .pin-container { display: flex; gap: 12px; margin: 12px 0; }
+        .pin-container input { width: 52px; height: 52px; text-align: center; font-size: 22px; font-weight: 600; border-radius: 12px; border: 2px solid #d2d6dc; }
+        .pin-container input:focus { border-color: #2196F3; box-shadow: 0 0 0 3px rgba(33,150,243,0.15); }
+        .tag { display: inline-block; background: linear-gradient(135deg, #e3f2fd, #bbdefb); padding: 6px 14px; border-radius: 20px; margin: 4px; font-size: 13px; color: #1565C0; font-weight: 500; }
+        .tag .remove { cursor: pointer; margin-left: 8px; color: #1976D2; font-weight: bold; }
+        #tags-container { min-height: 44px; border: 1.5px solid #d2d6dc; border-radius: 10px; padding: 8px; width: 100%; max-width: 400px; background: white; }
+        .result { margin-top: 10px; padding: 12px 16px; background: #f7fafc; border-radius: 10px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; color: #4a5568; border: 1px solid #e2e8f0; }
+        .dropdown { position: absolute; border: 1px solid #e2e8f0; background: white; max-height: 180px; overflow-y: auto; width: 100%; max-width: 400px; z-index: 10; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .dropdown-item { padding: 10px 16px; cursor: pointer; font-size: 14px; transition: background 0.15s; }
+        .dropdown-item:hover { background: #ebf5ff; }
+        .autocomplete-wrap { position: relative; max-width: 400px; }
+        /* ===== INPUT VALUE MONITOR BAR ===== */
+        #inputMonitorBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #e2e8f0;
+            z-index: 99999;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 12px;
+            height: 40px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        #inputMonitorBar .monitor-title {
+            color: #a5b4fc;
+            font-weight: 700;
+            white-space: nowrap;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            margin-right: 4px;
+        }
+        #inputMonitorBar .monitor-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(148, 163, 184, 0.2);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+        #inputMonitorBar .monitor-field {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        #inputMonitorBar .monitor-field:hover {
+            background: rgba(148, 163, 184, 0.08);
+        }
+        #inputMonitorBar .monitor-label {
+            color: #94a3b8;
+            font-size: 10px;
+            white-space: nowrap;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #inputMonitorBar .monitor-value {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #34d399;
+            min-width: 80px;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .monitor-value.js-injected {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+        }
+        #inputMonitorBar .monitor-value.match {
+            color: #34d399;
+        }
+        #inputMonitorBar .monitor-source {
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+        }
+        #inputMonitorBar .source-real {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        #inputMonitorBar .source-js {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        #inputMonitorBar .monitor-element-id {
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        #inputMonitorBar .monitor-value.group-val {
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(120, 53, 15, 0.2);
+            font-size: 13px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        #inputMonitorBar .monitor-group-label {
+            color: #fbbf24;
+            font-size: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- INPUT VALUE MONITOR BAR -->
+<div id="inputMonitorBar">
+    <span class="monitor-title">Input Monitor</span>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Active:</span>
+        <span class="monitor-element-id" id="monitorActiveField">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Event Value:</span>
+        <span class="monitor-value" id="monitorEventValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">.value:</span>
+        <span class="monitor-value" id="monitorDomValue">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Source:</span>
+        <span class="monitor-source" id="monitorSource">—</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Keys:</span>
+        <span class="monitor-value" id="monitorKeyLog" style="max-width:200px;">—</span>
+    </div>
+    <div class="monitor-divider" id="monitorGroupDivider" style="display:none;"></div>
+    <div class="monitor-field" id="monitorGroupSection" style="display:none;">
+        <span class="monitor-group-label" id="monitorGroupLabel">—</span>
+        <span class="monitor-value group-val" id="monitorGroupValue">—</span>
+    </div>
+</div>
+
+<header style="background: linear-gradient(135deg, #2196F3, #1565C0); padding: 30px 40px; margin-top: 48px; color: white;">
+    <div style="max-width: 800px; margin: auto;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">Special Input Patterns</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">OTP, PIN, Credit Card, Phone Mask, Currency, Date &amp; Autocomplete</p>
+    </div>
+</header>
+
+<main style="max-width: 800px; margin: 30px auto; padding: 0 20px 40px;">
+
+    <!-- OTP 4-digit (auto-tab) -->
+    <div class="section">
+        <h2>OTP — 4-Digit (Auto-Tab)</h2>
+        <p>Each field auto-tabs to the next after a digit is entered.</p>
+        <div class="otp-container">
+            <input type="text" class="otp-digit" id="otp1" maxlength="1" data-next="otp2" autofocus>
+            <input type="text" class="otp-digit" id="otp2" maxlength="1" data-next="otp3">
+            <input type="text" class="otp-digit" id="otp3" maxlength="1" data-next="otp4">
+            <input type="text" class="otp-digit" id="otp4" maxlength="1">
+        </div>
+        <div class="result" id="otp-result">OTP: waiting...</div>
+    </div>
+
+    <!-- OTP 6-digit (single field) -->
+    <div class="section">
+        <h2>OTP — 6-Digit (Single Field)</h2>
+        <label for="otp6">6-Digit OTP</label>
+        <input type="text" id="otp6" maxlength="6" placeholder="______" style="width:120px; letter-spacing: 8px; font-size: 18px; text-align: center;">
+        <span class="hint">Single input with maxlength=6, spaced characters</span>
+    </div>
+
+    <!-- PIN (masked, auto-tab) -->
+    <div class="section">
+        <h2>PIN — 4-Digit (Masked, Auto-Tab)</h2>
+        <div class="pin-container">
+            <input type="password" class="pin-digit" id="pin1" maxlength="1" data-next="pin2">
+            <input type="password" class="pin-digit" id="pin2" maxlength="1" data-next="pin3">
+            <input type="password" class="pin-digit" id="pin3" maxlength="1" data-next="pin4">
+            <input type="password" class="pin-digit" id="pin4" maxlength="1">
+        </div>
+        <span class="hint">Like OTP but type="password" — digits are masked</span>
+        <div class="result" id="pin-result">PIN: waiting...</div>
+    </div>
+
+    <!-- Credit Card -->
+    <div class="section">
+        <h2>Credit Card Number (Auto-Space)</h2>
+        <label for="cardNumber">Card Number</label>
+        <input type="text" id="cardNumber" maxlength="19" placeholder="0000 0000 0000 0000" style="width: 250px; font-size: 16px; letter-spacing: 2px;">
+        <span class="hint">Formats as: XXXX XXXX XXXX XXXX</span>
+
+        <label for="cardExpiry">Expiry (MM/YY)</label>
+        <input type="text" id="cardExpiry" maxlength="5" placeholder="MM/YY" style="width: 80px;">
+        <span class="hint">Auto-inserts / after MM</span>
+
+        <label for="cardCvv">CVV</label>
+        <input type="password" id="cardCvv" maxlength="4" placeholder="***" style="width: 60px;">
+        <span class="hint">3-4 digit security code (masked)</span>
+    </div>
+
+    <!-- Phone Mask -->
+    <div class="section">
+        <h2>Phone Number (Auto-Mask)</h2>
+        <label for="phoneMask">Phone (Masked)</label>
+        <input type="tel" id="phoneMask" placeholder="(___) ___-____" style="width: 200px;">
+        <span class="hint">Formats as: (XXX) XXX-XXXX</span>
+    </div>
+
+    <!-- Currency -->
+    <div class="section">
+        <h2>Currency Input (Auto-Comma)</h2>
+        <label for="currency">Amount</label>
+        <input type="text" id="currency" placeholder="$0.00" style="width: 200px;">
+        <span class="hint">Auto-formats with $ and commas: $1,234,567</span>
+    </div>
+
+    <!-- Date Mask -->
+    <div class="section">
+        <h2>Date Mask (DD/MM/YYYY)</h2>
+        <label for="dateMask">Date (DD/MM/YYYY)</label>
+        <input type="text" id="dateMask" maxlength="10" placeholder="DD/MM/YYYY" style="width: 150px;">
+        <span class="hint">Auto-inserts / separators</span>
+    </div>
+
+    <!-- Tags Input -->
+    <div class="section">
+        <h2>Tags Input (Type + Enter)</h2>
+        <label for="tagInput">Add Tag</label>
+        <div id="tags-container"></div>
+        <input type="text" id="tagInput" placeholder="Type and press Enter" style="width: 380px;">
+        <span class="hint">Press Enter to add as tag chip</span>
+    </div>
+
+    <!-- Autocomplete / Typeahead -->
+    <div class="section">
+        <h2>Autocomplete / Typeahead</h2>
+        <label for="citySearch">City Search</label>
+        <div class="autocomplete-wrap">
+            <input type="text" id="citySearch" placeholder="Start typing a city..." style="width: 360px;" autocomplete="off">
+            <div id="cityDropdown" class="dropdown" style="display:none;"></div>
+        </div>
+        <span class="hint">Shows matching cities as you type</span>
+    </div>
+
+</main>
+
+<footer style="text-align: center; padding: 30px 20px; color: #a0aec0; font-size: 13px; border-top: 1px solid #e2e8f0; margin-top: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+    KaneAI Test Suite &mdash; Special Input Patterns &mdash; Smart Wait & Input Optimization Testing
+</footer>
+
+    <script>
+        // --- OTP Auto-Tab ---
+        document.querySelectorAll('.otp-digit').forEach(function(input) {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && this.dataset.next) {
+                    document.getElementById(this.dataset.next).focus();
+                }
+                var digits = document.querySelectorAll('.otp-digit');
+                var otp = '';
+                digits.forEach(function(d) { otp += d.value; });
+                document.getElementById('otp-result').textContent = 'OTP: ' + (otp.length === 4 ? otp : 'waiting...');
+            });
+        });
+
+        // --- PIN Auto-Tab ---
+        document.querySelectorAll('.pin-digit').forEach(function(input) {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && this.dataset.next) {
+                    document.getElementById(this.dataset.next).focus();
+                }
+                var digits = document.querySelectorAll('.pin-digit');
+                var pin = '';
+                digits.forEach(function(d) { pin += d.value; });
+                document.getElementById('pin-result').textContent = 'PIN: ' + (pin.length === 4 ? '****' : 'waiting...');
+            });
+        });
+
+        // --- Credit Card Formatting ---
+        document.getElementById('cardNumber').addEventListener('input', function() {
+            var val = this.value.replace(/\s/g, '').replace(/\D/g, '');
+            var parts = val.match(/.{1,4}/g);
+            this.value = parts ? parts.join(' ') : '';
+        });
+
+        document.getElementById('cardExpiry').addEventListener('input', function() {
+            var val = this.value.replace(/\//g, '').replace(/\D/g, '');
+            if (val.length >= 2) {
+                val = val.substring(0, 2) + '/' + val.substring(2);
+            }
+            this.value = val;
+        });
+
+        // --- Phone Mask ---
+        document.getElementById('phoneMask').addEventListener('input', function() {
+            var val = this.value.replace(/\D/g, '');
+            if (val.length >= 6) {
+                this.value = '(' + val.substring(0, 3) + ') ' + val.substring(3, 6) + '-' + val.substring(6, 10);
+            } else if (val.length >= 3) {
+                this.value = '(' + val.substring(0, 3) + ') ' + val.substring(3);
+            } else if (val.length > 0) {
+                this.value = '(' + val;
+            }
+        });
+
+        // --- Currency Formatting ---
+        document.getElementById('currency').addEventListener('input', function() {
+            var val = this.value.replace(/[$,]/g, '').replace(/\D/g, '');
+            if (val) {
+                this.value = '$' + parseInt(val).toLocaleString('en-US');
+            }
+        });
+
+        // --- Date Mask ---
+        document.getElementById('dateMask').addEventListener('input', function() {
+            var val = this.value.replace(/\//g, '').replace(/\D/g, '');
+            if (val.length >= 4) {
+                this.value = val.substring(0, 2) + '/' + val.substring(2, 4) + '/' + val.substring(4, 8);
+            } else if (val.length >= 2) {
+                this.value = val.substring(0, 2) + '/' + val.substring(2);
+            }
+        });
+
+        // --- Tags Input ---
+        document.getElementById('tagInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                e.preventDefault();
+                var tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.innerHTML = this.value.trim() + '<span class="remove" onclick="this.parentElement.remove()">x</span>';
+                document.getElementById('tags-container').appendChild(tag);
+                this.value = '';
+            }
+        });
+
+        // --- Autocomplete / Typeahead ---
+        var cities = [
+            'New York', 'New Delhi', 'New Orleans', 'Newark', 'Newcastle',
+            'London', 'Los Angeles', 'Las Vegas', 'Lagos', 'Lima',
+            'Paris', 'Prague', 'Perth', 'Portland', 'Phoenix',
+            'Tokyo', 'Toronto', 'Taipei', 'Tehran', 'Tashkent',
+            'Berlin', 'Bangkok', 'Brussels', 'Budapest', 'Bangalore'
+        ];
+
+        document.getElementById('citySearch').addEventListener('input', function() {
+            var query = this.value.toLowerCase();
+            var dropdown = document.getElementById('cityDropdown');
+            if (query.length < 1) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            var matches = cities.filter(function(c) {
+                return c.toLowerCase().includes(query);
+            });
+            if (matches.length > 0) {
+                dropdown.innerHTML = matches.map(function(c) {
+                    return '<div class="dropdown-item" onclick="selectCity(\'' + c + '\')">' + c + '</div>';
+                }).join('');
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        function selectCity(city) {
+            document.getElementById('citySearch').value = city;
+            document.getElementById('cityDropdown').style.display = 'none';
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-wrap')) {
+                document.getElementById('cityDropdown').style.display = 'none';
+            }
+        });
+    </script>
+<!-- INPUT VALUE MONITOR SCRIPT -->
+<script>
+(function() {
+    var eventValue = '';
+    var keyLog = [];
+    var activeField = null;
+    var inputEventFired = false;
+    var activeGroup = null;       // array of sibling fields in an OTP/PIN group
+    var activeGroupLabel = '';    // label like "OTP #otp1-#otp4"
+
+    function getFieldLabel(el) {
+        var label = '';
+        if (el.id) label = '#' + el.id;
+        else if (el.name) label = '[name=' + el.name + ']';
+        else if (el.placeholder) label = '"' + el.placeholder.substring(0, 20) + '..."';
+        else if (el.className) label = '.' + el.className.split(' ')[0];
+        else label = el.tagName.toLowerCase();
+        var type = el.getAttribute('type') || el.tagName.toLowerCase();
+        return label + ' (' + type + ')';
+    }
+
+    // Detect if a field belongs to an OTP/PIN-style group:
+    // siblings in same container that share a class AND have maxlength="1"
+    function detectGroup(el) {
+        if (el.tagName !== 'INPUT') return null;
+        if (el.getAttribute('maxlength') !== '1') return null;
+        var parent = el.parentElement;
+        if (!parent) return null;
+        // Find sibling inputs with maxlength="1" sharing at least one class
+        var elClasses = Array.from(el.classList);
+        var siblings = Array.from(parent.querySelectorAll('input[maxlength="1"]'));
+        if (siblings.length < 2) return null;
+        // Filter to those sharing a common class with the focused element
+        var group = siblings.filter(function(sib) {
+            return elClasses.some(function(cls) { return sib.classList.contains(cls); });
+        });
+        if (group.length < 2) return null;
+        return group;
+    }
+
+    function getGroupLabel(group) {
+        if (!group || group.length === 0) return '';
+        var first = group[0];
+        var last = group[group.length - 1];
+        var type = 'Group';
+        if (first.classList.contains('otp-digit')) type = 'OTP';
+        else if (first.classList.contains('pin-digit')) type = 'PIN';
+        var firstId = first.id ? '#' + first.id : '?';
+        var lastId = last.id ? '#' + last.id : '?';
+        return type + ' ' + firstId + ' → ' + lastId + ' (' + group.length + ' fields)';
+    }
+
+    function getGroupValue(group) {
+        if (!group) return '';
+        return group.map(function(el) { return el.value || '_'; }).join('');
+    }
+
+    function isSameGroup(groupA, groupB) {
+        if (!groupA || !groupB) return false;
+        if (groupA.length !== groupB.length) return false;
+        return groupA[0] === groupB[0];
+    }
+
+    function updateBar() {
+        var domVal = activeField ? (activeField.value || activeField.textContent || '') : '';
+        document.getElementById('monitorActiveField').textContent = activeField ? getFieldLabel(activeField) : '—';
+        document.getElementById('monitorEventValue').textContent = eventValue || '—';
+        document.getElementById('monitorDomValue').textContent = domVal || '—';
+        document.getElementById('monitorKeyLog').textContent = keyLog.length > 0 ? keyLog.slice(-20).join('') : '—';
+
+        var domValEl = document.getElementById('monitorDomValue');
+        var sourceEl = document.getElementById('monitorSource');
+
+        // OTP/PIN group display
+        var groupSection = document.getElementById('monitorGroupSection');
+        var groupDivider = document.getElementById('monitorGroupDivider');
+        if (activeGroup && activeGroup.length > 1) {
+            var groupVal = getGroupValue(activeGroup);
+            document.getElementById('monitorGroupLabel').textContent = activeGroupLabel;
+            document.getElementById('monitorGroupValue').textContent = groupVal;
+            groupSection.style.display = '';
+            groupDivider.style.display = '';
+        } else {
+            groupSection.style.display = 'none';
+            groupDivider.style.display = 'none';
+        }
+
+        // Source detection
+        if (!activeField || (!eventValue && !domVal)) {
+            sourceEl.textContent = '—';
+            sourceEl.className = 'monitor-source';
+            domValEl.className = 'monitor-value';
+        } else if (inputEventFired && eventValue === domVal) {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        } else if (domVal && !inputEventFired) {
+            sourceEl.textContent = 'JS INJECTED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else if (eventValue !== domVal) {
+            sourceEl.textContent = 'MODIFIED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        }
+    }
+
+    document.addEventListener('focusin', function(e) {
+        var tag = e.target.tagName;
+        var isEditable = e.target.isContentEditable;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || isEditable) {
+            var newGroup = detectGroup(e.target);
+            var stayingInGroup = isSameGroup(newGroup, activeGroup);
+
+            activeField = e.target;
+            eventValue = e.target.value || e.target.textContent || '';
+
+            if (stayingInGroup) {
+                // OTP auto-tab: keep keyLog, keep inputEventFired, just update active field
+                inputEventFired = true;
+            } else {
+                // New field or new group: reset
+                keyLog = [];
+                inputEventFired = false;
+                activeGroup = newGroup;
+                activeGroupLabel = newGroup ? getGroupLabel(newGroup) : '';
+            }
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+        if (!activeField) return;
+        // For group fields, accept keydown from any field in the group
+        var isGroupKey = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupKey && !activeField.contains(e.target)) return;
+        var key = e.key;
+        if (key === 'Backspace') keyLog.push('\u232b');
+        else if (key === 'Enter') keyLog.push('\u21b5');
+        else if (key === 'Tab') keyLog.push('\u21e5');
+        else if (key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta') { /* skip modifiers */ }
+        else if (key.length === 1) keyLog.push(key);
+        updateBar();
+    }, true);
+
+    document.addEventListener('input', function(e) {
+        if (!activeField) return;
+        // For group fields, accept input from any field in the group
+        var isGroupInput = activeGroup && activeGroup.indexOf(e.target) !== -1;
+        if (e.target !== activeField && !isGroupInput && !activeField.contains(e.target)) return;
+        inputEventFired = true;
+        eventValue = e.target.value || e.target.textContent || '';
+        // Update activeField to the element that actually received input
+        activeField = e.target;
+        updateBar();
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT') {
+            activeField = e.target;
+            activeGroup = null;
+            activeGroupLabel = '';
+            inputEventFired = true;
+            eventValue = e.target.value;
+            updateBar();
+        }
+    }, true);
+
+    // Poll for JS-injected values (detects element.value = "..." without events)
+    setInterval(function() {
+        if (activeField) updateBar();
+    }, 500);
+})();
+</script>
+</body>
+</html>
