@@ -1238,30 +1238,30 @@ function switchDom(mode) {
         PANEL_JS_SRC(shadow);
     }
     else if (mode === 'iframe') {
-        label.innerHTML = '<span class="dom-context-badge" style="background:rgba(6,182,212,0.15);color:#22d3ee;">ACTIVE: Iframe (srcdoc)</span>';
+        label.innerHTML = '<span class="dom-context-badge" style="background:rgba(6,182,212,0.15);color:#22d3ee;">ACTIVE: Iframe (static src)</span>';
         var iframe = document.createElement('iframe');
         iframe.id = 'dom-context-iframe';
+        iframe.src = 'iframe-panel.html';
         iframe.style.cssText = 'width:100%;border:2px solid #0891b2;border-radius:10px;min-height:400px;';
         iframe.title = 'DOM Context: Iframe';
         target.appendChild(iframe);
 
-        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;font-family:system-ui,sans-serif;">' + DOM_PANEL_HTML + '</body></html>');
-        iframeDoc.close();
-
-        // Auto-resize iframe to fit content
-        function resizeIframe() {
+        // Auto-resize iframe to fit content after load
+        iframe.addEventListener('load', function() {
             try {
+                var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                 var h = iframeDoc.documentElement.scrollHeight;
                 if (h > 100) iframe.style.height = (h + 20) + 'px';
             } catch(e) {}
-        }
-        setTimeout(resizeIframe, 100);
-        setTimeout(resizeIframe, 500);
+        });
 
-        // Attach JS inside iframe
-        PANEL_JS_SRC(iframeDoc);
+        // Listen for messages from iframe to update parent result box
+        window.addEventListener('message', function handler(e) {
+            if (e.data && e.data.type === 'iframe-panel-event' && currentDomMode === 'iframe') {
+                var parentResult = document.getElementById('domSwitchResult');
+                if (parentResult) parentResult.textContent = '[IFRAME] ' + e.data.message;
+            }
+        });
     }
 
     document.getElementById('domSwitchResult').textContent = 'Switched to: ' + mode.toUpperCase() + ' — interact with elements above';
