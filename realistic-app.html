@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>TeamFlow — Realistic App Dashboard</title>
+    <link rel="stylesheet" href="design-system.css">
+    <style>
+        .dashboard-grid { display: grid; gap: 20px; padding-bottom: 20px; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .board-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+        .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .kanban-col { background: var(--bg-card); border-radius: var(--radius-lg); padding: 16px; box-shadow: inset 0 0 0 1px var(--border-subtle); min-height: 180px; }
+        .kanban-col-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .kanban-col-name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+        .kanban-col-badge { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-muted); font-weight: 600; }
+        tf-task-card { display: block; margin-bottom: 10px; }
+        tf-task-card:last-child { margin-bottom: 0; }
+        .sidebar { display: flex; flex-direction: column; gap: 16px; }
+        .sidebar-block { background: var(--bg-card); border-radius: var(--radius-lg); padding: 18px; box-shadow: inset 0 0 0 1px var(--border-subtle); }
+        .sidebar-block-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); margin-bottom: 14px; }
+        .board-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .board-title { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+        iframe.embed-frame { border: 1px solid var(--border-default); border-radius: var(--radius-md); display: block; width: 100%; }
+        .member-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); }
+        .member-row:last-child { border-bottom: none; }
+        .member-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; font-weight: 700; flex-shrink: 0; }
+        .member-info { flex: 1; min-width: 0; }
+        .member-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .member-role { font-size: 11px; color: var(--text-tertiary); }
+        .member-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .status-online { background: var(--success); box-shadow: 0 0 4px rgba(16,185,129,0.5); }
+        .status-away { background: var(--warning); }
+        .status-offline { background: var(--text-muted); }
+        .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 5000; justify-content: center; align-items: center; }
+        .modal-bg.open { display: flex; }
+        @media (max-width: 1100px) { .board-layout { grid-template-columns: 1fr; } .kanban { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .kanban { grid-template-columns: 1fr; } }
+        @media (max-width: 640px) { .stats-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="has-monitor">
+<script>(function(){var t=localStorage.getItem('lt-theme')||(window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();</script>
+
+<!-- INPUT VALUE MONITOR BAR -->
+<div id="inputMonitorBar">
+    <span class="monitor-title">Input Monitor</span>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Active:</span>
+        <span class="monitor-element-id" id="monitorActiveField">&mdash;</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Event Value:</span>
+        <span class="monitor-value" id="monitorEventValue">&mdash;</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">.value:</span>
+        <span class="monitor-value" id="monitorDomValue">&mdash;</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Source:</span>
+        <span class="monitor-source" id="monitorSource">&mdash;</span>
+    </div>
+    <div class="monitor-divider"></div>
+    <div class="monitor-field">
+        <span class="monitor-label">Context:</span>
+        <span class="monitor-value" id="monitorContext">&mdash;</span>
+    </div>
+</div>
+
+<div class="top-bar"></div>
+<div class="glow-container"><div class="glow-inner"></div></div>
+<div class="glow-container glow-2"><div class="glow-inner"></div></div>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">TF</div>
+            <div class="logo-text">TeamFlow <span>Dashboard</span></div>
+        </a>
+        <nav class="header-nav">
+            <button class="header-btn" id="refreshBtn" onclick="window.location.reload()" aria-label="Refresh page">
+                <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 2v5h5"/><path d="M3.5 7A7.5 7.5 0 0110 2.5a7.5 7.5 0 017.5 7.5 7.5 7.5 0 01-7.5 7.5A7.5 7.5 0 013 12"/></svg>
+                <span class="hide-mobile">Refresh</span>
+            </button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="icon-sun">&#9728;</span>
+                <span class="icon-moon">&#9790;</span>
+            </button>
+            <a href="index.html" class="header-btn">
+                <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10H5M5 10l4-4M5 10l4 4"/></svg>
+                <span class="hide-mobile">All Pages</span>
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <div class="page-hero fade-in">
+        <h1>TeamFlow Dashboard</h1>
+        <p class="subtitle">A realistic project management app with shadow DOM components, embedded iframes, and nested DOM structures for comprehensive KaneAI testing.</p>
+    </div>
+
+    <div class="info-box">
+        This page simulates a real SaaS dashboard. Nesting patterns:
+        <strong>Shadow DOM</strong> (stat cards, task cards, settings),
+        <strong>Nested Shadow DOM</strong> (task cards with priority badges — 2 levels, settings — 3 levels),
+        <strong>Iframe</strong> (activity feed, chat panel),
+        <strong>Shadow &gt; Iframe</strong> (analytics widget, document viewer),
+        <strong>Iframe &gt; Shadow</strong> (chat messages),
+        <strong>Shadow &gt; Iframe &gt; Iframe</strong> (document viewer with embedded table).
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- ========== STATS ROW — Shadow DOM L1 ========== -->
+        <div class="section-label">Dashboard Overview</div>
+        <div class="stats-row">
+            <tf-stat-card id="stat-total" data-label="Total Tasks" data-value="24" data-icon="&#128203;" data-trend="+3 this week" data-trend-up="true"></tf-stat-card>
+            <tf-stat-card id="stat-progress" data-label="In Progress" data-value="8" data-icon="&#128260;" data-trend="-1 from yesterday" data-trend-up="false"></tf-stat-card>
+            <tf-stat-card id="stat-completed" data-label="Completed" data-value="16" data-icon="&#9989;" data-trend="+4 this week" data-trend-up="true"></tf-stat-card>
+            <tf-stat-card id="stat-velocity" data-label="Velocity" data-value="94%" data-icon="&#9889;" data-trend="+2% improvement" data-trend-up="true"></tf-stat-card>
+        </div>
+
+        <!-- ========== TASK BOARD — Shadow DOM L1 + Nested L2 ========== -->
+        <div class="section-label">Task Board</div>
+        <div class="board-layout">
+            <div>
+                <div class="board-head">
+                    <span class="board-title">Sprint 7</span>
+                    <button id="newTaskBtn" onclick="openTaskModal()">+ New Task</button>
+                </div>
+                <div class="kanban">
+                    <div class="kanban-col" id="col-todo">
+                        <div class="kanban-col-head">
+                            <span class="kanban-col-name">To Do</span>
+                            <span class="kanban-col-badge" id="count-todo">3</span>
+                        </div>
+                        <tf-task-card data-id="TF-101" data-title="Set up CI/CD pipeline" data-assignee="Sarah Chen" data-priority="high" data-due="Mar 1" data-tags="devops,infra"></tf-task-card>
+                        <tf-task-card data-id="TF-102" data-title="Write API documentation" data-assignee="Mike Ross" data-priority="medium" data-due="Mar 3" data-tags="docs"></tf-task-card>
+                        <tf-task-card data-id="TF-103" data-title="Design landing page mockups" data-assignee="Alex Kim" data-priority="low" data-due="Mar 5" data-tags="design,ui"></tf-task-card>
+                    </div>
+                    <div class="kanban-col" id="col-progress">
+                        <div class="kanban-col-head">
+                            <span class="kanban-col-name">In Progress</span>
+                            <span class="kanban-col-badge" id="count-progress">2</span>
+                        </div>
+                        <tf-task-card data-id="TF-104" data-title="Implement user authentication" data-assignee="John Davis" data-priority="high" data-due="Feb 28" data-tags="backend,auth"></tf-task-card>
+                        <tf-task-card data-id="TF-105" data-title="Database migration v2" data-assignee="Sarah Chen" data-priority="critical" data-due="Feb 27" data-tags="backend,db"></tf-task-card>
+                    </div>
+                    <div class="kanban-col" id="col-done">
+                        <div class="kanban-col-head">
+                            <span class="kanban-col-name">Done</span>
+                            <span class="kanban-col-badge" id="count-done">3</span>
+                        </div>
+                        <tf-task-card data-id="TF-106" data-title="Project repository setup" data-assignee="John Davis" data-priority="medium" data-due="Feb 20" data-tags="setup" data-done="true"></tf-task-card>
+                        <tf-task-card data-id="TF-107" data-title="Create wireframes" data-assignee="Alex Kim" data-priority="low" data-due="Feb 18" data-tags="design" data-done="true"></tf-task-card>
+                        <tf-task-card data-id="TF-108" data-title="Setup error monitoring" data-assignee="Mike Ross" data-priority="high" data-due="Feb 22" data-tags="devops" data-done="true"></tf-task-card>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <!-- Activity Feed — Iframe L1 -->
+                <div class="sidebar-block">
+                    <div class="sidebar-block-title">Activity Feed</div>
+                    <iframe id="activityFrame" class="embed-frame" height="240" title="Activity Feed"></iframe>
+                </div>
+
+                <!-- Analytics — Shadow DOM > Iframe -->
+                <div class="sidebar-block">
+                    <div class="sidebar-block-title">Sprint Analytics</div>
+                    <div id="analyticsHost"></div>
+                </div>
+
+                <!-- Team Members -->
+                <div class="sidebar-block">
+                    <div class="sidebar-block-title">Team</div>
+                    <div id="teamMembers">
+                        <div class="member-row">
+                            <div class="member-avatar">SC</div>
+                            <div class="member-info"><div class="member-name" id="member-sarah">Sarah Chen</div><div class="member-role">Backend Lead</div></div>
+                            <div class="member-status status-online" id="status-sarah" data-status="online"></div>
+                        </div>
+                        <div class="member-row">
+                            <div class="member-avatar">JD</div>
+                            <div class="member-info"><div class="member-name" id="member-john">John Davis</div><div class="member-role">Full Stack</div></div>
+                            <div class="member-status status-online" id="status-john" data-status="online"></div>
+                        </div>
+                        <div class="member-row">
+                            <div class="member-avatar">MR</div>
+                            <div class="member-info"><div class="member-name" id="member-mike">Mike Ross</div><div class="member-role">DevOps</div></div>
+                            <div class="member-status status-away" id="status-mike" data-status="away"></div>
+                        </div>
+                        <div class="member-row">
+                            <div class="member-avatar">AK</div>
+                            <div class="member-info"><div class="member-name" id="member-alex">Alex Kim</div><div class="member-role">UI/UX Designer</div></div>
+                            <div class="member-status status-offline" id="status-alex" data-status="offline"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== DOCUMENT VIEWER — Shadow DOM > Iframe > Iframe ========== -->
+        <div class="section-label">Documents</div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h2>Document Viewer</h2>
+                <span class="badge">shadow &gt; iframe &gt; iframe</span>
+            </div>
+            <p style="margin-bottom:16px;">Shadow DOM container wraps the document iframe. Inside that iframe, an embedded data table lives in a nested second iframe.</p>
+            <div id="docViewerHost"></div>
+        </div>
+
+        <!-- ========== TEAM CHAT — Iframe > Shadow DOM ========== -->
+        <div class="section-label">Communication</div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h2>Team Chat</h2>
+                <span class="badge">iframe &gt; shadow dom</span>
+            </div>
+            <p style="margin-bottom:16px;">Chat interface inside an iframe. Each message is a custom element with its own shadow DOM, and the input bar is also a shadow DOM component.</p>
+            <iframe id="chatFrame" class="embed-frame" height="420" title="Team Chat"></iframe>
+        </div>
+
+        <!-- ========== SETTINGS — Shadow > Shadow > Shadow (3 levels) + Iframe ========== -->
+        <div class="section-label">Configuration</div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h2>Project Settings</h2>
+                <span class="badge">3-level nested shadow + iframe</span>
+            </div>
+            <p style="margin-bottom:16px;">Settings panel with 3 levels of nested shadow DOM. General settings (L1) contain notification preferences (L2), which contain advanced controls (L3). An embedded help iframe sits inside the L1 shadow.</p>
+            <div id="settingsHost"></div>
+        </div>
+    </div>
+</main>
+
+<!-- New Task Modal -->
+<div id="taskModal" class="modal-bg" onclick="if(event.target===this)closeTaskModal()">
+    <div id="taskModalHost"></div>
+</div>
+
+<footer class="site-footer">
+    TeamFlow Dashboard &mdash; Built for <a href="index.html">LT QA Test Fixtures</a>
+</footer>
+
+<!-- ========================================================================
+     SCRIPTS
+     ======================================================================== -->
+
+<!-- Custom Element: tf-stat-card (Shadow DOM L1) -->
+<script>
+class TfStatCard extends HTMLElement {
+    constructor() { super(); this.attachShadow({ mode: 'open' }); }
+    connectedCallback() {
+        var label = this.dataset.label || 'Metric';
+        var value = this.dataset.value || '0';
+        var icon = this.dataset.icon || '';
+        var trend = this.dataset.trend || '';
+        var up = this.dataset.trendUp === 'true';
+        this.shadowRoot.innerHTML =
+            '<style>' +
+            ':host{display:block}' +
+            '.card{background:var(--bg-card,#121218);border-radius:12px;padding:20px;box-shadow:inset 0 0 0 1px var(--border-subtle,#242430)}' +
+            '.icon{font-size:20px;margin-bottom:8px}' +
+            '.value{font-size:28px;font-weight:800;letter-spacing:-0.03em;color:var(--text-primary,#ededef)}' +
+            '.label{font-size:13px;color:var(--text-secondary,#a1a1aa);margin-top:4px}' +
+            '.trend{font-size:11px;margin-top:8px;font-weight:600}' +
+            '.up{color:#10b981}.down{color:#ef4444}' +
+            '</style>' +
+            '<div class="card">' +
+            '<div class="icon">' + icon + '</div>' +
+            '<div class="value" id="statValue">' + value + '</div>' +
+            '<div class="label" id="statLabel">' + label + '</div>' +
+            '<div class="trend ' + (up ? 'up' : 'down') + '" id="statTrend">' + (up ? '↑ ' : '↓ ') + trend + '</div>' +
+            '</div>';
+    }
+}
+customElements.define('tf-stat-card', TfStatCard);
+</script>
+
+<!-- Custom Element: tf-badge (Shadow DOM L2 — nested inside tf-task-card) -->
+<script>
+class TfBadge extends HTMLElement {
+    constructor() { super(); this.attachShadow({ mode: 'open' }); }
+    connectedCallback() {
+        var level = this.getAttribute('level') || 'medium';
+        var colors = { critical: '#ef4444', high: '#f59e0b', medium: '#3b82f6', low: '#6b7280' };
+        var c = colors[level] || colors.medium;
+        this.shadowRoot.innerHTML =
+            '<style>:host{display:inline-block}.b{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;background:' + c + '20;color:' + c + ';border:1px solid ' + c + '30}</style>' +
+            '<span class="b" id="priorityBadge" data-level="' + level + '">' + level + '</span>';
+    }
+}
+customElements.define('tf-badge', TfBadge);
+</script>
+
+<!-- Custom Element: tf-task-card (Shadow DOM L1 — contains tf-badge L2) -->
+<script>
+class TfTaskCard extends HTMLElement {
+    constructor() { super(); this.attachShadow({ mode: 'open' }); }
+    connectedCallback() {
+        var d = this.dataset;
+        var id = d.id || 'TF-000';
+        var title = d.title || 'Task';
+        var assignee = d.assignee || 'Unassigned';
+        var priority = d.priority || 'medium';
+        var due = d.due || '';
+        var tags = (d.tags || '').split(',').filter(Boolean);
+        var done = d.done === 'true';
+        var initials = assignee.split(' ').map(function(n){return n[0]}).join('');
+        this.shadowRoot.innerHTML =
+            '<style>' +
+            ':host{display:block}' +
+            '.task{background:var(--bg-secondary,#1e1e26);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;box-shadow:inset 0 0 0 1px var(--border-subtle,#242430)}' +
+            '.task:hover{box-shadow:inset 0 0 0 1px var(--border-default,#2d2d38),0 4px 12px rgba(0,0,0,.2);transform:translateY(-1px)}' +
+            '.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}' +
+            '.tid{font-size:11px;color:var(--text-muted,#4a4a5e);font-family:monospace}' +
+            '.title{font-size:14px;font-weight:600;color:var(--text-primary,#ededef);margin-bottom:8px;' + (done ? 'text-decoration:line-through;opacity:.6' : '') + '}' +
+            '.meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}' +
+            '.assignee{font-size:12px;color:var(--text-secondary,#a1a1aa);display:flex;align-items:center;gap:6px}' +
+            '.avatar{width:20px;height:20px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700}' +
+            '.due{font-size:11px;color:var(--text-tertiary,#64647a)}' +
+            '.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}' +
+            '.tag{font-size:10px;padding:1px 6px;border-radius:4px;background:var(--accent-surface);color:var(--accent,#0ea5e9)}' +
+            '</style>' +
+            '<div class="task" id="taskCard" data-task-id="' + id + '" data-status="' + (done ? 'done' : 'active') + '">' +
+            '<div class="top"><span class="tid">' + id + '</span><tf-badge level="' + priority + '"></tf-badge></div>' +
+            '<div class="title" id="taskTitle">' + title + '</div>' +
+            '<div class="tags">' + tags.map(function(t){return '<span class="tag">' + t.trim() + '</span>'}).join('') + '</div>' +
+            '<div class="meta"><div class="assignee"><span class="avatar">' + initials + '</span><span id="taskAssignee">' + assignee + '</span></div><span class="due" id="taskDue">' + due + '</span></div>' +
+            '</div>';
+    }
+}
+customElements.define('tf-task-card', TfTaskCard);
+</script>
+
+<!-- Custom Element: tf-toggle (Shadow DOM — used at L3 in settings) -->
+<script>
+class TfToggle extends HTMLElement {
+    constructor() { super(); this.attachShadow({ mode: 'open' }); this._checked = false; }
+    connectedCallback() {
+        this._checked = this.getAttribute('checked') === 'true';
+        var label = this.getAttribute('label') || 'Toggle';
+        var self = this;
+        this.shadowRoot.innerHTML =
+            '<style>' +
+            ':host{display:block;margin:10px 0}' +
+            '.wrap{display:flex;align-items:center;gap:12px;cursor:pointer}' +
+            '.track{width:44px;height:24px;border-radius:12px;background:var(--border-strong,#3e3e52);position:relative;transition:background .2s}' +
+            '.track.on{background:var(--accent,#0ea5e9)}' +
+            '.thumb{width:20px;height:20px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}' +
+            '.track.on .thumb{transform:translateX(20px)}' +
+            '.lbl{font-weight:600;font-size:13px;color:var(--text-secondary,#a1a1aa)}' +
+            '.state{font-size:11px;color:var(--text-tertiary,#64647a);font-weight:600}' +
+            '</style>' +
+            '<div class="wrap" id="toggleWrap">' +
+            '<div class="track' + (this._checked ? ' on' : '') + '" id="track"><div class="thumb"></div></div>' +
+            '<span class="lbl">' + label + '</span>' +
+            '<span class="state" id="toggleState">' + (this._checked ? 'ON' : 'OFF') + '</span>' +
+            '</div>';
+        this.shadowRoot.getElementById('toggleWrap').addEventListener('click', function() {
+            self._checked = !self._checked;
+            self.shadowRoot.getElementById('track').className = self._checked ? 'track on' : 'track';
+            self.shadowRoot.getElementById('toggleState').textContent = self._checked ? 'ON' : 'OFF';
+            self.dispatchEvent(new CustomEvent('tf-toggle', { detail: { checked: self._checked }, bubbles: true, composed: true }));
+        });
+    }
+    get checked() { return this._checked; }
+}
+customElements.define('tf-toggle', TfToggle);
+</script>
+
+<!-- Activity Feed Iframe Content -->
+<script>
+(function() {
+    var frame = document.getElementById('activityFrame');
+    frame.srcdoc = [
+        '<!DOCTYPE html><html><head><style>',
+        'body{font-family:system-ui,sans-serif;padding:12px;margin:0;background:#0f0f17;color:#a1a1aa;font-size:13px}',
+        '.item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e2e}',
+        '.item:last-child{border-bottom:none}',
+        '.av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#6366f1);display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:700;flex-shrink:0}',
+        '.text{flex:1;line-height:1.5}',
+        '.name{font-weight:600;color:#ededef}',
+        '.time{font-size:11px;color:#4a4a5e;margin-top:2px}',
+        'input{padding:8px 12px;width:100%;background:#1a1a22;border:1px solid #2d2d38;border-radius:8px;color:#ededef;font-size:13px;margin-bottom:10px;box-sizing:border-box;outline:none}',
+        'input:focus{border-color:#0ea5e9}',
+        '</style></head><body>',
+        '<input type="text" id="activitySearch" placeholder="Search activity...">',
+        '<div id="activityList">',
+        '<div class="item" id="activity-1"><div class="av">JD</div><div class="text"><span class="name">John Davis</span> completed <strong>Project repository setup</strong><div class="time">2 hours ago</div></div></div>',
+        '<div class="item" id="activity-2"><div class="av">SC</div><div class="text"><span class="name">Sarah Chen</span> started <strong>Implement user auth</strong><div class="time">4 hours ago</div></div></div>',
+        '<div class="item" id="activity-3"><div class="av">AK</div><div class="text"><span class="name">Alex Kim</span> uploaded <strong>wireframes-v2.fig</strong><div class="time">6 hours ago</div></div></div>',
+        '<div class="item" id="activity-4"><div class="av">MR</div><div class="text"><span class="name">Mike Ross</span> deployed <strong>v1.0.2 to staging</strong><div class="time">1 day ago</div></div></div>',
+        '<div class="item" id="activity-5"><div class="av">JD</div><div class="text"><span class="name">John Davis</span> created sprint <strong>Sprint 7</strong><div class="time">2 days ago</div></div></div>',
+        '</div>',
+        '<script>',
+        'document.getElementById("activitySearch").addEventListener("input",function(e){',
+        '  var q=e.target.value.toLowerCase();',
+        '  var items=document.querySelectorAll(".item");',
+        '  items.forEach(function(it){it.style.display=it.textContent.toLowerCase().indexOf(q)!==-1?"flex":"none"});',
+        '  if(window.parent)window.parent.postMessage({type:"iframe-input",source:"activity",value:e.target.value},"*");',
+        '});',
+        '<\/script></body></html>'
+    ].join('\n');
+})();
+</script>
+
+<!-- Analytics Widget: Shadow DOM > Iframe -->
+<script>
+(function() {
+    var host = document.getElementById('analyticsHost');
+    var shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML =
+        '<style>' +
+        ':host{display:block}' +
+        '.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}' +
+        '.title{font-size:13px;font-weight:600;color:var(--text-primary,#ededef)}' +
+        '.period{font-size:11px;color:var(--text-tertiary,#64647a);padding:3px 8px;border-radius:4px;background:var(--bg-secondary,#1e1e26)}' +
+        'iframe{border:1px solid var(--border-subtle,#242430);border-radius:8px;width:100%;display:block}' +
+        '</style>' +
+        '<div class="header"><span class="title" id="analyticsTitle">Sprint Metrics</span><span class="period">Last 7 days</span></div>' +
+        '<iframe id="analyticsFrame" height="180" title="Analytics Chart"></iframe>';
+
+    var aFrame = shadow.getElementById('analyticsFrame');
+    aFrame.srcdoc = [
+        '<!DOCTYPE html><html><head><style>',
+        'body{font-family:system-ui,sans-serif;padding:14px;margin:0;background:#0f0f17;color:#a1a1aa;font-size:12px}',
+        '.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1e1e2e}',
+        '.row:last-child{border-bottom:none}',
+        '.metric{color:#64647a}.val{font-weight:700;color:#ededef}',
+        '.val.good{color:#10b981}.val.warn{color:#f59e0b}.val.bad{color:#ef4444}',
+        '.bar{height:6px;border-radius:3px;background:#1e1e2e;margin-top:8px}',
+        '.bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#0ea5e9,#6366f1)}',
+        '</style></head><body>',
+        '<div class="row"><span class="metric">Completion Rate</span><span class="val good" id="analytics-completion">67%</span></div>',
+        '<div class="bar"><div class="bar-fill" style="width:67%"></div></div>',
+        '<div class="row" style="margin-top:8px"><span class="metric">Avg Cycle Time</span><span class="val" id="analytics-cycle">3.2 days</span></div>',
+        '<div class="row"><span class="metric">Open Bugs</span><span class="val warn" id="analytics-bugs">5</span></div>',
+        '<div class="row"><span class="metric">Story Points</span><span class="val" id="analytics-points">42 / 50</span></div>',
+        '<div class="bar"><div class="bar-fill" style="width:84%"></div></div>',
+        '</body></html>'
+    ].join('\n');
+})();
+</script>
+
+<!-- Document Viewer: Shadow DOM > Iframe > Nested Iframe -->
+<script>
+(function() {
+    var host = document.getElementById('docViewerHost');
+    var shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML =
+        '<style>' +
+        ':host{display:block}' +
+        '.toolbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-secondary,#1e1e26);border-radius:8px 8px 0 0;border:1px solid var(--border-subtle,#242430);border-bottom:none}' +
+        '.doc-name{font-size:13px;font-weight:600;color:var(--text-primary,#ededef);flex:1}' +
+        '.doc-status{font-size:11px;padding:3px 10px;border-radius:12px;background:rgba(16,185,129,.12);color:#10b981;font-weight:600}' +
+        '.tool-btn{padding:5px 10px;border:1px solid var(--border-default,#2d2d38);border-radius:6px;background:transparent;color:var(--text-secondary,#a1a1aa);font-size:12px;cursor:pointer;font-family:inherit}' +
+        '.tool-btn:hover{background:var(--bg-card-hover,#1a1a22);color:var(--text-primary,#ededef);transform:none;box-shadow:none}' +
+        'iframe{border:1px solid var(--border-subtle,#242430);border-radius:0 0 8px 8px;width:100%;display:block}' +
+        '</style>' +
+        '<div class="toolbar">' +
+        '<span class="doc-name" id="docName">Q4 Project Report.md</span>' +
+        '<span class="doc-status" id="docStatus">Published</span>' +
+        '<button class="tool-btn" id="docZoomIn">Zoom +</button>' +
+        '<button class="tool-btn" id="docZoomOut">Zoom −</button>' +
+        '</div>' +
+        '<iframe id="docFrame" height="320" title="Document Content"></iframe>';
+
+    // Set document iframe content (contains a nested iframe for embedded data)
+    var docFrame = shadow.getElementById('docFrame');
+    docFrame.srcdoc = [
+        '<!DOCTYPE html><html><head><style>',
+        'body{font-family:system-ui,sans-serif;padding:24px;margin:0;background:#0f0f17;color:#c8c8d4;font-size:14px;line-height:1.7}',
+        'h1{font-size:20px;color:#ededef;margin:0 0 6px;font-weight:700}',
+        'h2{font-size:16px;color:#ededef;margin:20px 0 8px;font-weight:600}',
+        '.meta{font-size:12px;color:#64647a;margin-bottom:16px}',
+        'p{margin:8px 0;color:#a1a1aa}',
+        '.highlight{background:rgba(14,165,233,.1);border-left:3px solid #0ea5e9;padding:10px 14px;border-radius:0 6px 6px 0;margin:12px 0;font-size:13px}',
+        'iframe{border:1px solid #2d2d38;border-radius:6px;width:100%;margin:12px 0;display:block}',
+        '</style></head><body>',
+        '<h1 id="docTitle">Q4 Project Report</h1>',
+        '<div class="meta" id="docMeta">Last updated: Feb 26, 2026 &bull; Author: Sarah Chen &bull; Version 3.1</div>',
+        '<p id="docSummary">This document contains the quarterly project summary covering sprint velocity, team performance, and key deliverables for Q4 2025.</p>',
+        '<h2>Executive Summary</h2>',
+        '<p>The team completed 156 tasks across 6 sprints, maintaining an average velocity of 94%. Critical milestones were delivered on schedule including the authentication system, CI/CD pipeline, and monitoring infrastructure.</p>',
+        '<div class="highlight" id="docHighlight">Key achievement: Zero production incidents in the last 30 days. Uptime maintained at 99.97%.</div>',
+        '<h2>Sprint Metrics (Embedded Table)</h2>',
+        '<p>The table below shows per-sprint breakdown:</p>',
+        // Nested iframe (Iframe L2) for embedded data table
+        '<iframe id="embeddedTableFrame" height="160" title="Embedded Sprint Data" srcdoc=\'',
+        '<!DOCTYPE html><html><head><style>',
+        'body{font-family:system-ui,sans-serif;padding:10px;margin:0;background:#141418;color:#a1a1aa;font-size:12px}',
+        'table{width:100%;border-collapse:collapse}',
+        'th{background:#1e1e26;color:#ededef;padding:8px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}',
+        'td{padding:8px 12px;border-bottom:1px solid #1e1e2e;color:#c8c8d4}',
+        'tr:last-child td{border-bottom:none}',
+        '.good{color:#10b981}.warn{color:#f59e0b}',
+        '</style></head><body>',
+        '<table>',
+        '<tr><th>Sprint</th><th>Points</th><th>Velocity</th><th>Status</th></tr>',
+        '<tr><td id="sprint-4">Sprint 4</td><td>38</td><td class="good">92%</td><td class="good">Completed</td></tr>',
+        '<tr><td id="sprint-5">Sprint 5</td><td>42</td><td class="good">96%</td><td class="good">Completed</td></tr>',
+        '<tr><td id="sprint-6">Sprint 6</td><td>45</td><td class="good">94%</td><td class="good">Completed</td></tr>',
+        '<tr><td id="sprint-7">Sprint 7</td><td>50</td><td class="warn">84%</td><td class="warn">In Progress</td></tr>',
+        '</table>',
+        '</body></html>\'></iframe>',
+        '<h2>Next Steps</h2>',
+        '<p id="docNextSteps">Focus areas for Q1 2026 include performance optimization, mobile app launch, and international expansion preparation.</p>',
+        '</body></html>'
+    ].join('\n');
+
+    // Zoom handlers
+    var zoomLevel = 100;
+    shadow.getElementById('docZoomIn').addEventListener('click', function() {
+        zoomLevel = Math.min(150, zoomLevel + 10);
+        docFrame.style.transform = 'scale(' + (zoomLevel / 100) + ')';
+        docFrame.style.transformOrigin = 'top left';
+    });
+    shadow.getElementById('docZoomOut').addEventListener('click', function() {
+        zoomLevel = Math.max(50, zoomLevel - 10);
+        docFrame.style.transform = 'scale(' + (zoomLevel / 100) + ')';
+        docFrame.style.transformOrigin = 'top left';
+    });
+})();
+</script>
+
+<!-- Team Chat: Iframe > Shadow DOM -->
+<script>
+(function() {
+    var frame = document.getElementById('chatFrame');
+    frame.srcdoc = [
+        '<!DOCTYPE html><html><head><style>',
+        'body{font-family:system-ui,sans-serif;margin:0;padding:0;background:#0a0a0f;color:#a1a1aa;display:flex;flex-direction:column;height:100%;box-sizing:border-box}',
+        '.chat-header{padding:14px 18px;background:#121218;border-bottom:1px solid #242430;font-size:14px;font-weight:600;color:#ededef;display:flex;align-items:center;gap:8px}',
+        '.online-dot{width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 4px rgba(16,185,129,.5)}',
+        '.messages{flex:1;overflow-y:auto;padding:16px}',
+        '.input-bar{padding:12px 16px;background:#121218;border-top:1px solid #242430}',
+        '</style></head><body>',
+        '<div class="chat-header"><span class="online-dot"></span><span id="chatChannelName">#team-general</span><span style="font-size:11px;color:#64647a;margin-left:auto">4 members online</span></div>',
+        '<div class="messages" id="chatMessages">',
+        '<chat-bubble sender="Sarah Chen" initials="SC" time="10:30 AM" align="left">Hey team, sprint review at 3pm today. Please prepare your demos!</chat-bubble>',
+        '<chat-bubble sender="John Davis" initials="JD" time="10:32 AM" align="left">Sounds good! I\'ll have the auth demo ready.</chat-bubble>',
+        '<chat-bubble sender="You" initials="SR" time="10:35 AM" align="right">Perfect. I\'ll share the test results dashboard.</chat-bubble>',
+        '<chat-bubble sender="Mike Ross" initials="MR" time="10:45 AM" align="left">Can someone review PR #42? It\'s the monitoring setup.</chat-bubble>',
+        '</div>',
+        '<div class="input-bar"><chat-input></chat-input></div>',
+        // Define custom elements inside the iframe
+        '<script>',
+        'class ChatBubble extends HTMLElement{',
+        '  constructor(){super();this.attachShadow({mode:"open"})}',
+        '  connectedCallback(){',
+        '    var sender=this.getAttribute("sender")||"User";',
+        '    var initials=this.getAttribute("initials")||"?";',
+        '    var time=this.getAttribute("time")||"";',
+        '    var align=this.getAttribute("align")||"left";',
+        '    var text=this.textContent;',
+        '    this.shadowRoot.innerHTML=',
+        '      "<style>"+',
+        '      ":host{display:block;margin-bottom:14px}"+',
+        '      ".bubble{display:flex;gap:10px;align-items:"+(align==="right"?"flex-end":"flex-start")+";flex-direction:"+(align==="right"?"row-reverse":"row")+"}"+',
+        '      ".av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,"+(align==="right"?"#10b981,#059669":"#0ea5e9,#6366f1")+");display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:700;flex-shrink:0}"+',
+        '      ".content{max-width:70%}"+',
+        '      ".sender{font-size:11px;font-weight:600;color:#ededef;margin-bottom:3px;text-align:"+(align==="right"?"right":"left")+"}"+',
+        '      ".msg{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;color:#c8c8d4;background:"+(align==="right"?"#0c3d5f":"#1e1e26")+"}"+',
+        '      ".time{font-size:10px;color:#4a4a5e;margin-top:3px;text-align:"+(align==="right"?"right":"left")+"}"+',
+        '      "</style>"+',
+        '      "<div class=\\"bubble\\">"+',
+        '      "<div class=\\"av\\">"+initials+"</div>"+',
+        '      "<div class=\\"content\\">"+',
+        '      "<div class=\\"sender\\" id=\\"chatSender\\">"+sender+"</div>"+',
+        '      "<div class=\\"msg\\" id=\\"chatText\\">"+text+"</div>"+',
+        '      "<div class=\\"time\\" id=\\"chatTime\\">"+time+"</div>"+',
+        '      "</div></div>";',
+        '  }',
+        '}',
+        'customElements.define("chat-bubble",ChatBubble);',
+        '',
+        'class ChatInput extends HTMLElement{',
+        '  constructor(){super();this.attachShadow({mode:"open"})}',
+        '  connectedCallback(){',
+        '    var self=this;',
+        '    this.shadowRoot.innerHTML=',
+        '      "<style>"+',
+        '      ":host{display:block}"+',
+        '      ".bar{display:flex;gap:8px}"+',
+        '      "input{flex:1;padding:10px 14px;background:#1a1a22;border:1px solid #2d2d38;border-radius:10px;color:#ededef;font-size:13px;outline:none;font-family:inherit}"+',
+        '      "input:focus{border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.12)}"+',
+        '      "button{padding:10px 18px;background:linear-gradient(135deg,#0ea5e9,#6366f1);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}"+',
+        '      "button:hover{opacity:.9}"+',
+        '      "</style>"+',
+        '      "<div class=\\"bar\\">"+',
+        '      "<input type=\\"text\\" id=\\"chatMsgInput\\" placeholder=\\"Type a message...\\">"+',
+        '      "<button id=\\"chatSendBtn\\">Send</button>"+',
+        '      "</div>";',
+        '    var input=this.shadowRoot.getElementById("chatMsgInput");',
+        '    var btn=this.shadowRoot.getElementById("chatSendBtn");',
+        '    btn.addEventListener("click",function(){',
+        '      if(!input.value.trim())return;',
+        '      var messages=document.getElementById("chatMessages");',
+        '      var bubble=document.createElement("chat-bubble");',
+        '      bubble.setAttribute("sender","You");',
+        '      bubble.setAttribute("initials","SR");',
+        '      bubble.setAttribute("time",new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}));',
+        '      bubble.setAttribute("align","right");',
+        '      bubble.textContent=input.value;',
+        '      messages.appendChild(bubble);',
+        '      messages.scrollTop=messages.scrollHeight;',
+        '      input.value="";',
+        '    });',
+        '    input.addEventListener("keydown",function(e){if(e.key==="Enter")btn.click()});',
+        '    input.addEventListener("input",function(){',
+        '      if(window.parent)window.parent.postMessage({type:"iframe-input",source:"chat",value:input.value},"*");',
+        '    });',
+        '  }',
+        '}',
+        'customElements.define("chat-input",ChatInput);',
+        '<\/script></body></html>'
+    ].join('\n');
+})();
+</script>
+
+<!-- Settings Panel: 3-Level Nested Shadow DOM + Iframe -->
+<script>
+(function() {
+    var host = document.getElementById('settingsHost');
+
+    // ===== Level 1 Shadow: Settings Container =====
+    var shadow1 = host.attachShadow({ mode: 'open' });
+    shadow1.innerHTML =
+        '<style>' +
+        ':host{display:block}' +
+        '.container{display:grid;gap:16px}' +
+        '.group{background:var(--bg-secondary,#1e1e26);border-radius:12px;padding:20px;box-shadow:inset 0 0 0 1px var(--border-subtle,#242430)}' +
+        '.group-title{font-size:14px;font-weight:600;color:var(--text-primary,#ededef);margin-bottom:4px}' +
+        '.group-desc{font-size:12px;color:var(--text-tertiary,#64647a);margin-bottom:14px}' +
+        '.help-title{font-size:13px;font-weight:600;color:var(--text-primary,#ededef);margin-bottom:8px}' +
+        'iframe{border:1px solid var(--border-subtle,#242430);border-radius:8px;width:100%;display:block}' +
+        '.field{margin:12px 0}' +
+        '.field label{font-weight:600;font-size:13px;color:var(--text-secondary,#a1a1aa);display:block;margin-bottom:6px}' +
+        '.field input,.field select{padding:9px 14px;width:100%;max-width:320px;background:var(--bg-input,#141418);border:1px solid var(--border-default,#2d2d38);border-radius:8px;color:var(--text-primary,#ededef);font-size:13px;outline:none;font-family:inherit;box-sizing:border-box}' +
+        '.field input:focus,.field select:focus{border-color:var(--accent,#0ea5e9);box-shadow:0 0 0 3px rgba(14,165,233,.12)}' +
+        '.field select{cursor:pointer;appearance:auto}' +
+        '</style>' +
+        '<div class="container">' +
+        '<div class="group" id="generalGroup">' +
+        '<div class="group-title">General Settings</div>' +
+        '<div class="group-desc">Configure project name, visibility, and workspace preferences</div>' +
+        '<div class="field"><label for="settingsProjectName">Project Name</label><input type="text" id="settingsProjectName" value="TeamFlow" placeholder="Project name"></div>' +
+        '<div class="field"><label for="settingsWorkspace">Workspace</label><select id="settingsWorkspace"><option value="engineering">Engineering</option><option value="design">Design</option><option value="product">Product</option></select></div>' +
+        '<tf-toggle label="Public visibility" id="settingsVisibility" checked="true"></tf-toggle>' +
+        '</div>' +
+        '<div class="group" id="notifGroupHost">' +
+        '<div class="group-title">Notification Preferences</div>' +
+        '<div class="group-desc">Manage how you receive alerts and updates</div>' +
+        '<div id="notifL2Host"></div>' +
+        '</div>' +
+        '<div class="group">' +
+        '<div class="help-title">Documentation</div>' +
+        '<iframe id="helpFrame" height="120" title="Help Documentation"></iframe>' +
+        '</div>' +
+        '</div>';
+
+    // Set help iframe content (inside L1 shadow)
+    var helpFrame = shadow1.getElementById('helpFrame');
+    helpFrame.srcdoc = [
+        '<!DOCTYPE html><html><head><style>',
+        'body{font-family:system-ui,sans-serif;padding:14px;margin:0;background:#141418;color:#a1a1aa;font-size:13px;line-height:1.6}',
+        'h3{font-size:14px;color:#ededef;margin:0 0 6px}',
+        'a{color:#0ea5e9;text-decoration:none}',
+        'a:hover{text-decoration:underline}',
+        '</style></head><body>',
+        '<h3 id="helpTitle">Settings Help</h3>',
+        '<p id="helpContent">Configure your project settings to control access, notifications, and integrations. Changes are saved automatically. For advanced configuration, visit the <a href="#" id="helpLink">admin panel</a>.</p>',
+        '</body></html>'
+    ].join('\n');
+
+    // ===== Level 2 Shadow: Notification Preferences =====
+    var notifHost = shadow1.getElementById('notifL2Host');
+    var shadow2 = notifHost.attachShadow({ mode: 'open' });
+    shadow2.innerHTML =
+        '<style>' +
+        ':host{display:block}' +
+        '.notif-section{margin-bottom:8px}' +
+        '.notif-label{font-size:12px;font-weight:600;color:var(--text-tertiary,#64647a);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}' +
+        '.advanced-host{margin-top:16px;padding-top:14px;border-top:1px solid var(--border-subtle,#242430)}' +
+        '.advanced-label{font-size:12px;font-weight:600;color:var(--text-tertiary,#64647a);margin-bottom:10px}' +
+        '</style>' +
+        '<div class="notif-section">' +
+        '<div class="notif-label">Channels</div>' +
+        '<tf-toggle label="Email notifications" id="settingsEmail" checked="true"></tf-toggle>' +
+        '<tf-toggle label="Push notifications" id="settingsPush" checked="true"></tf-toggle>' +
+        '<tf-toggle label="Slack integration" id="settingsSlack"></tf-toggle>' +
+        '</div>' +
+        '<div class="advanced-host" id="advancedL3Host">' +
+        '<div class="advanced-label">Advanced Options</div>' +
+        '<div id="advancedControls"></div>' +
+        '</div>';
+
+    // ===== Level 3 Shadow: Advanced Controls =====
+    var advancedHost = shadow2.getElementById('advancedControls');
+    var shadow3 = advancedHost.attachShadow({ mode: 'open' });
+    shadow3.innerHTML =
+        '<style>' +
+        ':host{display:block}' +
+        '.field{margin:10px 0}' +
+        '.field label{font-weight:600;font-size:12px;color:var(--text-secondary,#a1a1aa);display:block;margin-bottom:5px}' +
+        '.field input,.field select{padding:8px 12px;width:100%;max-width:280px;background:var(--bg-input,#141418);border:1px solid var(--border-default,#2d2d38);border-radius:8px;color:var(--text-primary,#ededef);font-size:13px;outline:none;font-family:inherit;box-sizing:border-box}' +
+        '.field input:focus,.field select:focus{border-color:var(--accent,#0ea5e9);box-shadow:0 0 0 3px rgba(14,165,233,.12)}' +
+        '.field select{cursor:pointer;appearance:auto}' +
+        '.depth-indicator{font-size:10px;color:#6366f1;padding:3px 8px;border-radius:4px;background:rgba(99,102,241,.1);display:inline-block;margin-bottom:10px}' +
+        '</style>' +
+        '<span class="depth-indicator">Shadow Depth: Level 3</span>' +
+        '<div class="field"><label for="settingsApiTimeout">API Timeout (ms)</label><input type="number" id="settingsApiTimeout" value="5000" min="1000" max="30000"></div>' +
+        '<div class="field"><label for="settingsRetries">Max Retries</label><select id="settingsRetries"><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option><option value="10">10</option></select></div>' +
+        '<tf-toggle label="Debug mode" id="settingsDebug"></tf-toggle>' +
+        '<tf-toggle label="Verbose logging" id="settingsVerbose"></tf-toggle>';
+})();
+</script>
+
+<!-- New Task Modal (Dynamic Shadow DOM) -->
+<script>
+var taskModalInitialized = false;
+function openTaskModal() {
+    document.getElementById('taskModal').classList.add('open');
+    if (taskModalInitialized) return;
+    taskModalInitialized = true;
+
+    var host = document.getElementById('taskModalHost');
+    var shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML =
+        '<style>' +
+        ':host{display:block}' +
+        '.modal{background:var(--bg-card,#121218);padding:32px;border-radius:20px;width:480px;max-width:90vw;box-shadow:0 8px 30px rgba(0,0,0,.3),inset 0 0 0 1px var(--border-default,#2d2d38)}' +
+        'h3{font-size:18px;font-weight:600;color:var(--text-primary,#ededef);margin:0 0 20px}' +
+        'label{font-weight:600;font-size:13px;color:var(--text-secondary,#a1a1aa);display:block;margin:14px 0 6px}' +
+        'input,select,textarea{padding:10px 14px;width:100%;background:var(--bg-input,#141418);border:1px solid var(--border-default,#2d2d38);border-radius:10px;color:var(--text-primary,#ededef);font-size:14px;outline:none;font-family:inherit;box-sizing:border-box}' +
+        'input:focus,select:focus,textarea:focus{border-color:var(--accent,#0ea5e9);box-shadow:0 0 0 3px rgba(14,165,233,.12)}' +
+        'textarea{height:70px;resize:vertical}' +
+        'select{cursor:pointer;appearance:auto}' +
+        '.actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}' +
+        'button{padding:10px 22px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin:0}' +
+        '.btn-primary{background:var(--accent,#0ea5e9);color:white}' +
+        '.btn-secondary{background:var(--bg-secondary,#1e1e26);color:var(--text-primary,#ededef);border:1px solid var(--border-strong,#3e3e52)}' +
+        '.success{display:none;padding:12px;border-radius:10px;background:rgba(16,185,129,.12);color:#10b981;font-weight:600;font-size:14px;text-align:center;margin-top:16px}' +
+        '</style>' +
+        '<div class="modal">' +
+        '<h3>Create New Task</h3>' +
+        '<label for="modalTaskTitle">Task Title</label>' +
+        '<input type="text" id="modalTaskTitle" placeholder="e.g. Implement search feature">' +
+        '<label for="modalTaskDesc">Description</label>' +
+        '<textarea id="modalTaskDesc" placeholder="Describe the task..."></textarea>' +
+        '<label for="modalTaskPriority">Priority</label>' +
+        '<select id="modalTaskPriority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="critical">Critical</option></select>' +
+        '<label for="modalTaskAssignee">Assignee</label>' +
+        '<select id="modalTaskAssignee"><option value="">Unassigned</option><option value="Sarah Chen">Sarah Chen</option><option value="John Davis">John Davis</option><option value="Mike Ross">Mike Ross</option><option value="Alex Kim">Alex Kim</option></select>' +
+        '<label for="modalTaskDue">Due Date</label>' +
+        '<input type="date" id="modalTaskDue">' +
+        '<div class="actions">' +
+        '<button class="btn-secondary" id="modalCancelBtn">Cancel</button>' +
+        '<button class="btn-primary" id="modalSubmitBtn">Create Task</button>' +
+        '</div>' +
+        '<div class="success" id="modalSuccess">Task created successfully!</div>' +
+        '</div>';
+
+    shadow.getElementById('modalCancelBtn').addEventListener('click', closeTaskModal);
+    shadow.getElementById('modalSubmitBtn').addEventListener('click', function() {
+        var title = shadow.getElementById('modalTaskTitle').value;
+        if (!title) { shadow.getElementById('modalTaskTitle').style.borderColor = '#ef4444'; return; }
+        shadow.getElementById('modalSuccess').style.display = 'block';
+        setTimeout(function() {
+            shadow.getElementById('modalSuccess').style.display = 'none';
+            shadow.getElementById('modalTaskTitle').value = '';
+            shadow.getElementById('modalTaskDesc').value = '';
+            closeTaskModal();
+        }, 1500);
+    });
+}
+function closeTaskModal() {
+    document.getElementById('taskModal').classList.remove('open');
+}
+</script>
+
+<!-- INPUT VALUE MONITOR SCRIPT (enhanced for Shadow DOM via composedPath) -->
+<script>
+(function() {
+    var eventValue = '';
+    var activeField = null;
+    var inputEventFired = false;
+    var contextLabel = '';
+
+    function getFieldLabel(el) {
+        var label = '';
+        if (el.id) label = '#' + el.id;
+        else if (el.name) label = '[name=' + el.name + ']';
+        else if (el.placeholder) label = '"' + el.placeholder.substring(0, 20) + '..."';
+        else if (el.className) label = '.' + String(el.className).split(' ')[0];
+        else label = el.tagName.toLowerCase();
+        var type = el.getAttribute('type') || el.tagName.toLowerCase();
+        return label + ' (' + type + ')';
+    }
+
+    function getContext(e) {
+        var path = e.composedPath ? e.composedPath() : [];
+        var shadowCount = 0;
+        for (var i = 0; i < path.length; i++) {
+            if (path[i] instanceof ShadowRoot) shadowCount++;
+        }
+        if (shadowCount > 0) return 'Shadow L' + shadowCount;
+        return 'Light DOM';
+    }
+
+    function updateBar() {
+        var domVal = activeField ? (activeField.value || activeField.textContent || '') : '';
+        document.getElementById('monitorActiveField').textContent = activeField ? getFieldLabel(activeField) : '—';
+        document.getElementById('monitorEventValue').textContent = eventValue || '—';
+        document.getElementById('monitorDomValue').textContent = domVal || '—';
+        document.getElementById('monitorContext').textContent = contextLabel || '—';
+
+        var domValEl = document.getElementById('monitorDomValue');
+        var sourceEl = document.getElementById('monitorSource');
+
+        if (!activeField || (!eventValue && !domVal)) {
+            sourceEl.textContent = '—';
+            sourceEl.className = 'monitor-source';
+            domValEl.className = 'monitor-value';
+        } else if (inputEventFired && eventValue === domVal) {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        } else if (domVal && !inputEventFired) {
+            sourceEl.textContent = 'JS INJECTED';
+            sourceEl.className = 'monitor-source source-js';
+            domValEl.className = 'monitor-value js-injected';
+        } else {
+            sourceEl.textContent = 'REAL INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            domValEl.className = 'monitor-value match';
+        }
+    }
+
+    // Use composedPath to get actual target inside shadow DOM
+    document.addEventListener('focusin', function(e) {
+        var target = e.composedPath ? e.composedPath()[0] : e.target;
+        var tag = target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable) {
+            activeField = target;
+            eventValue = target.value || target.textContent || '';
+            inputEventFired = false;
+            contextLabel = getContext(e);
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('input', function(e) {
+        var target = e.composedPath ? e.composedPath()[0] : e.target;
+        if (!activeField) return;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable) {
+            activeField = target;
+            inputEventFired = true;
+            eventValue = target.value || target.textContent || '';
+            contextLabel = getContext(e);
+            updateBar();
+        }
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        var target = e.composedPath ? e.composedPath()[0] : e.target;
+        if (target.tagName === 'SELECT') {
+            activeField = target;
+            inputEventFired = true;
+            eventValue = target.value;
+            contextLabel = getContext(e);
+            updateBar();
+        }
+    }, true);
+
+    // Listen for postMessage from iframes
+    window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'iframe-input') {
+            document.getElementById('monitorActiveField').textContent = e.data.source + ' (iframe)';
+            document.getElementById('monitorEventValue').textContent = e.data.value || '—';
+            document.getElementById('monitorDomValue').textContent = e.data.value || '—';
+            document.getElementById('monitorContext').textContent = 'Iframe > ' + (e.data.shadow ? 'Shadow' : 'Light');
+            var sourceEl = document.getElementById('monitorSource');
+            sourceEl.textContent = 'IFRAME INPUT';
+            sourceEl.className = 'monitor-source source-real';
+            document.getElementById('monitorDomValue').className = 'monitor-value match';
+        }
+    });
+
+    setInterval(function() {
+        if (activeField) updateBar();
+    }, 500);
+})();
+</script>
+
+<!-- Theme Toggle -->
+<script>
+document.getElementById('themeToggle').addEventListener('click', function() {
+    var html = document.documentElement;
+    var current = html.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('lt-theme', next);
+});
+</script>
+
+<!-- Glow Effect -->
+<script>
+(function() {
+    var g1 = document.querySelector('.glow-container:not(.glow-2)');
+    var g2 = document.querySelector('.glow-container.glow-2');
+    if (!g1) return;
+    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    var cx = mx, cy = my, cx2 = mx, cy2 = my;
+    g1.style.transform = 'translate(' + (mx - 400) + 'px,' + (my - 400) + 'px)';
+    if (g2) g2.style.transform = 'translate(' + (mx - 300) + 'px,' + (my - 300) + 'px)';
+    document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
+    (function loop() {
+        cx += (mx - cx) * 0.08;
+        cy += (my - cy) * 0.08;
+        cx2 += (mx - cx2) * 0.035;
+        cy2 += (my - cy2) * 0.035;
+        g1.style.transform = 'translate(' + (cx - 400) + 'px,' + (cy - 400) + 'px)';
+        if (g2) g2.style.transform = 'translate(' + (cx2 - 300) + 'px,' + (cy2 - 300) + 'px)';
+        requestAnimationFrame(loop);
+    })();
+})();
+</script>
+</body>
+</html>
