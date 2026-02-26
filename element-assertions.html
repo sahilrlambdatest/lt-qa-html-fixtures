@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>Element State & Attribute Assertions</title>
+    <link rel="stylesheet" href="design-system.css">
+    <style>
+        .assertion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+        .assert-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; position: relative; }
+        .assert-card h4 { margin: 0 0 8px; font-size: 13px; color: var(--text-primary); font-weight: 600; }
+        .assert-card .meta { font-size: 11px; color: var(--text-tertiary); margin-top: 8px; font-family: var(--font-mono); line-height: 1.6; }
+        .assert-card .meta code { background: var(--bg-tertiary); padding: 1px 5px; border-radius: 3px; color: var(--accent); }
+        .state-badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .state-badge.pass { background: #064e3b; color: #34d399; }
+        .state-badge.fail { background: #7f1d1d; color: #fca5a5; }
+        .state-badge.error { background: #78350f; color: #fbbf24; }
+        [data-theme="light"] .state-badge.pass { background: #d1fae5; color: #065f46; }
+        [data-theme="light"] .state-badge.fail { background: #fee2e2; color: #991b1b; }
+        [data-theme="light"] .state-badge.error { background: #fef3c7; color: #92400e; }
+        .color-swatch { display: inline-block; width: 24px; height: 24px; border-radius: 4px; vertical-align: middle; border: 1px solid var(--border-subtle); margin-right: 6px; }
+        .demo-row { display: flex; align-items: center; gap: 12px; margin: 8px 0; flex-wrap: wrap; }
+        .hidden-el { display: none; }
+        .visibility-hidden { visibility: hidden; height: 32px; }
+        .opacity-zero { opacity: 0; height: 32px; }
+        .date-grid { display: grid; grid-template-columns: repeat(7, 40px); gap: 4px; margin-top: 8px; }
+        .date-cell { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border-subtle); background: var(--bg-secondary); color: var(--text-primary); transition: all 0.15s; }
+        .date-cell:hover:not([disabled]) { border-color: var(--accent); }
+        .date-cell[disabled] { opacity: 0.35; cursor: not-allowed; color: var(--text-muted); }
+        .date-cell.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .date-cell.today { border-color: var(--accent); font-weight: 700; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 28px; width: 90%; max-width: 440px; }
+        .modal-box h3 { margin: 0 0 16px; }
+        .ajax-placeholder { min-height: 60px; border: 2px dashed var(--border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 13px; margin-top: 8px; }
+        .long-attr-display { word-break: break-all; font-size: 10px; color: var(--text-tertiary); max-height: 40px; overflow: hidden; }
+        /* Toggle switch */
+        .toggle-track { width: 48px; height: 26px; background: var(--bg-tertiary); border-radius: 99px; position: relative; cursor: pointer; transition: background 0.2s; border: 1px solid var(--border-subtle); }
+        .toggle-track.on { background: var(--accent); }
+        .toggle-thumb { width: 20px; height: 20px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 3px; transition: transform 0.2s; }
+        .toggle-track.on .toggle-thumb { transform: translateX(22px); }
+        /* Iframe for assertions */
+        .assert-iframe { border: 1px solid var(--border-subtle); border-radius: var(--radius-md); width: 100%; height: 200px; }
+        /* Shadow host styling */
+        .shadow-host { border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<script>(function(){var t=localStorage.getItem('lt-theme')||(window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();</script>
+
+<div class="top-bar"></div>
+<div class="glow-container"><div class="glow-inner"></div></div>
+<div class="glow-container glow-2"><div class="glow-inner"></div></div>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">LT</div>
+            <div class="logo-text">Element Assertions</div>
+        </a>
+        <nav class="header-nav">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="icon-sun">&#9728;</span>
+                <span class="icon-moon">&#9790;</span>
+            </button>
+            <a href="index.html" class="header-btn">
+                <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10H5M5 10l4-4M5 10l4 4"/></svg>
+                <span class="hide-mobile">All Pages</span>
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="container-narrow">
+
+<div class="page-hero">
+    <h1>Element State & Attribute Assertions</h1>
+    <p class="subtitle">Comprehensive test surface for KaneAI element state assertions, DOM attribute assertions, CSS property assertions, and edge cases. Covers all 12 operators, 10 CSS properties, and color normalization.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: ELEMENT STATES (enabled/disabled/visible/hidden/clickable/present) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="element-states">
+    <div class="section-card-header">
+        <h2>1. Element States</h2>
+        <span class="badge">STATE ASSERTIONS</span>
+    </div>
+
+    <h3>Enabled / Disabled</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Enabled Button</h4>
+            <button id="btn-enabled" data-testid="submit-btn">Submit Order</button>
+            <div class="meta">State: <code>enabled</code> | Assert: "button is enabled"</div>
+        </div>
+        <div class="assert-card">
+            <h4>Disabled Button</h4>
+            <button id="btn-disabled" disabled data-testid="disabled-btn">Processing...</button>
+            <div class="meta">State: <code>disabled</code> | Assert: "button is disabled"</div>
+        </div>
+        <div class="assert-card">
+            <h4>Enabled Input</h4>
+            <input type="text" id="input-enabled" placeholder="Type here..." value="Hello World">
+            <div class="meta">State: <code>enabled</code> | Has value for attribute assertion too</div>
+        </div>
+        <div class="assert-card">
+            <h4>Disabled Input</h4>
+            <input type="text" id="input-disabled" disabled value="Cannot edit this">
+            <div class="meta">State: <code>disabled</code> | value="Cannot edit this"</div>
+        </div>
+        <div class="assert-card">
+            <h4>Disabled Select</h4>
+            <select id="select-disabled" disabled>
+                <option value="locked">Locked Option</option>
+            </select>
+            <div class="meta">State: <code>disabled</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>Readonly Input</h4>
+            <input type="text" id="input-readonly" readonly value="Read-only value">
+            <div class="meta">State: <code>readonly</code> (not disabled, but not editable)</div>
+        </div>
+    </div>
+
+    <h3>Visible / Hidden</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Visible Element</h4>
+            <div id="el-visible" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">I am visible</div>
+            <div class="meta">State: <code>visible</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>Hidden Element (display:none)</h4>
+            <div id="el-hidden-display" class="hidden-el">I am hidden with display:none</div>
+            <div class="meta">State: <code>hidden</code> | CSS: display:none | Element exists in DOM but not visible</div>
+        </div>
+        <div class="assert-card">
+            <h4>Hidden Element (visibility:hidden)</h4>
+            <div id="el-hidden-visibility" class="visibility-hidden">I am hidden with visibility:hidden</div>
+            <div class="meta">State: <code>hidden</code> | CSS: visibility:hidden | Takes space but invisible</div>
+        </div>
+        <div class="assert-card">
+            <h4>Hidden Element (opacity:0)</h4>
+            <div id="el-hidden-opacity" class="opacity-zero">I am hidden with opacity:0</div>
+            <div class="meta">State: <code>hidden</code> (edge case) | CSS: opacity:0</div>
+        </div>
+    </div>
+
+    <h3>Clickable / Not Clickable</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Clickable Button</h4>
+            <button id="btn-clickable" onclick="this.textContent='Clicked!'">Click Me</button>
+            <div class="meta">State: <code>clickable</code> | enabled + visible + not pointer-events:none</div>
+        </div>
+        <div class="assert-card">
+            <h4>Non-Clickable Button (disabled)</h4>
+            <button id="btn-not-clickable" disabled>Cannot Click</button>
+            <div class="meta">State: <code>not clickable</code> | disabled attribute</div>
+        </div>
+        <div class="assert-card">
+            <h4>Non-Clickable (pointer-events: none)</h4>
+            <button id="btn-pointer-none" style="pointer-events: none; opacity: 0.5;">Pointer Events None</button>
+            <div class="meta">State: <code>not clickable</code> | CSS: pointer-events:none</div>
+        </div>
+    </div>
+
+    <h3>Present / Not Present</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Present Element</h4>
+            <div id="el-present" data-testid="present-element">I exist in the DOM</div>
+            <div class="meta">State: <code>present</code> | Assert: "element is present"</div>
+        </div>
+        <div class="assert-card">
+            <h4>Not Present (no element with this ID)</h4>
+            <!-- No element with id="el-not-present" exists -->
+            <div class="meta">ID <code>el-not-present</code> does NOT exist in DOM.<br>Assert: "error banner is not present" should PASS</div>
+        </div>
+        <div class="assert-card">
+            <h4>Conditionally Present (removable)</h4>
+            <div id="el-removable">I can be removed</div>
+            <button onclick="var e=document.getElementById('el-removable');if(e)e.remove();else{var d=document.createElement('div');d.id='el-removable';d.textContent='I can be removed';this.parentNode.insertBefore(d,this);}">Toggle Presence</button>
+            <div class="meta">Click button to add/remove element from DOM</div>
+        </div>
+    </div>
+
+    <h3>Checked / Unchecked (Checkboxes & Radios)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Checked Checkbox</h4>
+            <label><input type="checkbox" id="cb-checked" checked> I agree to terms</label>
+            <div class="meta">State: <code>checked</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>Unchecked Checkbox</h4>
+            <label><input type="checkbox" id="cb-unchecked"> Subscribe to newsletter</label>
+            <div class="meta">State: <code>unchecked</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>Indeterminate Checkbox</h4>
+            <label><input type="checkbox" id="cb-indeterminate"> Select partial</label>
+            <div class="meta">State: <code>indeterminate</code> (set via JS)</div>
+        </div>
+        <div class="assert-card">
+            <h4>Disabled Checked Checkbox</h4>
+            <label><input type="checkbox" id="cb-disabled-checked" checked disabled> Locked option</label>
+            <div class="meta">State: <code>checked</code> + <code>disabled</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>Checked Radio</h4>
+            <label><input type="radio" name="plan" id="radio-checked" value="pro" checked> Pro Plan</label>
+            <label><input type="radio" name="plan" id="radio-unchecked" value="free"> Free Plan</label>
+            <div class="meta">Pro: <code>checked</code> | Free: <code>unchecked</code></div>
+        </div>
+    </div>
+
+    <h3>Toggle Switches (On / Off)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Toggle ON</h4>
+            <div class="demo-row">
+                <div class="toggle-track on" id="toggle-on" role="switch" aria-checked="true" aria-label="Notifications" tabindex="0" onclick="this.classList.toggle('on');this.setAttribute('aria-checked',this.classList.contains('on'))">
+                    <div class="toggle-thumb"></div>
+                </div>
+                <span>Notifications</span>
+            </div>
+            <div class="meta">State: <code>toggled on</code> | aria-checked="true"</div>
+        </div>
+        <div class="assert-card">
+            <h4>Toggle OFF</h4>
+            <div class="demo-row">
+                <div class="toggle-track" id="toggle-off" role="switch" aria-checked="false" aria-label="Dark mode" tabindex="0" onclick="this.classList.toggle('on');this.setAttribute('aria-checked',this.classList.contains('on'))">
+                    <div class="toggle-thumb"></div>
+                </div>
+                <span>Dark Mode</span>
+            </div>
+            <div class="meta">State: <code>toggled off</code> | aria-checked="false"</div>
+        </div>
+        <div class="assert-card">
+            <h4>Disabled Toggle</h4>
+            <div class="demo-row">
+                <div class="toggle-track" id="toggle-disabled" role="switch" aria-checked="false" aria-disabled="true" aria-label="3rd Party Tag Configuration" tabindex="-1" style="opacity:0.4;cursor:not-allowed;">
+                    <div class="toggle-thumb"></div>
+                </div>
+                <span>3rd Party Tag Configuration</span>
+            </div>
+            <div class="meta">PRD Journey 3: Assert "3rd Party Tag Configuration toggle is disabled"</div>
+        </div>
+    </div>
+
+    <h3>Interactive State Changes</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Button that disables after click</h4>
+            <button id="btn-becomes-disabled" onclick="this.disabled=true;this.textContent='Submitted'">Submit Form</button>
+            <div class="meta">Click to change state: enabled &rarr; disabled</div>
+        </div>
+        <div class="assert-card">
+            <h4>Button that enables after delay</h4>
+            <button id="btn-becomes-enabled" disabled>Please wait...</button>
+            <div class="meta">Enables after 3 seconds via JS timer</div>
+        </div>
+        <div class="assert-card">
+            <h4>Conflicting assertion target</h4>
+            <button id="btn-conflict-target" data-state="enabled">I am enabled</button>
+            <div class="meta">Use for TC-R5-05: Assert enabled (PASS) then assert disabled (FAIL) on same element</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: DOM ATTRIBUTES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="dom-attributes">
+    <div class="section-card-header">
+        <h2>2. DOM Attributes</h2>
+        <span class="badge">ATTRIBUTE ASSERTIONS</span>
+    </div>
+
+    <h3>ARIA Attributes</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>aria-expanded (true)</h4>
+            <button id="aria-expanded-true" aria-expanded="true" onclick="var v=this.getAttribute('aria-expanded')==='true'?'false':'true';this.setAttribute('aria-expanded',v);this.nextElementSibling.style.display=v==='true'?'block':'none'">Accordion Header (Expanded)</button>
+            <div id="accordion-panel-1" style="padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);margin-top:4px;">Accordion content visible</div>
+            <div class="meta">Attr: <code>aria-expanded="true"</code> | SoTheBys POC use case</div>
+        </div>
+        <div class="assert-card">
+            <h4>aria-expanded (false)</h4>
+            <button id="aria-expanded-false" aria-expanded="false" onclick="var v=this.getAttribute('aria-expanded')==='true'?'false':'true';this.setAttribute('aria-expanded',v);this.nextElementSibling.style.display=v==='true'?'block':'none'">Accordion Header (Collapsed)</button>
+            <div id="accordion-panel-2" style="padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);margin-top:4px;display:none;">Accordion content hidden</div>
+            <div class="meta">Attr: <code>aria-expanded="false"</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>role attribute</h4>
+            <div id="el-role-alert" role="alert" style="padding:8px;background:#7f1d1d;color:#fca5a5;border-radius:var(--radius-sm);">Error: Invalid input</div>
+            <div class="meta">Attr: <code>role="alert"</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>aria-label</h4>
+            <button id="btn-aria-label" aria-label="Close dialog">&#10005;</button>
+            <div class="meta">Attr: <code>aria-label="Close dialog"</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>aria-describedby</h4>
+            <input type="text" id="input-described" aria-describedby="desc-text" placeholder="Username">
+            <span id="desc-text" style="font-size:11px;color:var(--text-muted);">Must be 3-20 characters</span>
+            <div class="meta">Attr: <code>aria-describedby="desc-text"</code></div>
+        </div>
+    </div>
+
+    <h3>Data Attributes</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>data-testid</h4>
+            <div id="el-data-testid" data-testid="main-content">Main content area</div>
+            <div class="meta">Attr: <code>data-testid="main-content"</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>data-status</h4>
+            <div id="el-data-status" data-status="active">Active item</div>
+            <div class="meta">Attr: <code>data-status="active"</code> | For equals operator</div>
+        </div>
+        <div class="assert-card">
+            <h4>data-count (numeric)</h4>
+            <div id="el-data-count" data-count="8">Items: 8</div>
+            <div class="meta">Attr: <code>data-count="8"</code> | For gt/lt operators (8 > 5 = PASS)</div>
+        </div>
+        <div class="assert-card">
+            <h4>data-index (numeric)</h4>
+            <div id="el-data-index" data-index="3">Index: 3</div>
+            <div class="meta">Attr: <code>data-index="3"</code> | For lt operator (3 < 10 = PASS)</div>
+        </div>
+        <div class="assert-card">
+            <h4>data-score (boundary)</h4>
+            <div id="el-data-score" data-score="5">Score: 5</div>
+            <div class="meta">Attr: <code>data-score="5"</code> | Boundary: 5 >= 5 PASS, 5 > 5 FAIL</div>
+        </div>
+        <div class="assert-card">
+            <h4>data-priority (numeric)</h4>
+            <div id="el-data-priority" data-priority="3">Priority: 3</div>
+            <div class="meta">Attr: <code>data-priority="3"</code> | For lte operator (3 <= 5 = PASS)</div>
+        </div>
+        <div class="assert-card">
+            <h4>data-label (non-numeric)</h4>
+            <div id="el-data-label" data-label="abc">Label: abc</div>
+            <div class="meta">Attr: <code>data-label="abc"</code> | Numeric operator on non-numeric = ERROR</div>
+        </div>
+        <div class="assert-card">
+            <h4>data-mixed (partially numeric)</h4>
+            <div id="el-data-mixed" data-mixed="5abc">Mixed: 5abc</div>
+            <div class="meta">Attr: <code>data-mixed="5abc"</code> | Partially numeric = ERROR</div>
+        </div>
+        <div class="assert-card">
+            <h4>data-user-id (information disclosure test)</h4>
+            <div id="el-data-userid" data-user-id="usr_8f3a2b1c9d4e">User Profile</div>
+            <div class="meta">Attr: <code>data-user-id="usr_8f3a2b1c9d4e"</code> | Security: info disclosure risk</div>
+        </div>
+    </div>
+
+    <h3>Standard HTML Attributes</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>placeholder</h4>
+            <input type="text" id="input-placeholder" placeholder="Search products...">
+            <div class="meta">Attr: <code>placeholder="Search products..."</code> | contains "Search"</div>
+        </div>
+        <div class="assert-card">
+            <h4>href (link)</h4>
+            <a id="link-href" href="https://www.lambdatest.com/dashboard">Go to Dashboard</a>
+            <div class="meta">Attr: <code>href</code> contains "/dashboard" | starts_with "https://"</div>
+        </div>
+        <div class="assert-card">
+            <h4>href (not staging)</h4>
+            <a id="link-href-prod" href="https://www.lambdatest.com/pricing">Pricing</a>
+            <div class="meta">Attr: <code>href</code> does NOT contain "staging" | PRD Journey 6</div>
+        </div>
+        <div class="assert-card">
+            <h4>src (image)</h4>
+            <img id="img-src" src="favicon.svg" alt="LambdaTest Logo" width="48" height="48">
+            <div class="meta">Attr: <code>src</code> ends_with ".svg" | <code>alt="LambdaTest Logo"</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>type attribute</h4>
+            <input type="text" id="input-type-text" placeholder="Type is text">
+            <div class="meta">Attr: <code>type="text"</code> | not_equals "password"</div>
+        </div>
+        <div class="assert-card">
+            <h4>title attribute</h4>
+            <span id="el-title" title="Click to expand details">Hover for tooltip</span>
+            <div class="meta">Attr: <code>title="Click to expand details"</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>name attribute</h4>
+            <input type="hidden" id="input-name" name="csrf_token" value="abc123xyz">
+            <span>Hidden input with name</span>
+            <div class="meta">Attr: <code>name="csrf_token"</code> | <code>value="abc123xyz"</code></div>
+        </div>
+    </div>
+
+    <h3>Case-Sensitivity Testing</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Mixed-case class</h4>
+            <div id="el-mixed-case" class="MyComponent primary-action">Styled Component</div>
+            <div class="meta">Class: <code>MyComponent</code> | Assert "contains mycomponent" should PASS (case-insensitive default)</div>
+        </div>
+        <div class="assert-card">
+            <h4>Mixed-case data attribute</h4>
+            <div id="el-mixed-data" data-category="ElEcTrOnIcS">Electronics Item</div>
+            <div class="meta">Attr: <code>data-category="ElEcTrOnIcS"</code> | "contains electronics" = PASS</div>
+        </div>
+    </div>
+
+    <h3>Attribute Not Present</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Element without data-testid</h4>
+            <div id="el-no-testid">I have no data-testid attribute</div>
+            <div class="meta">Assert "data-testid equals main-content" should FAIL (attr not present)</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: CSS PROPERTY ASSERTIONS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="css-properties">
+    <div class="section-card-header">
+        <h2>3. CSS Property Assertions</h2>
+        <span class="badge">10 SUPPORTED PROPERTIES</span>
+    </div>
+
+    <h3>Color Properties</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>background-color: blue</h4>
+            <div id="css-bg-blue" style="background-color: blue; color: white; padding: 12px; border-radius: var(--radius-sm);">Blue background</div>
+            <div class="meta">CSS: <code>background-color: blue</code><br>Computed: <code>rgb(0, 0, 255)</code><br>Assert "background-color is blue" = PASS (normalization)</div>
+        </div>
+        <div class="assert-card">
+            <h4>color: red (via hex)</h4>
+            <div id="css-color-red-hex" style="color: #ff0000; font-size: 16px; font-weight: bold;">Red text via hex #ff0000</div>
+            <div class="meta">CSS: <code>color: #ff0000</code><br>Assert "color is red" = PASS (hex &harr; named)</div>
+        </div>
+        <div class="assert-card">
+            <h4>color: red (via rgb)</h4>
+            <div id="css-color-red-rgb" style="color: rgb(255, 0, 0); font-size: 16px;">Red text via rgb(255,0,0)</div>
+            <div class="meta">CSS: <code>color: rgb(255,0,0)</code><br>Assert "color is red" = PASS (rgb &harr; named)</div>
+        </div>
+        <div class="assert-card">
+            <h4>color: named "red"</h4>
+            <div id="css-color-red-named" style="color: red; font-size: 16px;">Red text via named color</div>
+            <div class="meta">CSS: <code>color: red</code><br>All three red variants should match</div>
+        </div>
+        <div class="assert-card">
+            <h4>border-color: green</h4>
+            <div id="css-border-green" style="border: 3px solid green; padding: 12px; border-radius: var(--radius-sm);">Green border</div>
+            <div class="meta">CSS: <code>border-color: green</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>Multiple color formats comparison</h4>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <div class="color-swatch" style="background:#ff0000;" title="hex #ff0000"></div>
+                <div class="color-swatch" style="background:rgb(255,0,0);" title="rgb(255,0,0)"></div>
+                <div class="color-swatch" style="background:red;" title="named: red"></div>
+                <span style="font-size:12px;color:var(--text-muted);">All = red</span>
+            </div>
+            <div class="meta">W3C CSS3 webcolors normalization test</div>
+        </div>
+    </div>
+
+    <h3>Typography Properties</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>font-size: 16px</h4>
+            <div id="css-fontsize-16" style="font-size: 16px;">Text at 16px</div>
+            <div class="meta">CSS: <code>font-size: 16px</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>font-size: 24px</h4>
+            <div id="css-fontsize-24" style="font-size: 24px;">Text at 24px</div>
+            <div class="meta">CSS: <code>font-size: 24px</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>font-family: Arial</h4>
+            <div id="css-fontfamily" style="font-family: 'Arial', sans-serif;">Text in Arial</div>
+            <div class="meta">CSS: <code>font-family: "Arial", sans-serif</code><br>Assert "contains Arial" = PASS (quotes stripped)</div>
+        </div>
+        <div class="assert-card">
+            <h4>font-weight: normal (400)</h4>
+            <div id="css-fontweight-normal" style="font-weight: 400;">Normal weight text (400)</div>
+            <div class="meta">CSS: <code>font-weight: 400</code><br>Assert "font-weight is normal" = PASS (400 = normal)</div>
+        </div>
+        <div class="assert-card">
+            <h4>font-weight: bold (700)</h4>
+            <div id="css-fontweight-bold" style="font-weight: 700;">Bold weight text (700)</div>
+            <div class="meta">CSS: <code>font-weight: 700</code><br>Assert "font-weight is bold" = PASS (700 = bold)</div>
+        </div>
+        <div class="assert-card">
+            <h4>font-style: italic</h4>
+            <div id="css-fontstyle" style="font-style: italic;">Italic text</div>
+            <div class="meta">CSS: <code>font-style: italic</code></div>
+        </div>
+    </div>
+
+    <h3>Display & Visibility Properties</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>display: none</h4>
+            <div id="css-display-none" style="display: none;">Hidden content</div>
+            <div class="meta">CSS: <code>display: none</code> | Element exists but not rendered</div>
+        </div>
+        <div class="assert-card">
+            <h4>display: block</h4>
+            <div id="css-display-block" style="display: block; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">Visible block</div>
+            <div class="meta">CSS: <code>display: block</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>display: flex</h4>
+            <div id="css-display-flex" style="display: flex; gap: 8px; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">
+                <span>Flex</span><span>Items</span>
+            </div>
+            <div class="meta">CSS: <code>display: flex</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>visibility: hidden</h4>
+            <div id="css-visibility-hidden" style="visibility: hidden; height: 32px; background: var(--bg-tertiary);">Hidden via visibility</div>
+            <div class="meta">CSS: <code>visibility: hidden</code> | Takes space, invisible</div>
+        </div>
+        <div class="assert-card">
+            <h4>visibility: visible</h4>
+            <div id="css-visibility-visible" style="visibility: visible; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">Visible content</div>
+            <div class="meta">CSS: <code>visibility: visible</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>opacity: 0.5</h4>
+            <div id="css-opacity-half" style="opacity: 0.5; padding: 12px; background: var(--accent); color: #fff; border-radius: var(--radius-sm);">50% opacity overlay</div>
+            <div class="meta">CSS: <code>opacity: 0.5</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>opacity: 0</h4>
+            <div id="css-opacity-zero" style="opacity: 0; height: 32px;">Fully transparent</div>
+            <div class="meta">CSS: <code>opacity: 0</code> | Edge case: invisible but in layout</div>
+        </div>
+        <div class="assert-card">
+            <h4>opacity: 1</h4>
+            <div id="css-opacity-full" style="opacity: 1; padding: 8px; background: var(--accent); color: #fff; border-radius: var(--radius-sm);">Full opacity</div>
+            <div class="meta">CSS: <code>opacity: 1</code></div>
+        </div>
+    </div>
+
+    <h3>Unsupported CSS Property (Edge Case)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>margin (not in supported list)</h4>
+            <div id="css-margin" style="margin: 10px; padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">Element with margin: 10px</div>
+            <div class="meta">CSS: <code>margin: 10px</code> | NOT in supported list of 10 properties<br>Assert "margin is 10px" should handle gracefully</div>
+        </div>
+        <div class="assert-card">
+            <h4>CSS property with no explicit value</h4>
+            <div id="css-no-border" style="padding: 12px;">No border-color set</div>
+            <div class="meta">Assert "border-color is red" = FAIL (no explicit border-color)<br>Actual should show default/empty value</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: NEGATION OPERATORS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="negation">
+    <div class="section-card-header">
+        <h2>4. Negation Operators</h2>
+        <span class="badge">NOT / NOT_EQUALS / NOT_CONTAINS</span>
+    </div>
+
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>NOT disabled</h4>
+            <button id="btn-not-disabled">Active Button</button>
+            <div class="meta">Assert: "button is NOT disabled" = PASS</div>
+        </div>
+        <div class="assert-card">
+            <h4>NOT checked</h4>
+            <label><input type="checkbox" id="cb-not-checked"> Unchecked option</label>
+            <div class="meta">Assert: "checkbox is NOT checked" = PASS</div>
+        </div>
+        <div class="assert-card">
+            <h4>NOT visible (hidden element)</h4>
+            <div id="el-not-visible" style="display:none;">Hidden</div>
+            <div class="meta">Assert: "element is NOT visible" = PASS</div>
+        </div>
+        <div class="assert-card">
+            <h4>Attribute not_equals</h4>
+            <input type="text" id="input-not-password">
+            <div class="meta">Assert: "type does not equal password" = PASS (type="text")</div>
+        </div>
+        <div class="assert-card">
+            <h4>Attribute not_contains</h4>
+            <a id="link-not-staging" href="https://www.lambdatest.com/pricing">Production Link</a>
+            <div class="meta">Assert: "href does not contain staging" = PASS</div>
+        </div>
+        <div class="assert-card">
+            <h4>Attribute not_starts_with</h4>
+            <a id="link-not-http" href="https://www.lambdatest.com">Secure Link</a>
+            <div class="meta">Assert: "href does not start with http://" = PASS (starts with https://)</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: DATE PICKER (Renuity Home Use Case) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="date-picker">
+    <div class="section-card-header">
+        <h2>5. Date Picker (Renuity Use Case)</h2>
+        <span class="badge">PRD JOURNEY 1</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Simulates the Renuity Home date picker scenario. The 3rd date from today should be enabled, past dates disabled.</p>
+
+    <div id="date-picker-container">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <h4 style="margin:0;" id="date-picker-month"></h4>
+            <button onclick="navigateDatePicker(-1)" style="padding:4px 10px;">&#9664;</button>
+            <button onclick="navigateDatePicker(1)" style="padding:4px 10px;">&#9654;</button>
+        </div>
+        <div class="date-grid" id="dateGrid">
+            <!-- Populated by JS -->
+        </div>
+        <div id="date-selection-status" style="margin-top:12px;font-size:13px;color:var(--text-secondary);"></div>
+    </div>
+    <div class="meta" style="margin-top:12px;">
+        PRD Journey 1: "Assert if the 3rd date from today is enabled"<br>
+        Past dates: <code>disabled</code> | Today+1, Today+2, Today+3...: <code>enabled</code><br>
+        Today: highlighted with border | Selected: highlighted with accent bg
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: EDGE CASES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="edge-cases">
+    <div class="section-card-header">
+        <h2>6. Edge Cases</h2>
+        <span class="badge">BOUNDARY & SPECIAL</span>
+    </div>
+
+    <h3>Empty & Special Attribute Values</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Empty attribute value</h4>
+            <div id="el-empty-attr" data-value="">Element with data-value=""</div>
+            <div class="meta">Attr: <code>data-value=""</code> (empty string)<br>TC-R2-01: Assert "data-value equals empty"</div>
+        </div>
+        <div class="assert-card">
+            <h4>Unicode attribute value</h4>
+            <div id="el-unicode-attr" data-label="Caf&#233; &#x2615; M&#252;nchen">Unicode text</div>
+            <div class="meta">Attr: <code>data-label="Caf&eacute; &#9749; M&uuml;nchen"</code><br>TC-R2-02: Unicode/emoji in attribute values</div>
+        </div>
+        <div class="assert-card">
+            <h4>Emoji attribute value</h4>
+            <div id="el-emoji-attr" data-emoji="&#x1F680;&#x1F31F;&#x2705;">Emoji data</div>
+            <div class="meta">Attr: <code>data-emoji="&#128640;&#127775;&#9989;"</code></div>
+        </div>
+        <div class="assert-card">
+            <h4>HTML entities in attribute</h4>
+            <div id="el-entities-attr" data-content="Price: $99 &amp; free shipping &lt;today&gt;">Entities text</div>
+            <div class="meta">Attr: <code>data-content</code> with &amp;, &lt;, &gt; entities</div>
+        </div>
+        <div class="assert-card">
+            <h4>Very long attribute (501+ chars)</h4>
+            <div id="el-long-attr">Long attribute element</div>
+            <div class="long-attr-display" id="long-attr-display"></div>
+            <div class="meta">TC-060: Value >500 chars should be truncated with warning<br>Boundary: 500 chars (no truncate) vs 501 chars (truncate)</div>
+        </div>
+        <div class="assert-card">
+            <h4>Exactly 500 chars attribute</h4>
+            <div id="el-500-attr">500 chars boundary</div>
+            <div class="meta">Boundary test: exactly 500 chars should NOT be truncated</div>
+        </div>
+    </div>
+
+    <h3>Dynamic Elements</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>AJAX-loaded element (appears after 2s)</h4>
+            <button id="btn-load-ajax" onclick="loadAjaxElement()">Load Content</button>
+            <div class="ajax-placeholder" id="ajax-container">Content will load here...</div>
+            <div class="meta">TC-R2-03: Element loads via simulated AJAX after 2s delay</div>
+        </div>
+        <div class="assert-card">
+            <h4>Disappearing element (removes after 3s)</h4>
+            <button id="btn-start-disappear" onclick="startDisappearing()">Start Timer</button>
+            <div id="el-disappearing" style="padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);margin-top:8px;">I will disappear in 3 seconds...</div>
+            <div class="meta">TC-R2-04: Element removed mid-assertion should trigger stale/error</div>
+        </div>
+        <div class="assert-card">
+            <h4>Rapidly mutating element</h4>
+            <div id="el-mutating" data-counter="0" style="padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);">Counter: 0</div>
+            <button onclick="toggleMutation()">Toggle Rapid Mutation</button>
+            <div class="meta">Element re-rendered every 100ms. Tests stale element retry logic.</div>
+        </div>
+    </div>
+
+    <h3>XSS / Injection Test Data</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>XSS in attribute value</h4>
+            <div id="el-xss-attr" data-content="&lt;script&gt;alert(1)&lt;/script&gt;">XSS test element</div>
+            <div class="meta">Attr: <code>data-content</code> = escaped script tag<br>TC-R2-08: Assert result panel must not execute script</div>
+        </div>
+        <div class="assert-card">
+            <h4>SQL injection in attribute</h4>
+            <div id="el-sql-attr" data-query="'; DROP TABLE users; --">SQL injection test</div>
+            <div class="meta">Attr: <code>data-query</code> = SQL injection pattern</div>
+        </div>
+    </div>
+
+    <h3>Post-Navigation Assertion</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Element that takes time to load after "navigation"</h4>
+            <button id="btn-simulate-nav" onclick="simulateNavigation()">Simulate Page Navigation</button>
+            <div id="post-nav-container">
+                <div id="post-nav-element" style="padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);">Ready to assert</div>
+            </div>
+            <div class="meta">TC-R2-07: Element briefly removed and re-added (simulating page navigation)</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 7: MODAL ASSERTIONS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="modal-assertions">
+    <div class="section-card-header">
+        <h2>7. Modal / Popup Assertions</h2>
+        <span class="badge">OVERLAY ELEMENTS</span>
+    </div>
+
+    <button id="btn-open-modal" onclick="document.getElementById('assertModal').classList.add('open')">Open Modal</button>
+
+    <div id="assertModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Assertion Target Modal</h3>
+            <p id="modal-text">This modal contains elements to assert on.</p>
+            <div style="margin: 16px 0;">
+                <button id="modal-submit-btn" data-action="submit">Submit</button>
+                <button id="modal-cancel-btn" onclick="document.getElementById('assertModal').classList.remove('open')" style="margin-left:8px;">Cancel</button>
+            </div>
+            <input type="text" id="modal-input" placeholder="Enter value in modal" data-context="modal">
+            <div id="modal-status" data-status="open" style="font-size:12px;color:var(--text-muted);margin-top:8px;">Modal is open</div>
+            <div class="meta" style="margin-top:12px;">TC-R2-05: Assert on elements inside modal overlay<br>
+            button enabled, input placeholder, data-action, data-status</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 8: IFRAME ASSERTIONS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="iframe-assertions">
+    <div class="section-card-header">
+        <h2>8. Iframe Assertions</h2>
+        <span class="badge">CROSS-FRAME</span>
+    </div>
+
+    <h3>Same-Origin Iframe with Assertable Elements</h3>
+    <iframe id="assert-iframe" class="assert-iframe" srcdoc='
+        <!DOCTYPE html>
+        <html><head><style>
+            body { font-family: system-ui; padding: 16px; margin: 0; background: #1a1a2e; color: #e0e0e0; }
+            button { padding: 8px 16px; border-radius: 6px; border: 1px solid #333; cursor: pointer; background: #2a2a3e; color: #e0e0e0; }
+            button:disabled { opacity: 0.4; cursor: not-allowed; }
+            input { padding: 8px; border-radius: 6px; border: 1px solid #333; background: #2a2a3e; color: #e0e0e0; width: 200px; }
+            .label { font-size: 11px; color: #888; margin-top: 4px; }
+        </style></head>
+        <body>
+            <h4 style="margin:0 0 12px;">Iframe Assertion Targets</h4>
+            <button id="iframe-btn-enabled" data-testid="iframe-submit">Submit (Enabled)</button>
+            <button id="iframe-btn-disabled" disabled>Disabled in Iframe</button>
+            <br><br>
+            <input id="iframe-input" type="text" placeholder="Iframe input field" value="iframe-value" data-context="iframe">
+            <div class="label">data-context="iframe" | placeholder="Iframe input field"</div>
+            <br>
+            <div id="iframe-status" data-status="active" role="status" aria-label="Iframe status">Active</div>
+            <div class="label">data-status="active" | role="status"</div>
+        </body></html>
+    '></iframe>
+    <div class="meta">TC-R1-01: Assert on element inside iframe. Must handle cross-frame context.<br>
+    Elements: enabled button, disabled button, input with attributes, status div with role</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 9: SHADOW DOM ASSERTIONS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="shadow-dom-assertions">
+    <div class="section-card-header">
+        <h2>9. Shadow DOM Assertions</h2>
+        <span class="badge">SHADOW BOUNDARY</span>
+    </div>
+
+    <h3>Open Shadow DOM</h3>
+    <div class="shadow-host" id="shadow-host-open"></div>
+    <div class="meta">TC-R1-02: Assert on element inside shadow DOM. CDP snapshot must traverse shadow roots.<br>
+    Contains: enabled button, disabled button, input with placeholder, toggle switch</div>
+
+    <h3>Nested Shadow DOM (2 levels)</h3>
+    <div class="shadow-host" id="shadow-host-nested"></div>
+    <div class="meta">Outer shadow root contains inner shadow root. Assert on deeply nested element.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 10: FAILURE CONDITIONS TEST SURFACE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="failure-conditions">
+    <div class="section-card-header">
+        <h2>10. Failure Conditions Test Surface</h2>
+        <span class="badge">FAIL / WARN / ERROR</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Elements designed to produce specific assertion outcomes for testing failure condition behavior.</p>
+
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Will FAIL: Assert enabled on disabled button</h4>
+            <button id="fc-disabled-btn" disabled>I am disabled</button>
+            <div class="meta">Assert "button is enabled" = <span class="state-badge fail">FAIL</span><br>
+            Use with: Fail immediately / Fail but continue / Warn but continue</div>
+        </div>
+        <div class="assert-card">
+            <h4>Will FAIL: Assert color is blue (actual: red)</h4>
+            <div id="fc-wrong-color" style="color: red; font-weight: bold;">Wrong color text</div>
+            <div class="meta">Assert "color is blue" = <span class="state-badge fail">FAIL</span><br>
+            Expected: blue | Actual: red (rgb(255,0,0))</div>
+        </div>
+        <div class="assert-card">
+            <h4>Will FAIL: Assert aria-expanded=true (actual: false)</h4>
+            <div id="fc-collapsed" aria-expanded="false">Collapsed section</div>
+            <div class="meta">Assert "aria-expanded equals true" = <span class="state-badge fail">FAIL</span></div>
+        </div>
+        <div class="assert-card">
+            <h4>Will ERROR: Assert on non-existent element</h4>
+            <!-- No element with id="fc-nonexistent" -->
+            <div class="meta">Assert "the submit button is enabled" (no submit button here)<br>= <span class="state-badge error">ERROR</span> (element not found after timeout)</div>
+        </div>
+        <div class="assert-card">
+            <h4>Multi-step test: Step 1 fails, Step 2 continues</h4>
+            <button id="fc-step1-target" disabled>Step 1 target (disabled)</button>
+            <button id="fc-step2-target" onclick="this.textContent='Clicked!'">Step 2 target (clickable)</button>
+            <div class="meta">TC-051/052/053: Test failure condition behaviors<br>
+            Step 1: Assert enabled (FAIL) | Step 2: Click (should execute with "fail but continue")</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 11: MIXED ASSERTION TARGETS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="mixed-assertions">
+    <div class="section-card-header">
+        <h2>11. Mixed Assertion Targets</h2>
+        <span class="badge">STATE + ATTR + CSS</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Elements that can be asserted in multiple ways (state, attribute, CSS) for mixed test scenarios.</p>
+
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Multi-assert button</h4>
+            <button id="multi-assert-btn"
+                    data-action="primary"
+                    aria-label="Add to cart"
+                    style="background-color: #0ea5e9; color: white; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
+                Add to Cart
+            </button>
+            <div class="meta">
+                State: <code>enabled</code> + <code>clickable</code><br>
+                Attr: <code>data-action="primary"</code> | <code>aria-label="Add to cart"</code><br>
+                CSS: <code>background-color: #0ea5e9</code> | <code>font-size: 14px</code> | <code>font-weight: 600</code><br>
+                TC-R5-04: Assert state then CSS on same element
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Form with text + state + attribute assertion targets</h4>
+            <form id="mixed-form" action="/login" method="post">
+                <input type="text" id="mixed-username" placeholder="Username" data-validation="required" value="">
+                <input type="password" id="mixed-password" placeholder="Password" data-validation="min-8">
+                <button type="submit" id="mixed-submit" disabled>Login</button>
+            </form>
+            <div class="meta">
+                TC-079: Mixed test sequence:<br>
+                1. Text: "Assert Welcome is visible" (on this page)<br>
+                2. State: "Assert Login button is disabled"<br>
+                3. Attr: "Assert form action contains /login"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Welcome text (for text assertion regression)</h4>
+            <h2 id="welcome-text" style="margin:0;">Welcome to KaneAI</h2>
+            <div class="meta">TC-073: Regression test for text assertion type</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 12: CONSECUTIVE ASSERTIONS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="consecutive">
+    <div class="section-card-header">
+        <h2>12. Consecutive Assertion Targets</h2>
+        <span class="badge">5+ BACK-TO-BACK</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">TC-R4-01: Multiple consecutive assertions on different elements. Verify no performance degradation.</p>
+
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Target 1: State</h4>
+            <button id="consec-1" data-order="1">Enabled Button #1</button>
+            <div class="meta">Assert: enabled</div>
+        </div>
+        <div class="assert-card">
+            <h4>Target 2: Attribute</h4>
+            <div id="consec-2" data-order="2" data-value="alpha">Alpha Value</div>
+            <div class="meta">Assert: data-value equals alpha</div>
+        </div>
+        <div class="assert-card">
+            <h4>Target 3: CSS</h4>
+            <div id="consec-3" data-order="3" style="color: green; font-size: 18px;">Green Text</div>
+            <div class="meta">Assert: color is green</div>
+        </div>
+        <div class="assert-card">
+            <h4>Target 4: Checkbox</h4>
+            <label><input type="checkbox" id="consec-4" data-order="4" checked> Checked Item</label>
+            <div class="meta">Assert: checked</div>
+        </div>
+        <div class="assert-card">
+            <h4>Target 5: Negation</h4>
+            <button id="consec-5" data-order="5">Not Disabled</button>
+            <div class="meta">Assert: NOT disabled</div>
+        </div>
+        <div class="assert-card">
+            <h4>Target 6: Numeric</h4>
+            <div id="consec-6" data-order="6" data-count="42">Count: 42</div>
+            <div class="meta">Assert: data-count > 10</div>
+        </div>
+        <div class="assert-card">
+            <h4>Target 7: CSS Color</h4>
+            <div id="consec-7" data-order="7" style="background-color: #ff6600; color:white; padding:8px; border-radius:4px;">Orange Box</div>
+            <div class="meta">Assert: background-color contains "102"</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 13: VARIABLES IN ASSERTIONS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="variables">
+    <div class="section-card-header">
+        <h2>13. Variable Resolution Targets</h2>
+        <span class="badge">{{VARIABLES}}</span>
+    </div>
+
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Placeholder for variable assertion</h4>
+            <input type="text" id="var-placeholder" placeholder="Search here...">
+            <div class="meta">TC-080: Define variable myVar="Search here"<br>Assert "placeholder contains {{myVar}}" = PASS</div>
+        </div>
+        <div class="assert-card">
+            <h4>Value for empty variable test</h4>
+            <input type="text" id="var-empty-test" placeholder="Any text here" data-value="something">
+            <div class="meta">TC-R5-02: Define emptyVar="" (empty string)<br>Assert "placeholder contains {{emptyVar}}" = PASS (everything contains empty)</div>
+        </div>
+        <div class="assert-card">
+            <h4>Target for undefined variable test</h4>
+            <div id="var-undefined-test" data-attr="test-value">Test Value</div>
+            <div class="meta">TC-R5-03: Assert "attr contains {{nonExistent}}"<br>Should ERROR: variable not defined</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 14: CONDITIONAL VS ASSERTION DISAMBIGUATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="disambiguation">
+    <div class="section-card-header">
+        <h2>14. Conditional vs Assertion</h2>
+        <span class="badge">DISAMBIGUATION</span>
+    </div>
+
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Target for disambiguation test</h4>
+            <button id="disambig-btn" onclick="this.textContent='Clicked via conditional'">Action Button</button>
+            <div class="meta">
+                TC-R5-01: Two NL commands, different routes:<br>
+                <code>"if button is enabled then click it"</code> &rarr; CONDITIONAL<br>
+                <code>"Assert button is enabled"</code> &rarr; ASSERTION<br>
+                Same element, different classification
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Ambiguous assertion target</h4>
+            <div id="ambig-element" style="opacity: 1; visibility: visible;">Looks Enabled</div>
+            <div class="meta">TC-068: Ambiguous NL: "Assert the element looks enabled"<br>Low-confidence classification &rarr; fallback to visual assertion</div>
+        </div>
+        <div class="assert-card">
+            <h4>Non-assertion NL target</h4>
+            <div id="non-assert-target" style="padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);">Page content area</div>
+            <div class="meta">TC-R5-06: NL "Assert page loads fast"<br>Not a valid element/attribute/CSS assertion &rarr; graceful handling</div>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+    LT QA HTML Test Fixtures &mdash; Element State & Attribute Assertions Test Surface
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SCRIPTS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+// Theme toggle
+document.getElementById('themeToggle').addEventListener('click', function() {
+    var html = document.documentElement;
+    var current = html.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('lt-theme', next);
+});
+
+// Mouse glow
+(function() {
+    var g1 = document.querySelector('.glow-container:not(.glow-2)');
+    var g2 = document.querySelector('.glow-container.glow-2');
+    if (!g1) return;
+    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    var cx = mx, cy = my, cx2 = mx, cy2 = my;
+    g1.style.transform = 'translate(' + (mx - 400) + 'px,' + (my - 400) + 'px)';
+    if (g2) g2.style.transform = 'translate(' + (mx - 300) + 'px,' + (my - 300) + 'px)';
+    document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
+    (function loop() {
+        cx += (mx - cx) * 0.08; cy += (my - cy) * 0.08;
+        cx2 += (mx - cx2) * 0.035; cy2 += (my - cy2) * 0.035;
+        g1.style.transform = 'translate(' + (cx - 400) + 'px,' + (cy - 400) + 'px)';
+        if (g2) g2.style.transform = 'translate(' + (cx2 - 300) + 'px,' + (cy2 - 300) + 'px)';
+        requestAnimationFrame(loop);
+    })();
+})();
+
+// Indeterminate checkbox
+document.getElementById('cb-indeterminate').indeterminate = true;
+
+// Button that enables after 3s delay
+setTimeout(function() {
+    var btn = document.getElementById('btn-becomes-enabled');
+    if (btn) { btn.disabled = false; btn.textContent = 'Now Enabled!'; }
+}, 3000);
+
+// Long attribute value (501 chars)
+(function() {
+    var longVal = 'A'.repeat(501);
+    var el501 = document.getElementById('el-long-attr');
+    el501.setAttribute('data-long-value', longVal);
+    document.getElementById('long-attr-display').textContent = 'data-long-value length: ' + longVal.length + ' chars';
+
+    var val500 = 'B'.repeat(500);
+    document.getElementById('el-500-attr').setAttribute('data-exact-500', val500);
+})();
+
+// Date picker
+var dateOffset = 0;
+function renderDatePicker() {
+    var today = new Date();
+    var month = new Date(today.getFullYear(), today.getMonth() + dateOffset, 1);
+    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('date-picker-month').textContent = monthNames[month.getMonth()] + ' ' + month.getFullYear();
+
+    var grid = document.getElementById('dateGrid');
+    grid.innerHTML = '';
+
+    // Day headers
+    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(function(d) {
+        var h = document.createElement('div');
+        h.style.cssText = 'font-size:11px;color:var(--text-muted);text-align:center;font-weight:600;';
+        h.textContent = d;
+        grid.appendChild(h);
+    });
+
+    var firstDay = month.getDay();
+    var daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+    var todayDate = today.getDate();
+    var todayMonth = today.getMonth();
+    var todayYear = today.getFullYear();
+
+    // Empty cells before first day
+    for (var i = 0; i < firstDay; i++) {
+        var empty = document.createElement('div');
+        empty.className = 'date-cell';
+        empty.style.visibility = 'hidden';
+        grid.appendChild(empty);
+    }
+
+    // Date cells
+    for (var d = 1; d <= daysInMonth; d++) {
+        var cell = document.createElement('div');
+        cell.className = 'date-cell';
+        cell.textContent = d;
+        cell.setAttribute('data-date', d);
+
+        var cellDate = new Date(month.getFullYear(), month.getMonth(), d);
+        var isToday = (d === todayDate && month.getMonth() === todayMonth && month.getFullYear() === todayYear);
+        var isPast = cellDate < new Date(todayYear, todayMonth, todayDate);
+
+        if (isToday) cell.classList.add('today');
+        if (isPast) {
+            cell.setAttribute('disabled', '');
+            cell.setAttribute('aria-disabled', 'true');
+        } else {
+            cell.setAttribute('data-enabled', 'true');
+            cell.onclick = function() {
+                grid.querySelectorAll('.selected').forEach(function(s) { s.classList.remove('selected'); });
+                this.classList.add('selected');
+                document.getElementById('date-selection-status').textContent = 'Selected: ' + this.textContent + ' ' + monthNames[month.getMonth()];
+            };
+        }
+
+        // Mark the 3rd date from today for PRD Journey 1
+        var diff = Math.floor((cellDate - new Date(todayYear, todayMonth, todayDate)) / (1000*60*60*24));
+        if (diff === 3) {
+            cell.setAttribute('data-special', '3rd-from-today');
+            cell.setAttribute('title', '3rd date from today - Renuity test target');
+        }
+
+        grid.appendChild(cell);
+    }
+}
+function navigateDatePicker(dir) { dateOffset += dir; renderDatePicker(); }
+renderDatePicker();
+
+// AJAX-loaded element
+function loadAjaxElement() {
+    var container = document.getElementById('ajax-container');
+    container.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">Loading...</div>';
+    setTimeout(function() {
+        container.innerHTML = '<div id="ajax-loaded-element" data-loaded="true" data-status="complete" style="padding:12px;background:var(--bg-tertiary);border-radius:var(--radius-sm);"><strong>AJAX Content Loaded</strong><br>data-loaded="true" | data-status="complete"</div>';
+    }, 2000);
+}
+
+// Disappearing element
+function startDisappearing() {
+    var el = document.getElementById('el-disappearing');
+    if (el) {
+        el.textContent = 'Disappearing in 3 seconds...';
+        setTimeout(function() {
+            if (document.getElementById('el-disappearing')) {
+                document.getElementById('el-disappearing').remove();
+            }
+        }, 3000);
+    }
+}
+
+// Rapidly mutating element
+var mutationInterval = null;
+function toggleMutation() {
+    if (mutationInterval) {
+        clearInterval(mutationInterval);
+        mutationInterval = null;
+        return;
+    }
+    var counter = 0;
+    mutationInterval = setInterval(function() {
+        var el = document.getElementById('el-mutating');
+        if (el) {
+            counter++;
+            el.setAttribute('data-counter', counter);
+            el.textContent = 'Counter: ' + counter;
+        }
+    }, 100);
+}
+
+// Post-navigation simulation
+function simulateNavigation() {
+    var container = document.getElementById('post-nav-container');
+    container.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">Navigating...</div>';
+    setTimeout(function() {
+        container.innerHTML = '<div id="post-nav-element" data-page="new" style="padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);">New page content loaded (data-page="new")</div>';
+    }, 1500);
+}
+
+// Shadow DOM setup
+(function() {
+    // Open Shadow DOM
+    var hostOpen = document.getElementById('shadow-host-open');
+    var shadowOpen = hostOpen.attachShadow({ mode: 'open' });
+    shadowOpen.innerHTML = [
+        '<style>',
+        '  :host { display: block; }',
+        '  button { padding: 8px 16px; border-radius: 6px; border: 1px solid #444; cursor: pointer; background: #2a2a3e; color: #e0e0e0; margin: 4px; }',
+        '  button:disabled { opacity: 0.4; cursor: not-allowed; }',
+        '  input { padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a3e; color: #e0e0e0; margin: 4px; }',
+        '  .toggle { width: 44px; height: 24px; background: #555; border-radius: 99px; position: relative; cursor: pointer; display: inline-block; vertical-align: middle; }',
+        '  .toggle.on { background: #0ea5e9; }',
+        '  .toggle-knob { width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.2s; }',
+        '  .toggle.on .toggle-knob { transform: translateX(20px); }',
+        '  .label { font-size: 11px; color: #888; margin: 4px 0; }',
+        '</style>',
+        '<div>',
+        '  <button id="shadow-btn-enabled" data-testid="shadow-submit">Submit (Shadow)</button>',
+        '  <button id="shadow-btn-disabled" disabled>Disabled (Shadow)</button>',
+        '  <br>',
+        '  <input id="shadow-input" type="text" placeholder="Shadow DOM input" data-context="shadow">',
+        '  <div class="label">Elements inside open shadow DOM</div>',
+        '  <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">',
+        '    <div class="toggle on" id="shadow-toggle" role="switch" aria-checked="true" aria-label="Shadow toggle" onclick="this.classList.toggle(\'on\');this.setAttribute(\'aria-checked\',this.classList.contains(\'on\'))"><div class="toggle-knob"></div></div>',
+        '    <span>Shadow Toggle</span>',
+        '  </div>',
+        '</div>'
+    ].join('\n');
+
+    // Nested Shadow DOM
+    var hostNested = document.getElementById('shadow-host-nested');
+    var shadowOuter = hostNested.attachShadow({ mode: 'open' });
+    shadowOuter.innerHTML = [
+        '<style>',
+        '  :host { display: block; }',
+        '  .outer { padding: 12px; border: 1px dashed #555; border-radius: 8px; }',
+        '  .label { font-size: 11px; color: #888; }',
+        '</style>',
+        '<div class="outer">',
+        '  <div class="label">Outer Shadow Root (Level 1)</div>',
+        '  <div id="inner-shadow-host"></div>',
+        '</div>'
+    ].join('\n');
+
+    var innerHost = shadowOuter.getElementById('inner-shadow-host');
+    var shadowInner = innerHost.attachShadow({ mode: 'open' });
+    shadowInner.innerHTML = [
+        '<style>',
+        '  .inner { padding: 12px; border: 1px dashed #666; border-radius: 8px; margin-top: 8px; }',
+        '  button { padding: 6px 12px; border-radius: 6px; border: 1px solid #444; background: #2a2a3e; color: #e0e0e0; cursor: pointer; }',
+        '  .label { font-size: 11px; color: #888; }',
+        '</style>',
+        '<div class="inner">',
+        '  <div class="label">Inner Shadow Root (Level 2)</div>',
+        '  <button id="nested-shadow-btn" data-depth="2" aria-label="Nested action">Nested Shadow Button</button>',
+        '</div>'
+    ].join('\n');
+})();
+</script>
+</body>
+</html>
