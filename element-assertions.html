@@ -1015,6 +1015,162 @@
     </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 15: RENUITY CUSTOMER JOURNEY (full flow) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="renuity-journey">
+    <div class="section-card-header">
+        <h2>15. Renuity Customer Journey</h2>
+        <span class="badge">E2E FLOW</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">TC-R3-04: Complete Renuity Home customer journey — address input, service selection, date picker assertion, selection, and confirmation.</p>
+
+    <div class="assertion-grid" style="grid-template-columns: 1fr;">
+        <div class="assert-card" style="max-width:100%;">
+            <h4>Step 1: Enter Address</h4>
+            <input type="text" id="renuity-address" placeholder="Enter your home address" data-step="1" data-validation="required">
+            <span class="hint" style="font-size:11px;color:var(--text-muted);">Assert: input is enabled, placeholder contains "home address"</span>
+        </div>
+    </div>
+    <div class="assertion-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="assert-card">
+            <h4>Step 2: Select Service Type</h4>
+            <select id="renuity-service" data-step="2" onchange="document.getElementById('renuity-next-step2').disabled=!this.value;">
+                <option value="">Choose a service...</option>
+                <option value="bathroom">Bathroom Remodel</option>
+                <option value="windows">Window Replacement</option>
+                <option value="roofing">Roofing</option>
+            </select>
+            <button id="renuity-next-step2" disabled data-step="2-next">Next</button>
+            <span class="hint" style="font-size:11px;color:var(--text-muted);">Assert: button is disabled until service selected</span>
+        </div>
+        <div class="assert-card">
+            <h4>Step 3: Pick a Date (3rd from today)</h4>
+            <div id="renuity-mini-dates" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+            <span class="hint" style="font-size:11px;color:var(--text-muted);">Assert: 3rd date from today is enabled. Past dates disabled.</span>
+        </div>
+    </div>
+    <div class="assertion-grid" style="grid-template-columns: 1fr;">
+        <div class="assert-card" style="max-width:100%;">
+            <h4>Step 4: Confirmation Panel</h4>
+            <div id="renuity-confirmation" data-booking-status="pending" data-step="4" style="padding:12px;background:var(--bg-tertiary);border-radius:var(--radius-sm);">
+                <div id="renuity-confirm-text">Select a service and date to confirm your appointment.</div>
+                <button id="renuity-confirm-btn" disabled data-action="confirm">Confirm Appointment</button>
+            </div>
+            <span class="hint" style="font-size:11px;color:var(--text-muted);">Assert: data-booking-status="pending" initially, changes to "confirmed" after confirm. Button disabled until date selected.</span>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 16: MOBILE WEB ASSERTIONS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="mobile-web">
+    <div class="section-card-header">
+        <h2>16. Mobile Web Assertions</h2>
+        <span class="badge">VIEWPORT-RESPONSIVE</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">TC-082/083/084: Elements that change state, attributes, and CSS values based on viewport width. Resize browser or test on mobile device.</p>
+
+    <style>
+        /* Mobile-responsive elements for assertion testing */
+        #mobile-nav-menu { display: none; }
+        #desktop-nav-menu { display: flex; gap: 12px; }
+        #mobile-hamburger { display: none; }
+        #responsive-heading { font-size: 28px; }
+        #responsive-sidebar { display: block; width: 200px; min-height: 60px; padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); }
+        #responsive-card { padding: 24px; font-size: 16px; }
+        #mobile-only-banner { display: none; }
+        @media (max-width: 768px) {
+            #mobile-nav-menu { display: flex; flex-direction: column; gap: 8px; }
+            #desktop-nav-menu { display: none; }
+            #mobile-hamburger { display: inline-flex; }
+            #responsive-heading { font-size: 18px; }
+            #responsive-sidebar { display: none; }
+            #responsive-card { padding: 12px; font-size: 14px; }
+            #mobile-only-banner { display: block; }
+        }
+    </style>
+
+    <h3>State Changes at Mobile Viewport</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Hamburger Menu (mobile-only)</h4>
+            <button id="mobile-hamburger" aria-label="Open navigation menu" aria-expanded="false" data-mobile="true" onclick="var m=document.getElementById('mobile-nav-menu');var v=m.style.display==='flex';m.style.display=v?'none':'flex';this.setAttribute('aria-expanded',!v);" style="padding:8px 12px;align-items:center;gap:4px;">&#9776; Menu</button>
+            <div id="mobile-nav-menu">
+                <a href="#" data-nav="home">Home</a>
+                <a href="#" data-nav="about">About</a>
+                <a href="#" data-nav="contact">Contact</a>
+            </div>
+            <div class="meta">
+                Desktop: <code>display: none</code> (hamburger hidden)<br>
+                Mobile (&lt;768px): <code>display: inline-flex</code> (hamburger visible)<br>
+                TC-082: Assert hamburger button is visible/present on mobile<br>
+                TC-083: Assert data-mobile="true" on hamburger
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Desktop Navigation (desktop-only)</h4>
+            <div id="desktop-nav-menu" data-context="desktop">
+                <a href="#" style="color:var(--accent);">Home</a>
+                <a href="#" style="color:var(--accent);">Products</a>
+                <a href="#" style="color:var(--accent);">Contact</a>
+            </div>
+            <div class="meta">
+                Desktop: <code>display: flex</code> (visible)<br>
+                Mobile: <code>display: none</code> (hidden)<br>
+                TC-082: Assert desktop nav is NOT visible on mobile
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Mobile-Only Banner</h4>
+            <div id="mobile-only-banner" data-device="mobile" role="banner" style="padding:8px;background:#0ea5e9;color:white;border-radius:var(--radius-sm);text-align:center;font-size:13px;">
+                Download our mobile app!
+            </div>
+            <div class="meta">
+                Desktop: <code>display: none</code><br>
+                Mobile: <code>display: block</code><br>
+                TC-082: Assert banner is present/visible on mobile<br>
+                TC-083: Assert data-device="mobile"
+            </div>
+        </div>
+    </div>
+
+    <h3>CSS Values that Change with Viewport</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Responsive Heading (font-size changes)</h4>
+            <h2 id="responsive-heading" style="margin:0;">Responsive Title</h2>
+            <div class="meta">
+                Desktop: <code>font-size: 28px</code><br>
+                Mobile (&lt;768px): <code>font-size: 18px</code><br>
+                TC-084: Assert font-size is viewport-dependent
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Responsive Card (padding + font-size)</h4>
+            <div id="responsive-card" style="background:var(--bg-tertiary);border-radius:var(--radius-sm);">
+                Card content that changes size
+            </div>
+            <div class="meta">
+                Desktop: <code>padding: 24px</code>, <code>font-size: 16px</code><br>
+                Mobile: <code>padding: 12px</code>, <code>font-size: 14px</code>
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Sidebar (hidden on mobile)</h4>
+            <div id="responsive-sidebar">
+                Sidebar content
+            </div>
+            <div class="meta">
+                Desktop: <code>display: block</code><br>
+                Mobile: <code>display: none</code><br>
+                TC-084: Assert display is "none" on mobile viewport
+            </div>
+        </div>
+    </div>
+</div>
+
 </main>
 
 <footer class="site-footer">
@@ -1192,6 +1348,49 @@ function simulateNavigation() {
         container.innerHTML = '<div id="post-nav-element" data-page="new" style="padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);">New page content loaded (data-page="new")</div>';
     }, 1500);
 }
+
+// Renuity mini date picker
+(function() {
+    var container = document.getElementById('renuity-mini-dates');
+    if (!container) return;
+    var today = new Date();
+    for (var i = -2; i <= 7; i++) {
+        var d = new Date(today);
+        d.setDate(today.getDate() + i);
+        var btn = document.createElement('button');
+        btn.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        btn.style.cssText = 'padding:8px 12px;border-radius:6px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;font-size:12px;';
+        btn.setAttribute('data-date-offset', i);
+        if (i < 0) {
+            btn.disabled = true;
+            btn.style.opacity = '0.35';
+            btn.style.cursor = 'not-allowed';
+        } else {
+            if (i === 0) { btn.style.borderColor = 'var(--accent)'; btn.setAttribute('data-today', 'true'); }
+            if (i === 3) { btn.setAttribute('data-special', '3rd-from-today'); btn.setAttribute('title', 'Renuity target: 3rd date from today'); }
+            btn.onclick = function() {
+                container.querySelectorAll('button').forEach(function(b) { b.style.background = 'var(--bg-secondary)'; b.style.color = 'var(--text-primary)'; });
+                this.style.background = 'var(--accent)';
+                this.style.color = '#fff';
+                document.getElementById('renuity-confirm-btn').disabled = false;
+                document.getElementById('renuity-confirm-text').textContent = 'Appointment: ' + this.textContent + ' — Ready to confirm';
+            };
+        }
+        container.appendChild(btn);
+    }
+    // Confirm button logic
+    var confirmBtn = document.getElementById('renuity-confirm-btn');
+    if (confirmBtn) {
+        confirmBtn.onclick = function() {
+            var panel = document.getElementById('renuity-confirmation');
+            panel.setAttribute('data-booking-status', 'confirmed');
+            panel.style.borderLeft = '3px solid #34d399';
+            document.getElementById('renuity-confirm-text').textContent = 'Appointment confirmed!';
+            this.disabled = true;
+            this.textContent = 'Confirmed';
+        };
+    }
+})();
 
 // Shadow DOM setup
 (function() {
