@@ -1205,6 +1205,541 @@
     </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 17 — RFC Coverage Gap Fillers (TE-2686)            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card">
+    <div class="section-card-header">
+        <h2>17. RFC Coverage — Media, ARIA, Fieldset & Attribute Existence</h2>
+        <span class="state-badge pass">TE-2686</span>
+    </div>
+
+    <!-- 17a — Video & Audio Elements -->
+    <h3>17a. Media Elements</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Sample Video (with controls)</h4>
+            <video id="sample-video" controls width="260" aria-label="Sample video" style="background:#000; border-radius: 6px;">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            </video>
+            <div class="meta">
+                HAS-01: <code>has_controls</code> = true<br>
+                ARIA-10: <code>aria-label</code> = "Sample video"<br>
+                MEDIA-01: Source <code>src</code> contains "mov_bbb.mp4"<br>
+                MEDIA-02: Source <code>type</code> = "video/mp4"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Background Video (autoplay, loop, muted, no controls)</h4>
+            <video id="bg-video" autoplay loop muted playsinline width="260" style="background:#000; border-radius: 6px; opacity: 0.7;">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            </video>
+            <div class="meta">
+                HAS-02: <code>has_controls</code> = false<br>
+                HAS-03: <code>has_autoplay</code> = true<br>
+                HAS-04: <code>has_loop</code> = true<br>
+                HAS-05: <code>has_muted</code> = true
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Audio Player</h4>
+            <audio id="audio-player" controls>
+                <source src="https://www.w3schools.com/html/horse.ogg" type="audio/ogg">
+                <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+            </audio>
+            <div class="meta">
+                <code>has_controls</code> = true<br>
+                MEDIA-03: Source <code>src</code> contains "horse"<br>
+                Source: <code>type</code> = "audio/ogg"
+            </div>
+        </div>
+    </div>
+
+    <!-- 17b — Inherited Disabled (Fieldset) -->
+    <h3>17b. Inherited Disabled (Fieldset)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Fieldset Disabled — Inherited by children</h4>
+            <fieldset disabled id="disabled-fieldset" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px;">
+                <legend style="font-size: 12px; color: var(--text-tertiary); padding: 0 6px;">Disabled Fieldset</legend>
+                <button id="inherited-disabled-btn" style="margin: 4px 0;">Inherited Disabled Btn</button>
+                <input id="inherited-disabled-input" type="text" value="Inherited disabled" placeholder="Can't type here" style="margin: 4px 0;">
+                <select id="inherited-disabled-select" style="margin: 4px 0;">
+                    <option>Locked Option</option>
+                </select>
+            </fieldset>
+            <div class="meta">
+                ES-05: Button is <code>disabled</code> = true (inherited from fieldset)<br>
+                Input is disabled via parent <code>&lt;fieldset disabled&gt;</code><br>
+                Select is disabled via inheritance
+            </div>
+        </div>
+    </div>
+
+    <!-- 17c — Required & Autofocus -->
+    <h3>17c. Required, Autofocus & Boolean Attributes</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Required Field</h4>
+            <input id="required-field" type="text" required placeholder="This field is required" style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+            <div class="meta">
+                <code>has_required</code> = true<br>
+                <code>required</code> attribute present<br>
+                ES-11 / HAS-09
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Readonly Field</h4>
+            <input id="readonly-field" type="text" readonly value="Read-only content" style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-secondary);">
+            <div class="meta">
+                <code>has_readonly</code> = true<br>
+                <code>readonly</code> attribute present<br>
+                ES-10 / HAS-10
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Search Input (autofocus)</h4>
+            <!-- autofocus won't re-fire on scroll but attribute is present for assertion -->
+            <input id="search-autofocus" type="search" autofocus placeholder="Search..." style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+            <div class="meta">
+                <code>has_autofocus</code> = true<br>
+                HAS-11: Attribute existence check
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Multi-Select (skills)</h4>
+            <select id="select-skills" multiple size="4" style="width: 100%; padding: 4px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+                <option value="js" selected>JavaScript</option>
+                <option value="py">Python</option>
+                <option value="java">Java</option>
+                <option value="go">Go</option>
+                <option value="rust">Rust</option>
+            </select>
+            <div class="meta">
+                <code>has_multiple</code> = true<br>
+                HAS-06: Select with <code>multiple</code> attribute
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Images — Alt Attribute Existence</h4>
+            <div class="demo-row">
+                <img id="img-with-alt" src="https://via.placeholder.com/40" alt="Company Logo" width="40" height="40" style="border-radius: var(--radius-sm);">
+                <span style="font-size: 12px; color: var(--text-secondary);">Has alt: "Company Logo"</span>
+            </div>
+            <div class="demo-row">
+                <img id="img-no-alt" src="favicon.svg" width="40" height="40" style="border-radius: var(--radius-sm); opacity: 0.5;">
+                <span style="font-size: 12px; color: var(--text-secondary);">No alt attribute (NoAlt)</span>
+            </div>
+            <div class="meta">
+                DOM-05: <code>alt</code> = "Company Logo"<br>
+                DOM-06: <code>src</code> contains "placeholder"<br>
+                HAS-12: <code>has_alt</code> of Company Logo = true<br>
+                HAS-13: <code>has_alt</code> of NoAlt image = false
+            </div>
+        </div>
+    </div>
+
+    <!-- 17d — Extended ARIA Attributes -->
+    <h3>17d. Extended ARIA Attributes</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>ARIA Button (full attribute set)</h4>
+            <button id="aria-full-btn"
+                aria-label="Close dialog"
+                aria-expanded="false"
+                aria-haspopup="true"
+                aria-pressed="false"
+                aria-controls="dropdown-menu"
+                style="padding: 6px 14px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); color: var(--text-primary); cursor: pointer;">
+                ARIA Button &#x2716;
+            </button>
+            <div id="dropdown-menu" style="display: none;">Dropdown content</div>
+            <div class="meta">
+                ARIA-01: <code>aria-label</code> = "Close dialog"<br>
+                ARIA-02: <code>aria-expanded</code> = "false"<br>
+                ARIA-03: <code>aria-haspopup</code> = "true"<br>
+                ARIA-04: <code>aria-pressed</code> = "false"<br>
+                ARIA-05: <code>aria-controls</code> = "dropdown-menu"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Email with Error (aria-invalid)</h4>
+            <input id="email-aria-invalid" type="email" value="not-an-email"
+                aria-invalid="true"
+                aria-errormessage="email-error-msg"
+                style="width: 100%; padding: 6px 8px; border: 2px solid #ef4444; border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+            <span id="email-error-msg" style="font-size: 11px; color: #ef4444;">Invalid email format</span>
+            <div class="meta">
+                ARIA-06: <code>aria-invalid</code> = "true"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Aria-Hidden Element</h4>
+            <div id="el-aria-hidden" aria-hidden="true" style="padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-muted);">
+                This is aria-hidden
+            </div>
+            <div class="meta">
+                ARIA-07: <code>aria-hidden</code> = "true"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Live Region (aria-live)</h4>
+            <div id="el-aria-live" role="status" aria-live="polite" style="padding: 8px; background: #064e3b; color: #34d399; border-radius: var(--radius-sm); font-size: 13px;">
+                Status: All systems operational
+            </div>
+            <div class="meta">
+                ARIA-08: <code>aria-live</code> = "polite"<br>
+                ROLE-03: <code>role</code> = "status"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Aria-Required Input</h4>
+            <label style="font-size: 12px; color: var(--text-secondary);">Email (signup form)</label>
+            <input id="email-aria-required" type="email" placeholder="email@example.com"
+                aria-required="true"
+                style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+            <div class="meta">
+                ARIA-09: <code>aria-required</code> = "true"
+            </div>
+        </div>
+    </div>
+
+    <!-- 17e — Extended Roles -->
+    <h3>17e. Extended Roles</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Navigation (role)</h4>
+            <nav id="el-role-nav" role="navigation" style="padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">
+                <a href="#" style="color: var(--accent); font-size: 13px; margin-right: 12px;">Home</a>
+                <a href="#" style="color: var(--text-secondary); font-size: 13px; margin-right: 12px;">About</a>
+                <a href="#" style="color: var(--text-secondary); font-size: 13px;">Contact</a>
+            </nav>
+            <div class="meta">
+                ROLE-02: <code>role</code> = "navigation"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Alert Role</h4>
+            <div id="el-role-alert-rfc" role="alert" style="padding: 8px; background: #7f1d1d; color: #fca5a5; border-radius: var(--radius-sm); font-size: 13px;">
+                Error: Something went wrong!
+            </div>
+            <div class="meta">
+                ROLE-01: <code>role</code> = "alert"
+            </div>
+        </div>
+    </div>
+
+    <!-- 17f — Data Attributes (data-cy, data-qa) -->
+    <h3>17f. Extended Data Attributes</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Data Attributes Button</h4>
+            <button id="data-attrs-btn"
+                data-testid="action-button"
+                data-value="42"
+                data-cy="submit-action"
+                data-qa="qa-submit"
+                style="padding: 6px 14px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer;">
+                Data Attributes Button
+            </button>
+            <div class="meta">
+                DATA-01: <code>data-testid</code> = "action-button"<br>
+                DATA-02: <code>data-value</code> = "42"<br>
+                DATA-03: <code>data-cy</code> = "submit-action"<br>
+                DATA-04: <code>data-qa</code> = "qa-submit"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Page Title (data-testid)</h4>
+            <h3 id="page-title-data" data-testid="main-title" style="margin: 0; font-size: 16px;">Page Title Element</h3>
+            <div class="meta">
+                DATA-05: <code>data-testid</code> = "main-title"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Name Input (data-cy)</h4>
+            <input id="name-input-data" type="text" value="John Doe" placeholder="Enter your name"
+                data-cy="name-field"
+                style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+            <div class="meta">
+                DOM-07: <code>placeholder</code> = "Enter your name"<br>
+                DOM-08: <code>value</code> = "John Doe"<br>
+                DATA-06: <code>data-cy</code> = "name-field"
+            </div>
+        </div>
+    </div>
+
+    <!-- 17g — CSS Display Inline & Font-Style Normal -->
+    <h3>17g. Additional CSS Targets</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Inline Display Element</h4>
+            <span id="css-display-inline" style="display: inline; background: var(--bg-tertiary); padding: 2px 8px; border-radius: 3px; font-size: 13px;">Inline element</span>
+            <div class="meta">
+                CSS-19: <code>display</code> = "inline"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Normal Font Style</h4>
+            <span id="css-fontstyle-normal" style="font-style: normal; font-size: 14px;">Normal style text</span>
+            <div class="meta">
+                CSS-15: <code>font-style</code> = "normal"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Visibility Visible</h4>
+            <div id="css-visibility-test" style="visibility: visible; padding: 6px 10px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px;">This element is visible</div>
+            <div class="meta">
+                CSS-20: <code>visibility</code> = "visible"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>100% Opacity</h4>
+            <div id="css-opacity-100" style="opacity: 1; padding: 6px 10px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px;">100% opacity</div>
+            <div class="meta">
+                CSS-17: <code>opacity</code> = "1"
+            </div>
+        </div>
+    </div>
+
+    <!-- 17h — Select Dropdown with Pre-Selected Value -->
+    <h3>17h. Select Dropdown Value</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Country Dropdown</h4>
+            <select id="country-dropdown" style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+                <option value="">Select country</option>
+                <option value="us">United States</option>
+                <option value="in" selected>India</option>
+                <option value="uk">United Kingdom</option>
+                <option value="de">Germany</option>
+            </select>
+            <div class="meta">
+                E2E: Read value of Country dropdown → "India"<br>
+                <code>value</code> = "in" (selected option)
+            </div>
+        </div>
+    </div>
+
+    <!-- 17i — Toggle as Checkbox (E2E Pattern) -->
+    <h3>17i. Toggle Checkboxes (E2E Pattern)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Dark Mode Toggle (checked)</h4>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-primary);">
+                <input type="checkbox" id="toggle-darkmode" checked style="width: 18px; height: 18px; accent-color: var(--accent);">
+                Dark mode
+            </label>
+            <div class="meta">
+                E2E: Assert Dark mode toggle checkbox is <code>checked</code>
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Notifications Toggle (unchecked)</h4>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-primary);">
+                <input type="checkbox" id="toggle-notifications" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                Notifications
+            </label>
+            <div class="meta">
+                E2E: Assert Notifications toggle checkbox is <code>not checked</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- 17j — Additional DOM Attributes from Eval -->
+    <h3>17j. Additional DOM Attributes (Eval Coverage)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Links</h4>
+            <div class="demo-row">
+                <a id="link-login" href="/login" title="Go to login page" style="color: var(--accent); font-size: 13px;">Login</a>
+            </div>
+            <div class="demo-row">
+                <a id="link-contact" href="mailto:test@example.com" style="color: var(--accent); font-size: 13px;">Contact Us</a>
+            </div>
+            <div class="demo-row">
+                <a id="link-example" href="https://www.example.com" style="color: var(--accent); font-size: 13px;">Example.com</a>
+            </div>
+            <div class="meta">
+                DOM-01: Login <code>href</code> = "/login"<br>
+                DOM-02: Login <code>title</code> = "Go to login page"<br>
+                DOM-03: Contact Us <code>href</code> = "mailto:test@example.com"<br>
+                DOM-04: Example.com <code>href</code> = "https://www.example.com"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Signup Form</h4>
+            <form id="signup-form" action="/api/signup" method="POST" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 8px;">
+                <input id="signup-name" type="text" value="John Doe" placeholder="Enter your name" data-cy="name-field" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+                <input id="signup-email" type="email" placeholder="Email" aria-required="true" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+                <input id="signup-password" type="password" name="password" placeholder="Password" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+                <input id="signup-age" type="number" value="25" placeholder="Age" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary); width: 100px;">
+                <input id="signup-disabled-email" type="email" disabled placeholder="Cannot type" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-muted);">
+            </form>
+            <div class="meta">
+                DOM-09: Email <code>type</code> = "email"<br>
+                DOM-10: Password <code>name</code> = "password"<br>
+                DOM-11: Disabled email <code>placeholder</code> = "Cannot type"<br>
+                DOM-12: Age <code>value</code> = "25"<br>
+                DOM-13: Form <code>action</code> = "/api/signup"<br>
+                DOM-14: Form <code>method</code> = "POST"
+            </div>
+        </div>
+    </div>
+
+    <!-- 17k — Element States from Eval -->
+    <h3>17k. Element States (Eval Matching)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Enabled / Disabled Buttons</h4>
+            <div class="demo-row">
+                <button id="eval-submit-btn" style="padding: 6px 14px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer;">Submit</button>
+                <button id="eval-disabled-btn" disabled style="padding: 6px 14px; background: var(--bg-tertiary); color: var(--text-muted); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">Submit (Disabled)</button>
+            </div>
+            <div class="meta">
+                ES-01: Submit button <code>disabled</code> = false<br>
+                ES-02: Submit (Disabled) button <code>disabled</code> = true<br>
+                HAS-07: <code>has_disabled</code> of Submit (Disabled) = true<br>
+                HAS-08: <code>has_disabled</code> of Submit = false
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Enabled / Disabled Inputs</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <input id="eval-username" type="text" placeholder="Username" value="" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+                <input id="eval-disabled-email" type="email" disabled placeholder="Cannot type" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-muted);">
+            </div>
+            <div class="meta">
+                ES-03: Username input <code>disabled</code> = false<br>
+                ES-04: Disabled email input <code>disabled</code> = true
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Checkboxes — Checked / Unchecked</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary);">
+                    <input type="checkbox" id="eval-accept-terms" checked> Accept terms
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary);">
+                    <input type="checkbox" id="eval-subscribe"> Subscribe newsletter
+                </label>
+            </div>
+            <div class="meta">
+                ES-06: Accept terms <code>checked</code> = true<br>
+                ES-07: Subscribe newsletter <code>checked</code> = false
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Radio — Selected / Not Selected</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary);">
+                    <input type="radio" name="payment-eval" id="eval-credit" checked> Credit card
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary);">
+                    <input type="radio" name="payment-eval" id="eval-debit"> Debit card
+                </label>
+            </div>
+            <div class="meta">
+                ES-08: Credit card <code>checked</code> = true<br>
+                ES-09: Debit card <code>checked</code> = false
+            </div>
+        </div>
+    </div>
+
+    <!-- 17l — CSS Properties from Eval (specific colors) -->
+    <h3>17l. CSS Color Targets (Eval Matching)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Text Colors</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span id="eval-text-blue" style="color: rgb(37, 99, 235); font-size: 14px;">This text is blue</span>
+                <span id="eval-text-red" style="color: rgb(239, 68, 68); font-size: 14px;">This text is red</span>
+                <span id="eval-text-green" style="color: rgb(22, 163, 74); font-size: 14px;">This text is green</span>
+            </div>
+            <div class="meta">
+                CSS-01: Blue <code>color</code> = "rgb(37, 99, 235)"<br>
+                CSS-02: Red <code>color</code> = "rgb(239, 68, 68)"<br>
+                CSS-03: Green <code>color</code> = "rgb(22, 163, 74)"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Background Colors</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div id="eval-bg-yellow" style="background-color: rgb(253, 224, 71); padding: 6px 10px; border-radius: var(--radius-sm); color: #000; font-size: 13px;">Yellow background</div>
+                <div id="eval-bg-indigo" style="background-color: rgb(99, 102, 241); padding: 6px 10px; border-radius: var(--radius-sm); color: #fff; font-size: 13px;">Indigo background</div>
+            </div>
+            <div class="meta">
+                CSS-04: Yellow <code>background-color</code> = "rgb(253, 224, 71)"<br>
+                CSS-05: Indigo <code>background-color</code> = "rgb(99, 102, 241)"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Border Colors</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div id="eval-border-red" style="border: 3px solid rgb(239, 68, 68); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 13px;">Red border</div>
+                <div id="eval-border-green" style="border: 3px solid rgb(22, 163, 74); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 13px;">Green border</div>
+            </div>
+            <div class="meta">
+                CSS-06: Red <code>border-color</code> contains "rgb(239, 68, 68)"<br>
+                CSS-07: Green <code>border-color</code> contains "rgb(22, 163, 74)"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Font Sizes</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span id="eval-fs-large" style="font-size: 24px;">Large text (24px)</span>
+                <span id="eval-fs-small" style="font-size: 12px;">Small text (12px)</span>
+            </div>
+            <div class="meta">
+                CSS-08: Large <code>font-size</code> = "24px"<br>
+                CSS-09: Small <code>font-size</code> = "12px"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Font Families</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span id="eval-ff-serif" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px;">Serif font (Georgia)</span>
+                <span id="eval-ff-mono" style="font-family: 'Courier New', Courier, monospace; font-size: 14px;">Monospace font (Courier New)</span>
+            </div>
+            <div class="meta">
+                CSS-10: Serif <code>font-family</code> contains "Georgia"<br>
+                CSS-11: Mono <code>font-family</code> contains "Courier New"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Font Weights</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span id="eval-fw-bold" style="font-weight: 700; font-size: 14px;">Bold text (700)</span>
+                <span id="eval-fw-normal" style="font-weight: 400; font-size: 14px;">Normal text (400)</span>
+            </div>
+            <div class="meta">
+                CSS-12: Bold <code>font-weight</code> = "700"<br>
+                CSS-13: Normal <code>font-weight</code> = "400"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Font Style &amp; Opacity</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span id="eval-italic" style="font-style: italic; font-size: 14px;">Italic text</span>
+                <div id="eval-opacity-50" style="opacity: 0.5; padding: 4px 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px;">50% opacity</div>
+            </div>
+            <div class="meta">
+                CSS-14: <code>font-style</code> = "italic"<br>
+                CSS-16: <code>opacity</code> = "0.5"
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Display Types</h4>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div id="eval-display-block" style="display: block; padding: 4px 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px;">Block element</div>
+            </div>
+            <div class="meta">
+                CSS-18: <code>display</code> = "block"
+            </div>
+        </div>
+    </div>
+</div>
+
 </main>
 
 <footer class="site-footer">
