@@ -1432,6 +1432,114 @@ Line 3</pre>
                     </div>
                 </div>
             </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Typography & Font Assertions</div>
+                <div class="edge-grid">
+                    <div class="edge-item" id="font-serif" style="font-family:Georgia,'Times New Roman',serif;font-size:16px">
+                        <div class="edge-label">font-family: Georgia</div>
+                        <div>Serif font (Georgia)</div>
+                    </div>
+                    <div class="edge-item" id="font-mono" style="font-family:'Courier New',Courier,monospace;font-size:14px">
+                        <div class="edge-label">font-family: Courier New</div>
+                        <div>Monospace font (Courier New)</div>
+                    </div>
+                    <div class="edge-item" id="font-sans" style="font-family:Arial,Helvetica,sans-serif;font-size:14px">
+                        <div class="edge-label">font-family: Arial</div>
+                        <div>Sans-serif font (Arial)</div>
+                    </div>
+                    <div class="edge-item" id="font-bold" style="font-weight:700">
+                        <div class="edge-label">font-weight: 700</div>
+                        <div style="font-weight:700;color:var(--text-primary)">Bold text (700)</div>
+                    </div>
+                    <div class="edge-item" id="font-normal" style="font-weight:400">
+                        <div class="edge-label">font-weight: 400</div>
+                        <div style="font-weight:400;color:var(--text-primary)">Normal text (400)</div>
+                    </div>
+                    <div class="edge-item" id="font-light" style="font-weight:300">
+                        <div class="edge-label">font-weight: 300</div>
+                        <div style="font-weight:300;color:var(--text-primary)">Light text (300)</div>
+                    </div>
+                    <div class="edge-item" id="font-italic" style="font-style:italic">
+                        <div class="edge-label">font-style: italic</div>
+                        <div style="font-style:italic;color:var(--text-primary)">Italic text</div>
+                    </div>
+                    <div class="edge-item" id="font-normal-style" style="font-style:normal">
+                        <div class="edge-label">font-style: normal</div>
+                        <div style="font-style:normal;color:var(--text-primary)">Normal style text</div>
+                    </div>
+                    <div class="edge-item" id="font-size-24" style="font-size:24px">
+                        <div class="edge-label">font-size: 24px</div>
+                        <div style="font-size:24px;color:var(--text-primary)">Large text (24px)</div>
+                    </div>
+                    <div class="edge-item" id="font-size-12" style="font-size:12px">
+                        <div class="edge-label">font-size: 12px</div>
+                        <div style="font-size:12px;color:var(--text-primary)">Small text (12px)</div>
+                    </div>
+                    <div class="edge-item" id="font-size-18" style="font-size:18px">
+                        <div class="edge-label">font-size: 18px</div>
+                        <div style="font-size:18px;color:var(--text-primary)">Medium text (18px)</div>
+                    </div>
+                    <div class="edge-item" id="font-size-36" style="font-size:36px;line-height:1.1">
+                        <div class="edge-label" style="font-size:10px">font-size: 36px</div>
+                        <div style="font-size:36px;color:var(--text-primary)">Heading</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Color Assertion Targets</div>
+                <div class="edge-grid">
+                    <div class="edge-item">
+                        <div class="edge-label">color: rgb(37, 99, 235)</div>
+                        <div id="color-blue-text" style="color:rgb(37,99,235);font-size:14px;font-weight:600">This text is blue</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">color: rgb(239, 68, 68)</div>
+                        <div id="color-red-text" style="color:rgb(239,68,68);font-size:14px;font-weight:600">This text is red</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">color: rgb(22, 163, 74)</div>
+                        <div id="color-green-text" style="color:rgb(22,163,74);font-size:14px;font-weight:600">This text is green</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">background: rgb(253, 224, 71)</div>
+                        <div id="color-yellow-bg" style="background-color:rgb(253,224,71);color:#000;padding:6px 10px;border-radius:4px;font-size:13px">Yellow background</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">background: rgb(99, 102, 241)</div>
+                        <div id="color-indigo-bg" style="background-color:rgb(99,102,241);color:#fff;padding:6px 10px;border-radius:4px;font-size:13px">Indigo background</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">border: rgb(239, 68, 68)</div>
+                        <div id="color-red-border" style="border:3px solid rgb(239,68,68);padding:6px 10px;border-radius:4px;font-size:13px;color:var(--text-primary)">Red border</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">border: rgb(22, 163, 74)</div>
+                        <div id="color-green-border" style="border:3px solid rgb(22,163,74);padding:6px 10px;border-radius:4px;font-size:13px;color:var(--text-primary)">Green border</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">display: block</div>
+                        <div id="display-block-el" style="display:block;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">Block element</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">display: inline</div>
+                        <span id="display-inline-el" style="display:inline;padding:2px 8px;background:var(--bg-tertiary);border-radius:3px;font-size:13px">Inline element</span>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">visibility: visible</div>
+                        <div id="visibility-visible-el" style="visibility:visible;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">This element is visible</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">opacity: 0.5</div>
+                        <div id="opacity-half-el" style="opacity:0.5;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">50% opacity</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">opacity: 1</div>
+                        <div id="opacity-full-el" style="opacity:1;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">100% opacity</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ========== CONDITIONAL SCENARIOS ========== -->
