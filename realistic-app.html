@@ -152,6 +152,45 @@
         .contenteditable-box { min-height: 60px; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-primary); font-size: 13px; outline: none; line-height: 1.6; }
         .contenteditable-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,165,233,0.12); }
         @media (max-width: 768px) { .sprint-health { grid-template-columns: 1fr; } .color-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        /* ===== Onboarding / Media ===== */
+        .media-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .media-card { background: var(--bg-secondary); border-radius: var(--radius-lg); overflow: hidden; box-shadow: inset 0 0 0 1px var(--border-subtle); }
+        .media-card video, .media-card audio { width: 100%; display: block; }
+        .media-card-body { padding: 14px 16px; }
+        .media-card-body h4 { margin: 0 0 4px; font-size: 14px; color: var(--text-primary); }
+        .media-card-body p { margin: 0; font-size: 12px; color: var(--text-tertiary); }
+        @media (max-width: 768px) { .media-grid { grid-template-columns: 1fr; } }
+
+        /* ===== Account Settings ===== */
+        .settings-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .settings-fieldset { border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 18px; background: var(--bg-secondary); }
+        .settings-fieldset legend { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); padding: 0 8px; }
+        .settings-fieldset.disabled-group { opacity: 0.5; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-label { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+        .setting-desc { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; background: var(--bg-tertiary); border-radius: 24px; cursor: pointer; transition: background 0.2s; border: 1px solid var(--border-subtle); }
+        .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: white; top: 2px; left: 3px; transition: transform 0.2s; }
+        .toggle-switch input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(19px); }
+        .select-styled { padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-primary); font-size: 13px; font-family: inherit; width: 100%; }
+        .tag-select { padding: 6px 10px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-primary); font-size: 12px; font-family: inherit; width: 100%; }
+        @media (max-width: 768px) { .settings-form { grid-template-columns: 1fr; } }
+
+        /* ===== Alert Banner ===== */
+        .alert-banner { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-lg); font-size: 13px; }
+        .alert-banner.alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+        .alert-banner.alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
+        .alert-banner.alert-warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; }
+        .alert-banner.alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; }
+        [data-theme="light"] .alert-banner.alert-error { color: #991b1b; }
+        [data-theme="light"] .alert-banner.alert-success { color: #065f46; }
+        [data-theme="light"] .alert-banner.alert-warning { color: #92400e; }
+        [data-theme="light"] .alert-banner.alert-info { color: #1e40af; }
     </style>
 </head>
 <body class="has-monitor">
@@ -689,6 +728,305 @@
             </div>
             <p style="margin-bottom:16px;">Chat interface inside an iframe. Each message is a custom element with its own shadow DOM, and the input bar is also a shadow DOM component.</p>
             <iframe id="chatFrame" class="embed-frame" height="420" title="Team Chat"></iframe>
+        </div>
+
+        <!-- ========== ONBOARDING & MEDIA ========== -->
+        <div class="section-label">Onboarding & Resources</div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h2>Getting Started</h2>
+                <span class="badge">media elements</span>
+            </div>
+            <p style="margin-bottom:16px;font-size:13px;color:var(--text-tertiary)">Watch the onboarding video, listen to the latest standup recording, and review the product walkthrough.</p>
+
+            <div class="media-grid">
+                <div class="media-card">
+                    <video id="onboarding-video" controls width="100%" aria-label="Product onboarding tutorial" data-cy="onboarding-video" data-qa="video-tutorial" poster="https://dummyimage.com/640x360/1a1a2e/0ea5e9.png&text=TeamFlow+Tutorial">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="media-card-body">
+                        <h4>Product Onboarding</h4>
+                        <p>Learn how to set up your first project, invite team members, and configure sprint boards.</p>
+                    </div>
+                </div>
+                <div class="media-card">
+                    <video id="bg-promo-video" autoplay loop muted playsinline width="100%" style="max-height:200px;object-fit:cover;" data-cy="promo-video">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    </video>
+                    <div class="media-card-body">
+                        <h4>Ambient Dashboard Background</h4>
+                        <p>Auto-playing ambient visual for the dashboard hero area. No controls, loops silently.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Standup Recording</div>
+                <div style="display:flex;align-items:center;gap:16px;background:var(--bg-secondary);padding:14px 18px;border-radius:var(--radius-lg);box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                    <div style="flex-shrink:0">
+                        <img id="standup-avatar" src="https://dummyimage.com/48x48/10b981/ffffff.png&text=SC" alt="Sarah Chen" width="48" height="48" style="border-radius:50%;" data-cy="speaker-avatar">
+                    </div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px">Daily Standup — Feb 26, 2026</div>
+                        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px">Sarah Chen • Backend Lead • 2m 14s</div>
+                        <audio id="standup-audio" controls style="width:100%;max-width:400px;">
+                            <source src="https://www.w3schools.com/html/horse.ogg" type="audio/ogg">
+                            <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Resource Links</div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px">
+                    <a id="link-docs" href="/docs" title="View documentation" style="color:var(--accent);font-size:13px;text-decoration:none;padding:6px 14px;background:var(--bg-secondary);border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle);" data-cy="docs-link">Documentation</a>
+                    <a id="link-api" href="https://api.teamflow.dev/v2" title="API Reference" style="color:var(--accent);font-size:13px;text-decoration:none;padding:6px 14px;background:var(--bg-secondary);border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle);" data-cy="api-link">API Reference</a>
+                    <a id="link-support" href="mailto:support@teamflow.dev" title="Email support team" style="color:var(--accent);font-size:13px;text-decoration:none;padding:6px 14px;background:var(--bg-secondary);border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle);" data-cy="support-link">Contact Support</a>
+                    <a id="link-changelog" href="/changelog" title="View release notes" style="color:var(--accent);font-size:13px;text-decoration:none;padding:6px 14px;background:var(--bg-secondary);border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle);" data-cy="changelog-link">Changelog</a>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Brand Assets</div>
+                <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+                    <div style="text-align:center">
+                        <img id="logo-with-alt" src="https://dummyimage.com/80x80/0ea5e9/ffffff.png&text=TF+placeholder" alt="TeamFlow Logo" width="80" height="80" style="border-radius:var(--radius-lg);box-shadow:0 2px 8px rgba(0,0,0,0.2);" data-qa="brand-logo">
+                        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">Main Logo</div>
+                    </div>
+                    <div style="text-align:center">
+                        <img id="icon-no-alt" src="https://dummyimage.com/80x80/1a1a2e/3b82f6.png&text=TF" width="80" height="80" style="border-radius:var(--radius-lg);box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">Icon (no alt)</div>
+                    </div>
+                    <div style="text-align:center">
+                        <img id="favicon-asset" src="favicon.svg" alt="Favicon" width="48" height="48" style="border-radius:var(--radius-sm);background:var(--bg-secondary);padding:8px;">
+                        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">Favicon</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ACCOUNT SETTINGS — Fieldsets, Toggles, Dropdowns ========== -->
+        <div class="section-label">Account & Preferences</div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h2>Account Settings</h2>
+                <span class="badge">fieldsets + toggles</span>
+            </div>
+
+            <div style="margin-bottom:16px">
+                <div class="alert-banner alert-info" role="status" aria-live="polite" id="settings-status">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v1M8 7v5"/></svg>
+                    <span>Settings are synced across all your devices. Last saved 2 minutes ago.</span>
+                </div>
+            </div>
+
+            <div class="settings-form">
+                <!-- Profile Settings (active fieldset) -->
+                <fieldset class="settings-fieldset" id="profile-fieldset">
+                    <legend>Profile Settings</legend>
+
+                    <div class="input-demo" style="margin-bottom:10px">
+                        <label for="settings-name">Full Name</label>
+                        <input type="text" id="settings-name" value="Sahil R" placeholder="Enter your name" required aria-required="true" data-cy="settings-name" data-qa="profile-name">
+                    </div>
+                    <div class="input-demo" style="margin-bottom:10px">
+                        <label for="settings-email">Email Address</label>
+                        <input type="email" id="settings-email" value="sahil@teamflow.dev" placeholder="Email" name="email" aria-required="true" data-cy="settings-email">
+                    </div>
+                    <div class="input-demo" style="margin-bottom:10px">
+                        <label for="settings-bio">Bio (readonly)</label>
+                        <input type="text" id="settings-bio" value="Engineering Lead @ TeamFlow" readonly data-qa="profile-bio">
+                    </div>
+                    <div class="input-demo" style="margin-bottom:10px">
+                        <label for="settings-timezone">Timezone</label>
+                        <select id="settings-timezone" class="select-styled" data-cy="timezone-select">
+                            <option value="">Select timezone</option>
+                            <option value="utc">UTC</option>
+                            <option value="est">Eastern (EST)</option>
+                            <option value="ist" selected>India (IST)</option>
+                            <option value="pst">Pacific (PST)</option>
+                            <option value="jst">Japan (JST)</option>
+                        </select>
+                    </div>
+                    <div class="input-demo" style="margin-bottom:10px">
+                        <label for="settings-skills">Skills (multi-select)</label>
+                        <select id="settings-skills" class="tag-select" multiple size="4" data-cy="skills-select">
+                            <option value="js" selected>JavaScript</option>
+                            <option value="ts" selected>TypeScript</option>
+                            <option value="py">Python</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                            <option value="java">Java</option>
+                        </select>
+                    </div>
+
+                    <form id="profile-form" action="/api/profile" method="POST" onsubmit="return false;" style="margin-top:10px">
+                        <input type="hidden" name="csrf_token" value="tf_csrf_abc123xyz">
+                        <input type="hidden" name="user_id" value="usr_sahil_001">
+                        <button type="submit" class="btn-primary-demo" data-cy="save-profile" data-qa="save-btn" aria-label="Save profile changes">Save Changes</button>
+                    </form>
+                </fieldset>
+
+                <!-- Notification Preferences -->
+                <fieldset class="settings-fieldset" id="notifications-fieldset">
+                    <legend>Notification Preferences</legend>
+
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">Email Notifications</div>
+                            <div class="setting-desc">Receive daily digest via email</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-email-notif" checked data-setting="email_notifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">Push Notifications</div>
+                            <div class="setting-desc">Real-time browser notifications</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-push-notif" data-setting="push_notifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">Dark Mode</div>
+                            <div class="setting-desc">Use dark theme for the dashboard</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-darkmode-setting" checked data-setting="dark_mode">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">Sound Alerts</div>
+                            <div class="setting-desc">Play sounds for mentions and assignments</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-sound" data-setting="sound_alerts">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">Auto-assign Tasks</div>
+                            <div class="setting-desc">Automatically assign unassigned tasks to you</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-autoassign" checked data-setting="auto_assign">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Disabled fieldset — locked billing settings -->
+            <fieldset class="settings-fieldset disabled-group" disabled id="billing-fieldset" style="margin-top:16px">
+                <legend>Billing Settings (Locked)</legend>
+                <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">These settings require admin approval. Contact your account manager to make changes.</p>
+                <div class="input-demo" style="margin-bottom:8px">
+                    <label for="billing-plan">Current Plan</label>
+                    <input type="text" id="billing-plan" value="Enterprise" data-plan="enterprise">
+                </div>
+                <div class="input-demo" style="margin-bottom:8px">
+                    <label for="billing-seats">Seats</label>
+                    <input type="number" id="billing-seats" value="50" min="1" max="500">
+                </div>
+                <button id="billing-upgrade-btn" class="btn-primary-demo" style="margin-top:6px">Upgrade Plan</button>
+                <select id="billing-cycle" class="select-styled" style="margin-top:6px">
+                    <option>Monthly</option>
+                    <option selected>Annual</option>
+                </select>
+            </fieldset>
+
+            <!-- ARIA-enhanced alert and status indicators -->
+            <div class="sub-section">
+                <div class="sub-section-title">System Status</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                    <div class="alert-banner alert-error" role="alert" id="system-error-alert">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v5M8 11v1"/></svg>
+                        <span>Error: Database connection timeout on shard-3. Auto-retry in 30s.</span>
+                    </div>
+                    <div class="alert-banner alert-success" role="status" id="deploy-success-status" aria-live="polite">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 8l2 2 4-4"/></svg>
+                        <span>Deployment v2.14.3 completed successfully. All health checks passing.</span>
+                    </div>
+                    <div class="alert-banner alert-warning" role="alert" id="quota-warning" aria-live="assertive">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 13H1z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 6v4M8 12v1"/></svg>
+                        <span>Warning: API rate limit at 85%. Consider upgrading your plan.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ARIA Button with full attribute set (realistic dropdown trigger) -->
+            <div class="sub-section">
+                <div class="sub-section-title">Actions</div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+                    <button id="aria-dropdown-btn"
+                        aria-label="More actions"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-pressed="false"
+                        aria-controls="actions-dropdown-menu"
+                        class="btn-secondary-demo"
+                        data-testid="actions-dropdown"
+                        data-cy="more-actions"
+                        data-qa="actions-btn">
+                        More Actions &#9660;
+                    </button>
+                    <div id="actions-dropdown-menu" style="display:none;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:6px 0;min-width:160px;" role="menu" aria-label="Actions menu">
+                        <button role="menuitem" style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;color:var(--text-primary);font-size:13px;cursor:pointer;font-family:inherit">Export CSV</button>
+                        <button role="menuitem" style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;color:var(--text-primary);font-size:13px;cursor:pointer;font-family:inherit">Print Report</button>
+                        <button role="menuitem" style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;color:#ef4444;font-size:13px;cursor:pointer;font-family:inherit">Delete Project</button>
+                    </div>
+
+                    <button id="bookmark-btn"
+                        aria-label="Bookmark this project"
+                        aria-pressed="false"
+                        class="btn-secondary-demo"
+                        data-testid="bookmark-toggle"
+                        tabindex="0"
+                        role="button">
+                        &#9734; Bookmark
+                    </button>
+
+                    <nav id="settings-nav" role="navigation" aria-label="Settings navigation" style="display:flex;gap:8px">
+                        <a href="#profile-fieldset" style="color:var(--accent);font-size:13px;text-decoration:none;padding:6px 12px;background:var(--bg-secondary);border-radius:var(--radius-md)">Profile</a>
+                        <a href="#notifications-fieldset" style="color:var(--text-secondary);font-size:13px;text-decoration:none;padding:6px 12px;background:var(--bg-secondary);border-radius:var(--radius-md)">Notifications</a>
+                        <a href="#billing-fieldset" style="color:var(--text-secondary);font-size:13px;text-decoration:none;padding:6px 12px;background:var(--bg-secondary);border-radius:var(--radius-md)">Billing</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Hidden/ARIA elements -->
+            <div class="sub-section">
+                <div class="sub-section-title">Accessibility Targets</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+                    <div style="background:var(--bg-secondary);padding:10px;border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:4px">aria-hidden</div>
+                        <div id="hidden-helper-text" aria-hidden="true" style="font-size:13px;color:var(--text-muted)">Decorative separator content</div>
+                    </div>
+                    <div style="background:var(--bg-secondary);padding:10px;border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:4px">aria-live region</div>
+                        <div id="live-update-region" role="status" aria-live="polite" style="font-size:13px;color:var(--accent)">Status: All systems operational</div>
+                    </div>
+                    <div style="background:var(--bg-secondary);padding:10px;border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:4px">aria-invalid input</div>
+                        <input id="aria-invalid-field" type="email" value="bad-email" aria-invalid="true" aria-errormessage="email-err-msg" style="padding:6px 10px;border:2px solid #ef4444;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-primary);width:100%;font-size:12px;box-sizing:border-box">
+                        <span id="email-err-msg" style="font-size:10px;color:#ef4444">Invalid email format</span>
+                    </div>
+                    <div style="background:var(--bg-secondary);padding:10px;border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:4px">aria-required</div>
+                        <input id="aria-required-field" type="text" placeholder="Required field" aria-required="true" style="padding:6px 10px;border:1px solid var(--border-default);border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-primary);width:100%;font-size:12px;box-sizing:border-box">
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ========== DESIGN SYSTEM & ASSERTION TARGETS ========== -->
@@ -2496,6 +2834,36 @@ function closeTaskModal() {
     setInterval(function() {
         if (activeField) updateBar();
     }, 500);
+})();
+</script>
+
+<!-- Dropdown & Bookmark Toggles -->
+<script>
+(function() {
+    var dropBtn = document.getElementById('aria-dropdown-btn');
+    var dropMenu = document.getElementById('actions-dropdown-menu');
+    if (dropBtn && dropMenu) {
+        dropBtn.addEventListener('click', function() {
+            var open = dropMenu.style.display !== 'none';
+            dropMenu.style.display = open ? 'none' : 'block';
+            dropBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+        });
+        document.addEventListener('click', function(e) {
+            if (!dropBtn.contains(e.target) && !dropMenu.contains(e.target)) {
+                dropMenu.style.display = 'none';
+                dropBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+    var bookmarkBtn = document.getElementById('bookmark-btn');
+    if (bookmarkBtn) {
+        bookmarkBtn.addEventListener('click', function() {
+            var pressed = bookmarkBtn.getAttribute('aria-pressed') === 'true';
+            bookmarkBtn.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+            bookmarkBtn.innerHTML = pressed ? '&#9734; Bookmark' : '&#9733; Bookmarked';
+            bookmarkBtn.style.color = pressed ? '' : '#f59e0b';
+        });
+    }
 })();
 </script>
 
