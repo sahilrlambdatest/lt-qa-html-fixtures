@@ -38,6 +38,120 @@
         @media (max-width: 1100px) { .board-layout { grid-template-columns: 1fr; } .kanban { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .kanban { grid-template-columns: 1fr; } }
         @media (max-width: 640px) { .stats-row { grid-template-columns: 1fr; } }
+
+        /* ===== Sprint Health ===== */
+        .sprint-health { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .health-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; box-shadow: inset 0 0 0 1px var(--border-subtle); }
+        .health-card-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .health-pct { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+        .health-pct.green { color: #10b981; }
+        .health-pct.blue { color: #3b82f6; }
+        .health-pct.amber { color: #f59e0b; }
+        .health-pct.red { color: #ef4444; }
+        .health-pct.purple { color: #8b5cf6; }
+        .progress-bar { height: 8px; border-radius: 4px; background: var(--bg-secondary); overflow: hidden; margin-bottom: 12px; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+        .progress-fill.green { background: linear-gradient(90deg, #10b981, #34d399); }
+        .progress-fill.blue { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .progress-fill.amber { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .progress-fill.red { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .progress-fill.purple { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .progress-fill.gradient { background: linear-gradient(90deg, #0ea5e9, #6366f1, #8b5cf6); }
+        .progress-label { font-size: 11px; color: var(--text-tertiary); display: flex; justify-content: space-between; }
+        .milestone-track { display: flex; align-items: center; gap: 0; margin-top: 8px; position: relative; padding: 20px 0 0; }
+        .milestone-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; position: relative; z-index: 1; }
+        .milestone-dot.done { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.4); }
+        .milestone-dot.active { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.5); animation: pulse-dot 2s infinite; }
+        .milestone-dot.pending { background: var(--border-strong); }
+        @keyframes pulse-dot { 0%,100%{ box-shadow: 0 0 8px rgba(59,130,246,0.5); } 50%{ box-shadow: 0 0 16px rgba(59,130,246,0.8); } }
+        .milestone-line { flex: 1; height: 2px; background: var(--border-subtle); }
+        .milestone-line.done { background: #10b981; }
+        .milestone-label-row { display: flex; justify-content: space-between; margin-top: 8px; }
+        .milestone-label { font-size: 10px; color: var(--text-tertiary); text-align: center; font-weight: 600; }
+        .milestone-label.active { color: #3b82f6; }
+        .milestone-label.done { color: #10b981; }
+
+        /* ===== Data Table ===== */
+        .table-container { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); }
+        .data-table th:first-child { border-radius: 8px 0 0 0; }
+        .data-table th:last-child { border-radius: 0 8px 0 0; }
+        .data-table td { padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); vertical-align: middle; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--bg-card-hover); }
+        .data-table .cell-name { font-weight: 600; color: var(--text-primary); }
+        .status-pill { display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+        .pill-success { background: rgba(16,185,129,0.12); color: #10b981; }
+        .pill-warning { background: rgba(245,158,11,0.12); color: #f59e0b; }
+        .pill-error { background: rgba(239,68,68,0.12); color: #ef4444; }
+        .pill-info { background: rgba(59,130,246,0.12); color: #3b82f6; }
+        .pill-purple { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+        .pill-orange { background: rgba(249,115,22,0.12); color: #f97316; }
+        .pill-pink { background: rgba(236,72,153,0.12); color: #ec4899; }
+        .pill-teal { background: rgba(20,184,166,0.12); color: #14b8a6; }
+        .priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+        .dot-critical { background: #ef4444; }
+        .dot-high { background: #f59e0b; }
+        .dot-medium { background: #3b82f6; }
+        .dot-low { background: #6b7280; }
+        .table-check { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+        /* ===== Search + Notifications (Header) ===== */
+        .header-search { display: flex; align-items: center; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0 10px; gap: 6px; transition: border-color var(--transition-fast); }
+        .header-search:focus-within { border-color: var(--accent); }
+        .header-search input { background: transparent; border: none; color: var(--text-primary); font-size: 13px; padding: 7px 0; outline: none; width: 160px; font-family: inherit; }
+        .header-search input::placeholder { color: var(--text-muted); }
+        .header-search svg { color: var(--text-muted); flex-shrink: 0; }
+        .notif-bell { position: relative; background: none; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 6px 8px; color: var(--text-secondary); cursor: pointer; font-family: inherit; }
+        .notif-bell:hover { border-color: var(--border-default); color: var(--text-primary); }
+        .notif-count { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .user-avatar-sm { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; font-weight: 700; cursor: pointer; border: 2px solid var(--border-subtle); }
+
+        /* ===== Breadcrumb ===== */
+        .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-tertiary); margin-bottom: -8px; }
+        .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-secondary); font-weight: 600; }
+
+        /* ===== Design System / Assertion ===== */
+        .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .color-swatch { border-radius: var(--radius-md); overflow: hidden; box-shadow: inset 0 0 0 1px var(--border-subtle); }
+        .swatch-preview { height: 48px; }
+        .swatch-info { padding: 6px 8px; background: var(--bg-secondary); font-size: 10px; }
+        .swatch-name { font-weight: 700; color: var(--text-primary); display: block; }
+        .swatch-value { color: var(--text-tertiary); font-family: monospace; }
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .badge-lg { padding: 6px 14px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 700; }
+        .btn-grid { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .btn-primary-demo { padding: 8px 18px; background: var(--accent); color: white; border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
+        .btn-secondary-demo { padding: 8px 18px; background: transparent; color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: var(--radius-md); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
+        .btn-danger-demo { padding: 8px 18px; background: #ef4444; color: white; border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
+        .btn-success-demo { padding: 8px 18px; background: #10b981; color: white; border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
+        .btn-ghost-demo { padding: 8px 18px; background: transparent; color: var(--accent); border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; text-decoration: underline; }
+        .state-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        .state-item { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px; box-shadow: inset 0 0 0 1px var(--border-subtle); }
+        .state-item-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 6px; }
+        .edge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+        .edge-item { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 10px; box-shadow: inset 0 0 0 1px var(--border-subtle); font-size: 13px; }
+        .edge-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 4px; }
+        .dynamic-value { font-family: monospace; font-size: 14px; color: var(--accent); font-weight: 600; }
+        .sub-section { margin-top: 20px; }
+        .sub-section-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .input-demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+        .input-demo { display: flex; flex-direction: column; gap: 4px; }
+        .input-demo label { font-size: 11px; font-weight: 600; color: var(--text-tertiary); }
+        .input-demo input, .input-demo textarea, .input-demo select { padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-primary); font-size: 13px; outline: none; font-family: inherit; }
+        .input-demo input:focus, .input-demo textarea:focus { border-color: var(--accent); }
+        .input-demo input:invalid { border-color: #ef4444; }
+        .input-demo input:disabled, .input-demo textarea:disabled { opacity: 0.5; cursor: not-allowed; }
+        .input-demo input[readonly] { background: var(--bg-secondary); }
+        .tooltip-target { position: relative; display: inline-block; padding: 6px 12px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); font-size: 13px; color: var(--text-secondary); cursor: help; }
+        .tooltip-target:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding: 6px 10px; background: var(--bg-elevated); color: var(--text-primary); font-size: 11px; border-radius: 6px; white-space: nowrap; margin-bottom: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10; }
+        .contenteditable-box { min-height: 60px; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-primary); font-size: 13px; outline: none; line-height: 1.6; }
+        .contenteditable-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,165,233,0.12); }
+        @media (max-width: 768px) { .sprint-health { grid-template-columns: 1fr; } .color-grid { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body class="has-monitor">
@@ -84,6 +198,15 @@
             <div class="logo-text">TeamFlow <span>Dashboard</span></div>
         </a>
         <nav class="header-nav">
+            <div class="header-search">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="5"/><path d="M10 10l4.5 4.5"/></svg>
+                <input type="text" id="headerSearch" placeholder="Search tasks..." aria-label="Search tasks">
+            </div>
+            <button class="notif-bell" id="notifBell" aria-label="Notifications" title="3 unread notifications">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5a4 4 0 014 4v3l1.5 2H2.5L4 8.5v-3a4 4 0 014-4zM6 12.5a2 2 0 004 0"/></svg>
+                <span class="notif-count" id="notifCount" data-count="3">3</span>
+            </button>
+            <div class="user-avatar-sm" id="userAvatar" title="Sahil R" data-user="sahil" data-role="admin">SR</div>
             <button class="header-btn" id="refreshBtn" onclick="window.location.reload()" aria-label="Refresh page">
                 <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 2v5h5"/><path d="M3.5 7A7.5 7.5 0 0110 2.5a7.5 7.5 0 017.5 7.5 7.5 7.5 0 01-7.5 7.5A7.5 7.5 0 013 12"/></svg>
                 <span class="hide-mobile">Refresh</span>
@@ -106,6 +229,14 @@
         <p class="subtitle">A realistic project management app with shadow DOM components, embedded iframes, and nested DOM structures for comprehensive KaneAI testing.</p>
     </div>
 
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="sep">/</span>
+        <a href="#">Projects</a>
+        <span class="sep">/</span>
+        <span class="current" id="breadcrumbCurrent">TeamFlow</span>
+    </nav>
+
     <div class="info-box">
         This page simulates a real SaaS dashboard. Nesting patterns:
         <strong>Shadow DOM</strong> (stat cards, task cards, settings),
@@ -124,6 +255,83 @@
             <tf-stat-card id="stat-progress" data-label="In Progress" data-value="8" data-icon="&#128260;" data-trend="-1 from yesterday" data-trend-up="false"></tf-stat-card>
             <tf-stat-card id="stat-completed" data-label="Completed" data-value="16" data-icon="&#9989;" data-trend="+4 this week" data-trend-up="true"></tf-stat-card>
             <tf-stat-card id="stat-velocity" data-label="Velocity" data-value="94%" data-icon="&#9889;" data-trend="+2% improvement" data-trend-up="true"></tf-stat-card>
+        </div>
+
+        <!-- ========== SPRINT HEALTH ========== -->
+        <div class="section-label">Sprint Health</div>
+        <div class="sprint-health">
+            <div class="health-card">
+                <div class="health-card-title">Sprint Progress <span class="health-pct blue" id="sprintPct">68%</span></div>
+                <div class="progress-bar"><div class="progress-fill blue" id="sprintBar" style="width:68%" data-value="68"></div></div>
+                <div class="progress-label"><span>17 of 25 stories</span><span>7 days remaining</span></div>
+
+                <div class="health-card-title" style="margin-top:18px">Code Coverage <span class="health-pct green" id="coveragePct">84%</span></div>
+                <div class="progress-bar"><div class="progress-fill green" id="coverageBar" style="width:84%" data-value="84"></div></div>
+                <div class="progress-label"><span>Target: 80%</span><span class="pill-success status-pill" style="font-size:10px">Above Target</span></div>
+
+                <div class="health-card-title" style="margin-top:18px">Bug Resolution <span class="health-pct amber" id="bugPct">45%</span></div>
+                <div class="progress-bar"><div class="progress-fill amber" id="bugBar" style="width:45%" data-value="45"></div></div>
+                <div class="progress-label"><span>9 of 20 resolved</span><span class="pill-warning status-pill" style="font-size:10px">Needs Attention</span></div>
+
+                <div class="health-card-title" style="margin-top:18px">Test Pass Rate <span class="health-pct purple" id="testPct">92%</span></div>
+                <div class="progress-bar"><div class="progress-fill purple" id="testBar" style="width:92%" data-value="92"></div></div>
+                <div class="progress-label"><span>230 of 250 passing</span><span class="pill-purple status-pill" style="font-size:10px">Good</span></div>
+            </div>
+            <div class="health-card">
+                <div class="health-card-title">Release Pipeline</div>
+                <div class="milestone-track">
+                    <div class="milestone-dot done" id="ms-planning" data-stage="planning"></div>
+                    <div class="milestone-line done"></div>
+                    <div class="milestone-dot done" id="ms-development" data-stage="development"></div>
+                    <div class="milestone-line done"></div>
+                    <div class="milestone-dot active" id="ms-testing" data-stage="testing"></div>
+                    <div class="milestone-line"></div>
+                    <div class="milestone-dot pending" id="ms-staging" data-stage="staging"></div>
+                    <div class="milestone-line"></div>
+                    <div class="milestone-dot pending" id="ms-production" data-stage="production"></div>
+                </div>
+                <div class="milestone-label-row">
+                    <span class="milestone-label done">Planning</span>
+                    <span class="milestone-label done">Dev</span>
+                    <span class="milestone-label active">Testing</span>
+                    <span class="milestone-label">Staging</span>
+                    <span class="milestone-label">Prod</span>
+                </div>
+
+                <div class="health-card-title" style="margin-top:24px">Team Velocity</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <div style="flex:1;min-width:80px;text-align:center;padding:10px;background:var(--bg-secondary);border-radius:8px;box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                        <div style="font-size:22px;font-weight:800;color:#10b981" id="vel-completed">16</div>
+                        <div style="font-size:10px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase">Completed</div>
+                    </div>
+                    <div style="flex:1;min-width:80px;text-align:center;padding:10px;background:var(--bg-secondary);border-radius:8px;box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                        <div style="font-size:22px;font-weight:800;color:#3b82f6" id="vel-progress">8</div>
+                        <div style="font-size:10px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase">In Progress</div>
+                    </div>
+                    <div style="flex:1;min-width:80px;text-align:center;padding:10px;background:var(--bg-secondary);border-radius:8px;box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                        <div style="font-size:22px;font-weight:800;color:#ef4444" id="vel-blocked">2</div>
+                        <div style="font-size:10px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase">Blocked</div>
+                    </div>
+                    <div style="flex:1;min-width:80px;text-align:center;padding:10px;background:var(--bg-secondary);border-radius:8px;box-shadow:inset 0 0 0 1px var(--border-subtle)">
+                        <div style="font-size:22px;font-weight:800;color:#f59e0b" id="vel-review">3</div>
+                        <div style="font-size:10px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase">In Review</div>
+                    </div>
+                </div>
+
+                <div class="health-card-title" style="margin-top:24px">Resource Allocation</div>
+                <div style="margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text-secondary)">Frontend</span><span style="color:#3b82f6;font-weight:600" id="alloc-frontend">35%</span></div>
+                    <div class="progress-bar"><div class="progress-fill blue" style="width:35%"></div></div>
+                </div>
+                <div style="margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text-secondary)">Backend</span><span style="color:#8b5cf6;font-weight:600" id="alloc-backend">40%</span></div>
+                    <div class="progress-bar"><div class="progress-fill purple" style="width:40%"></div></div>
+                </div>
+                <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text-secondary)">DevOps</span><span style="color:#f59e0b;font-weight:600" id="alloc-devops">25%</span></div>
+                    <div class="progress-bar"><div class="progress-fill amber" style="width:25%"></div></div>
+                </div>
+            </div>
         </div>
 
         <!-- ========== TASK BOARD — Shadow DOM L1 + Nested L2 ========== -->
@@ -207,6 +415,114 @@
             </div>
         </div>
 
+        <!-- ========== DATA TABLE — Team Activity Log ========== -->
+        <div class="section-label">Team Activity Log</div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h2>Recent Activity</h2>
+                <span class="badge">data table + colored badges</span>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="activityTable">
+                    <thead>
+                        <tr>
+                            <th style="width:36px"><input type="checkbox" class="table-check" id="selectAll" aria-label="Select all"></th>
+                            <th>Date</th>
+                            <th>Member</th>
+                            <th>Action</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="row-1" data-row-id="1">
+                            <td><input type="checkbox" class="table-check row-check" data-row="1" aria-label="Select row 1"></td>
+                            <td id="date-1">Feb 26</td>
+                            <td class="cell-name" id="member-row-1">Sarah Chen</td>
+                            <td id="action-1">Merged PR #47: Auth middleware</td>
+                            <td><span class="status-pill pill-success" id="status-1" data-status="completed">Completed</span></td>
+                            <td><span class="priority-dot dot-high"></span><span id="priority-1" data-priority="high">High</span></td>
+                            <td><span class="status-pill pill-info" id="cat-1">Backend</span></td>
+                        </tr>
+                        <tr id="row-2" data-row-id="2">
+                            <td><input type="checkbox" class="table-check row-check" data-row="2" aria-label="Select row 2"></td>
+                            <td id="date-2">Feb 26</td>
+                            <td class="cell-name" id="member-row-2">John Davis</td>
+                            <td id="action-2">Started code review for dashboard</td>
+                            <td><span class="status-pill pill-info" id="status-2" data-status="in-progress">In Progress</span></td>
+                            <td><span class="priority-dot dot-medium"></span><span id="priority-2" data-priority="medium">Medium</span></td>
+                            <td><span class="status-pill pill-purple" id="cat-2">Frontend</span></td>
+                        </tr>
+                        <tr id="row-3" data-row-id="3">
+                            <td><input type="checkbox" class="table-check row-check" data-row="3" aria-label="Select row 3"></td>
+                            <td id="date-3">Feb 25</td>
+                            <td class="cell-name" id="member-row-3">Mike Ross</td>
+                            <td id="action-3">Deployed monitoring agents to prod</td>
+                            <td><span class="status-pill pill-success" id="status-3" data-status="completed">Completed</span></td>
+                            <td><span class="priority-dot dot-critical"></span><span id="priority-3" data-priority="critical">Critical</span></td>
+                            <td><span class="status-pill pill-orange" id="cat-3">DevOps</span></td>
+                        </tr>
+                        <tr id="row-4" data-row-id="4">
+                            <td><input type="checkbox" class="table-check row-check" data-row="4" aria-label="Select row 4"></td>
+                            <td id="date-4">Feb 25</td>
+                            <td class="cell-name" id="member-row-4">Alex Kim</td>
+                            <td id="action-4">Design review: mobile navigation</td>
+                            <td><span class="status-pill pill-purple" id="status-4" data-status="in-review">In Review</span></td>
+                            <td><span class="priority-dot dot-medium"></span><span id="priority-4" data-priority="medium">Medium</span></td>
+                            <td><span class="status-pill pill-pink" id="cat-4">Design</span></td>
+                        </tr>
+                        <tr id="row-5" data-row-id="5">
+                            <td><input type="checkbox" class="table-check row-check" data-row="5" aria-label="Select row 5"></td>
+                            <td id="date-5">Feb 24</td>
+                            <td class="cell-name" id="member-row-5">Sarah Chen</td>
+                            <td id="action-5">Database migration v2 — blocked by schema</td>
+                            <td><span class="status-pill pill-error" id="status-5" data-status="blocked">Blocked</span></td>
+                            <td><span class="priority-dot dot-critical"></span><span id="priority-5" data-priority="critical">Critical</span></td>
+                            <td><span class="status-pill pill-info" id="cat-5">Backend</span></td>
+                        </tr>
+                        <tr id="row-6" data-row-id="6">
+                            <td><input type="checkbox" class="table-check row-check" data-row="6" aria-label="Select row 6"></td>
+                            <td id="date-6">Feb 24</td>
+                            <td class="cell-name" id="member-row-6">John Davis</td>
+                            <td id="action-6">Unit tests for payment module</td>
+                            <td><span class="status-pill pill-warning" id="status-6" data-status="pending">Pending</span></td>
+                            <td><span class="priority-dot dot-high"></span><span id="priority-6" data-priority="high">High</span></td>
+                            <td><span class="status-pill pill-teal" id="cat-6">Testing</span></td>
+                        </tr>
+                        <tr id="row-7" data-row-id="7">
+                            <td><input type="checkbox" class="table-check row-check" data-row="7" aria-label="Select row 7"></td>
+                            <td id="date-7">Feb 23</td>
+                            <td class="cell-name" id="member-row-7">Mike Ross</td>
+                            <td id="action-7">CI pipeline failed — Docker build error</td>
+                            <td><span class="status-pill pill-error" id="status-7" data-status="failed">Failed</span></td>
+                            <td><span class="priority-dot dot-high"></span><span id="priority-7" data-priority="high">High</span></td>
+                            <td><span class="status-pill pill-orange" id="cat-7">DevOps</span></td>
+                        </tr>
+                        <tr id="row-8" data-row-id="8">
+                            <td><input type="checkbox" class="table-check row-check" data-row="8" aria-label="Select row 8"></td>
+                            <td id="date-8">Feb 23</td>
+                            <td class="cell-name" id="member-row-8">Alex Kim</td>
+                            <td id="action-8">Uploaded new icon set (v3.2)</td>
+                            <td><span class="status-pill pill-success" id="status-8" data-status="completed">Completed</span></td>
+                            <td><span class="priority-dot dot-low"></span><span id="priority-8" data-priority="low">Low</span></td>
+                            <td><span class="status-pill pill-pink" id="cat-8">Design</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12px;color:var(--text-tertiary)">
+                <span id="tableRowCount">Showing 8 of 42 entries</span>
+                <div style="display:flex;gap:4px">
+                    <button style="padding:4px 10px;border:1px solid var(--border-subtle);border-radius:6px;background:transparent;color:var(--text-muted);font-size:12px;cursor:pointer" id="tablePrev" disabled>Prev</button>
+                    <button style="padding:4px 10px;border:1px solid var(--accent);border-radius:6px;background:var(--accent-surface);color:var(--accent);font-size:12px;cursor:pointer;font-weight:600" id="tablePage1" data-page="1">1</button>
+                    <button style="padding:4px 10px;border:1px solid var(--border-subtle);border-radius:6px;background:transparent;color:var(--text-muted);font-size:12px;cursor:pointer" id="tablePage2" data-page="2">2</button>
+                    <button style="padding:4px 10px;border:1px solid var(--border-subtle);border-radius:6px;background:transparent;color:var(--text-muted);font-size:12px;cursor:pointer" id="tablePage3" data-page="3">3</button>
+                    <button style="padding:4px 10px;border:1px solid var(--border-subtle);border-radius:6px;background:transparent;color:var(--text-muted);font-size:12px;cursor:pointer" id="tableNext">Next</button>
+                </div>
+            </div>
+        </div>
+
         <!-- ========== DOCUMENT VIEWER — Shadow DOM > Iframe > Iframe ========== -->
         <div class="section-label">Documents</div>
         <div class="section-card">
@@ -227,6 +543,529 @@
             </div>
             <p style="margin-bottom:16px;">Chat interface inside an iframe. Each message is a custom element with its own shadow DOM, and the input bar is also a shadow DOM component.</p>
             <iframe id="chatFrame" class="embed-frame" height="420" title="Team Chat"></iframe>
+        </div>
+
+        <!-- ========== DESIGN SYSTEM & ASSERTION TARGETS ========== -->
+        <div class="section-label">Design System & Assertion Targets</div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h2>Color Palette</h2>
+                <span class="badge">assertion targets</span>
+            </div>
+            <p style="margin-bottom:14px;font-size:13px;color:var(--text-tertiary)">Each swatch has a known color value for assertion testing. Test hex, rgb, hsl, named, and transparent colors.</p>
+            <div class="color-grid">
+                <div class="color-swatch" id="swatch-blue">
+                    <div class="swatch-preview" style="background:#0ea5e9" data-color="#0ea5e9"></div>
+                    <div class="swatch-info"><span class="swatch-name">Primary</span><span class="swatch-value">#0ea5e9</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-indigo">
+                    <div class="swatch-preview" style="background:#6366f1" data-color="#6366f1"></div>
+                    <div class="swatch-info"><span class="swatch-name">Indigo</span><span class="swatch-value">#6366f1</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-green">
+                    <div class="swatch-preview" style="background:#10b981" data-color="#10b981"></div>
+                    <div class="swatch-info"><span class="swatch-name">Success</span><span class="swatch-value">#10b981</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-amber">
+                    <div class="swatch-preview" style="background:#f59e0b" data-color="#f59e0b"></div>
+                    <div class="swatch-info"><span class="swatch-name">Warning</span><span class="swatch-value">#f59e0b</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-red">
+                    <div class="swatch-preview" style="background:#ef4444" data-color="#ef4444"></div>
+                    <div class="swatch-info"><span class="swatch-name">Error</span><span class="swatch-value">#ef4444</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-purple">
+                    <div class="swatch-preview" style="background:#8b5cf6" data-color="#8b5cf6"></div>
+                    <div class="swatch-info"><span class="swatch-name">Purple</span><span class="swatch-value">#8b5cf6</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-pink">
+                    <div class="swatch-preview" style="background:#ec4899" data-color="#ec4899"></div>
+                    <div class="swatch-info"><span class="swatch-name">Pink</span><span class="swatch-value">#ec4899</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-teal">
+                    <div class="swatch-preview" style="background:#14b8a6" data-color="#14b8a6"></div>
+                    <div class="swatch-info"><span class="swatch-name">Teal</span><span class="swatch-value">#14b8a6</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-orange">
+                    <div class="swatch-preview" style="background:#f97316" data-color="#f97316"></div>
+                    <div class="swatch-info"><span class="swatch-name">Orange</span><span class="swatch-value">#f97316</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-rgb">
+                    <div class="swatch-preview" style="background:rgb(59,130,246)" data-color="rgb(59,130,246)"></div>
+                    <div class="swatch-info"><span class="swatch-name">RGB Blue</span><span class="swatch-value">rgb(59,130,246)</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-hsl">
+                    <div class="swatch-preview" style="background:hsl(280,67%,55%)" data-color="hsl(280,67%,55%)"></div>
+                    <div class="swatch-info"><span class="swatch-name">HSL Violet</span><span class="swatch-value">hsl(280,67%,55%)</span></div>
+                </div>
+                <div class="color-swatch" id="swatch-rgba">
+                    <div class="swatch-preview" style="background:rgba(239,68,68,0.5)" data-color="rgba(239,68,68,0.5)"></div>
+                    <div class="swatch-info"><span class="swatch-name">Semi-Red</span><span class="swatch-value">rgba(239,68,68,0.5)</span></div>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Status Badges</div>
+                <div class="badge-grid">
+                    <span class="badge-lg pill-success" id="badge-success" data-status="success">Success</span>
+                    <span class="badge-lg pill-warning" id="badge-warning" data-status="warning">Warning</span>
+                    <span class="badge-lg pill-error" id="badge-error" data-status="error">Error</span>
+                    <span class="badge-lg pill-info" id="badge-info" data-status="info">Info</span>
+                    <span class="badge-lg pill-purple" id="badge-review" data-status="in-review">In Review</span>
+                    <span class="badge-lg pill-orange" id="badge-blocked" data-status="blocked">Blocked</span>
+                    <span class="badge-lg pill-pink" id="badge-design" data-status="design">Design</span>
+                    <span class="badge-lg pill-teal" id="badge-teal" data-status="testing">Testing</span>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Buttons</div>
+                <div class="btn-grid">
+                    <button class="btn-primary-demo" id="btn-primary" data-variant="primary">Primary</button>
+                    <button class="btn-secondary-demo" id="btn-secondary" data-variant="secondary">Secondary</button>
+                    <button class="btn-danger-demo" id="btn-danger" data-variant="danger">Danger</button>
+                    <button class="btn-success-demo" id="btn-success-action" data-variant="success">Approve</button>
+                    <button class="btn-ghost-demo" id="btn-ghost" data-variant="ghost">Ghost Link</button>
+                    <button class="btn-primary-demo" id="btn-disabled" data-variant="primary" disabled style="opacity:0.5;cursor:not-allowed">Disabled</button>
+                    <button class="btn-secondary-demo" id="btn-loading" data-variant="secondary" data-loading="true">
+                        <span style="opacity:0.6">Loading...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card" style="margin-top:20px">
+            <div class="section-card-header">
+                <h2>Element States</h2>
+                <span class="badge">visibility + states</span>
+            </div>
+            <div class="state-grid">
+                <div class="state-item">
+                    <div class="state-item-label">Visible Element</div>
+                    <div id="state-visible" data-visibility="visible" style="color:var(--text-primary)">I am visible</div>
+                </div>
+                <div class="state-item">
+                    <div class="state-item-label">display: none</div>
+                    <div id="state-display-none-wrapper">
+                        <span id="state-display-none" style="display:none" data-visibility="hidden-display">Hidden by display:none</span>
+                        <span style="font-size:12px;color:var(--text-muted);font-style:italic">(hidden element present in DOM)</span>
+                    </div>
+                </div>
+                <div class="state-item">
+                    <div class="state-item-label">visibility: hidden</div>
+                    <div id="state-visibility-hidden-wrapper">
+                        <span id="state-visibility-hidden" style="visibility:hidden" data-visibility="hidden-visibility">Hidden by visibility:hidden</span>
+                        <span style="font-size:12px;color:var(--text-muted);font-style:italic">(occupies space but invisible)</span>
+                    </div>
+                </div>
+                <div class="state-item">
+                    <div class="state-item-label">opacity: 0</div>
+                    <div id="state-opacity-zero-wrapper">
+                        <span id="state-opacity-zero" style="opacity:0" data-visibility="hidden-opacity">Hidden by opacity:0</span>
+                        <span style="font-size:12px;color:var(--text-muted);font-style:italic">(transparent but interactable)</span>
+                    </div>
+                </div>
+                <div class="state-item">
+                    <div class="state-item-label">aria-hidden="true"</div>
+                    <div id="state-aria-hidden" aria-hidden="true" data-visibility="aria-hidden">Accessible hidden (aria-hidden=true)</div>
+                    <span style="font-size:12px;color:var(--text-muted);font-style:italic">(visually present, hidden from screen readers)</span>
+                </div>
+                <div class="state-item">
+                    <div class="state-item-label">Off-screen</div>
+                    <div id="state-offscreen" style="position:absolute;left:-9999px" data-visibility="offscreen">Off-screen positioned element</div>
+                    <span style="font-size:12px;color:var(--text-muted);font-style:italic">(positioned off-screen)</span>
+                </div>
+                <div class="state-item">
+                    <div class="state-item-label">Checkbox States</div>
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-checked" checked data-state="checked"> Checked</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-unchecked" data-state="unchecked"> Unchecked</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-indeterminate" data-state="indeterminate"> Indeterminate</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-disabled" disabled checked data-state="disabled"> Disabled checked</label>
+                    </div>
+                </div>
+                <div class="state-item">
+                    <div class="state-item-label">Radio States</div>
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-demo" id="radio-selected" value="selected" checked data-state="selected"> Selected</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-demo" id="radio-unselected" value="unselected" data-state="unselected"> Not selected</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-disabled" id="radio-disabled" value="disabled" disabled data-state="disabled"> Disabled</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card" style="margin-top:20px">
+            <div class="section-card-header">
+                <h2>Input & Form States</h2>
+                <span class="badge">form validation</span>
+            </div>
+            <div class="input-demo-grid">
+                <div class="input-demo">
+                    <label for="input-valid">Valid Email</label>
+                    <input type="email" id="input-valid" value="user@example.com" data-state="valid" aria-describedby="valid-hint">
+                    <span id="valid-hint" style="font-size:11px;color:#10b981">Looks good!</span>
+                </div>
+                <div class="input-demo">
+                    <label for="input-invalid">Invalid Email</label>
+                    <input type="email" id="input-invalid" value="not-an-email" data-state="invalid" aria-invalid="true" aria-describedby="invalid-hint">
+                    <span id="invalid-hint" style="font-size:11px;color:#ef4444">Please enter a valid email</span>
+                </div>
+                <div class="input-demo">
+                    <label for="input-required">Required Field</label>
+                    <input type="text" id="input-required" required placeholder="This field is required" data-state="required" aria-required="true">
+                </div>
+                <div class="input-demo">
+                    <label for="input-readonly">Read-only</label>
+                    <input type="text" id="input-readonly" value="Cannot edit this" readonly data-state="readonly">
+                </div>
+                <div class="input-demo">
+                    <label for="input-disabled">Disabled</label>
+                    <input type="text" id="input-disabled" value="Disabled input" disabled data-state="disabled">
+                </div>
+                <div class="input-demo">
+                    <label for="input-maxlength">Max Length (20)</label>
+                    <input type="text" id="input-maxlength" maxlength="20" placeholder="Max 20 chars" data-maxlength="20">
+                </div>
+                <div class="input-demo">
+                    <label for="input-pattern">Pattern (digits only)</label>
+                    <input type="text" id="input-pattern" pattern="[0-9]+" placeholder="Numbers only" title="Enter digits only" data-pattern="[0-9]+">
+                </div>
+                <div class="input-demo">
+                    <label for="input-password">Password</label>
+                    <input type="password" id="input-password" value="secret123" data-state="password" autocomplete="off">
+                </div>
+                <div class="input-demo">
+                    <label for="input-number">Number (min:0, max:100)</label>
+                    <input type="number" id="input-number" value="42" min="0" max="100" step="1" data-min="0" data-max="100">
+                </div>
+                <div class="input-demo">
+                    <label for="input-range">Range Slider</label>
+                    <input type="range" id="input-range" min="0" max="100" value="65" data-value="65" style="width:100%">
+                    <span id="range-value" style="font-size:12px;color:var(--accent);font-weight:600">65</span>
+                </div>
+                <div class="input-demo">
+                    <label for="input-color">Color Picker</label>
+                    <input type="color" id="input-color" value="#0ea5e9" data-color="#0ea5e9" style="height:36px;padding:2px">
+                </div>
+                <div class="input-demo">
+                    <label for="input-date">Date</label>
+                    <input type="date" id="input-date" value="2026-02-26" data-date="2026-02-26">
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Contenteditable & Tooltips</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                    <div>
+                        <div style="font-size:11px;font-weight:600;color:var(--text-tertiary);margin-bottom:6px">CONTENTEDITABLE</div>
+                        <div class="contenteditable-box" contenteditable="true" id="editable-div" data-editable="true" role="textbox" aria-label="Editable content area">Click here to edit. This is a <strong>contenteditable</strong> div with <em>rich text</em> support.</div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;font-weight:600;color:var(--text-tertiary);margin-bottom:6px">TOOLTIPS</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px">
+                            <span class="tooltip-target" id="tooltip-1" data-tooltip="This is tooltip #1" title="Tooltip via title attribute">Hover me (title)</span>
+                            <span class="tooltip-target" id="tooltip-2" data-tooltip="Custom tooltip content" aria-describedby="tooltip-desc-2">Hover me (CSS)</span>
+                            <span id="tooltip-desc-2" style="display:none">Descriptive tooltip text for screen readers</span>
+                            <span class="tooltip-target" id="tooltip-3" data-tooltip="Third tooltip" tabindex="0">Focusable tooltip</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card" style="margin-top:20px">
+            <div class="section-card-header">
+                <h2>Dynamic Content & Edge Cases</h2>
+                <span class="badge">dynamic + unicode</span>
+            </div>
+
+            <div class="sub-section-title">Dynamic Values</div>
+            <div class="edge-grid">
+                <div class="edge-item">
+                    <div class="edge-label">Live Clock</div>
+                    <div class="dynamic-value" id="live-clock" data-dynamic="clock">--:--:--</div>
+                </div>
+                <div class="edge-item">
+                    <div class="edge-label">Counter</div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <button id="counter-dec" style="width:28px;height:28px;border:1px solid var(--border-default);border-radius:6px;background:transparent;color:var(--text-primary);cursor:pointer;font-size:16px">-</button>
+                        <span class="dynamic-value" id="counter-value" data-dynamic="counter">0</span>
+                        <button id="counter-inc" style="width:28px;height:28px;border:1px solid var(--border-default);border-radius:6px;background:transparent;color:var(--text-primary);cursor:pointer;font-size:16px">+</button>
+                    </div>
+                </div>
+                <div class="edge-item">
+                    <div class="edge-label">Countdown (30s)</div>
+                    <div class="dynamic-value" id="countdown-value" data-dynamic="countdown">30</div>
+                    <div class="progress-bar" style="margin-top:6px"><div class="progress-fill gradient" id="countdown-bar" style="width:100%"></div></div>
+                </div>
+                <div class="edge-item">
+                    <div class="edge-label">Auto-Increment</div>
+                    <div class="dynamic-value" id="auto-increment" data-dynamic="auto-increment">1</div>
+                </div>
+                <div class="edge-item">
+                    <div class="edge-label">Random Color</div>
+                    <div id="random-color-box" style="width:40px;height:40px;border-radius:8px;background:#0ea5e9;transition:background 0.3s" data-dynamic="random-color"></div>
+                    <div id="random-color-value" style="font-size:11px;color:var(--text-tertiary);margin-top:4px;font-family:monospace">#0ea5e9</div>
+                </div>
+                <div class="edge-item">
+                    <div class="edge-label">Toggle Text</div>
+                    <div id="toggle-text" data-dynamic="toggle" data-state="on" style="font-size:14px;font-weight:600;color:#10b981;cursor:pointer">Active</div>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Data & ARIA Attributes</div>
+                <div class="edge-grid">
+                    <div class="edge-item" id="data-attr-testid" data-testid="task-card-main" data-qa="primary-element">
+                        <div class="edge-label">data-testid</div>
+                        <code style="font-size:12px;color:var(--accent)">data-testid="task-card-main"</code>
+                    </div>
+                    <div class="edge-item" id="data-attr-custom" data-custom-field="custom-value-123" data-priority="high" data-category="frontend">
+                        <div class="edge-label">Multiple data-*</div>
+                        <code style="font-size:12px;color:var(--accent)">data-custom-field, data-priority, data-category</code>
+                    </div>
+                    <div class="edge-item" id="aria-label-el" aria-label="Important notification area" role="alert">
+                        <div class="edge-label">aria-label + role</div>
+                        <code style="font-size:12px;color:var(--accent)">aria-label="Important notification area" role="alert"</code>
+                    </div>
+                    <div class="edge-item" id="aria-live-el" aria-live="polite" aria-atomic="true">
+                        <div class="edge-label">aria-live="polite"</div>
+                        <span id="aria-live-content" style="font-size:13px;color:var(--text-secondary)">Live region: updates announced to screen readers</span>
+                    </div>
+                    <div class="edge-item" id="data-json" data-config='{"theme":"dark","lang":"en","debug":false}'>
+                        <div class="edge-label">JSON in data-*</div>
+                        <code style="font-size:12px;color:var(--accent)">data-config='{"theme":"dark",...}'</code>
+                    </div>
+                    <div class="edge-item" id="tabindex-el" tabindex="0" role="button" aria-pressed="false">
+                        <div class="edge-label">tabindex + role</div>
+                        <code style="font-size:12px;color:var(--accent)">tabindex="0" role="button" aria-pressed="false"</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">Text Edge Cases</div>
+                <div class="edge-grid">
+                    <div class="edge-item">
+                        <div class="edge-label">Unicode (CJK)</div>
+                        <div id="text-unicode-cjk" data-text="unicode-cjk" style="font-size:14px;color:var(--text-primary)">&#26085;&#26412;&#35486;&#12486;&#12473;&#12488; &#20013;&#25991;&#27979;&#35797;</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Emoji</div>
+                        <div id="text-emoji" data-text="emoji" style="font-size:18px">&#x1F44B;&#x1F3AF;&#x1F680;&#x2705;&#x274C;&#x26A0;&#xFE0F;&#x1F525;&#x1F4A1;</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">RTL (Arabic)</div>
+                        <div id="text-rtl" dir="rtl" lang="ar" data-text="rtl" style="font-size:16px;color:var(--text-primary)">&#1605;&#1585;&#1581;&#1576;&#1575; &#1576;&#1575;&#1604;&#1593;&#1575;&#1604;&#1605;</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">HTML Entities</div>
+                        <div id="text-entities" data-text="entities" style="font-size:13px;color:var(--text-primary)">&amp;amp; &amp;lt; &amp;gt; &amp;quot; &amp;apos; &amp;copy; &amp;reg; &amp;trade;</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Empty String</div>
+                        <span id="text-empty" data-text="empty"></span>
+                        <span style="font-size:12px;color:var(--text-muted);font-style:italic">(empty span above)</span>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Whitespace Only</div>
+                        <span id="text-whitespace" data-text="whitespace">   </span>
+                        <span style="font-size:12px;color:var(--text-muted);font-style:italic">(3 spaces)</span>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Very Long Text</div>
+                        <div id="text-long" data-text="long" style="font-size:12px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Supercalifragilisticexpialidociousantidisestablishmentarianismfloccinaucinihilipilificationpneumonoultramicroscopicsilicovolcanoconiosis</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Special Characters</div>
+                        <div id="text-special" data-text="special" style="font-size:13px;color:var(--text-primary)">!@#$%^&amp;*()_+-=[]{}|;':&quot;,.&lt;&gt;?/~`</div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Nested Spans</div>
+                        <div id="text-nested" data-text="nested">
+                            <span id="span-outer" style="color:#ef4444">Red <span id="span-middle" style="color:#10b981">Green <span id="span-inner" style="color:#3b82f6">Blue</span></span></span>
+                        </div>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Multiline</div>
+                        <pre id="text-multiline" data-text="multiline" style="font-size:12px;color:var(--text-primary);margin:0;font-family:monospace;white-space:pre">Line 1
+Line 2
+Line 3</pre>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Zero-Width Characters</div>
+                        <div id="text-zerowidth" data-text="zerowidth" style="font-size:13px;color:var(--text-primary)">A&#8203;B&#8204;C&#8205;D</div>
+                        <span style="font-size:11px;color:var(--text-muted);font-family:monospace">A+ZWSP+B+ZWNJ+C+ZWJ+D</span>
+                    </div>
+                    <div class="edge-item">
+                        <div class="edge-label">Number Formats</div>
+                        <div style="display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--text-primary)">
+                            <span id="num-integer" data-format="integer">42</span>
+                            <span id="num-float" data-format="float">3.14159</span>
+                            <span id="num-negative" data-format="negative">-273.15</span>
+                            <span id="num-currency" data-format="currency">$1,234.56</span>
+                            <span id="num-percent" data-format="percent">99.9%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <div class="sub-section-title">CSS Property Targets</div>
+                <div class="edge-grid">
+                    <div class="edge-item" id="css-transform" style="transform:rotate(5deg)">
+                        <div class="edge-label">transform: rotate(5deg)</div>
+                        <div style="color:var(--text-primary)">Rotated element</div>
+                    </div>
+                    <div class="edge-item" id="css-opacity" style="opacity:0.6">
+                        <div class="edge-label">opacity: 0.6</div>
+                        <div style="color:var(--text-primary)">Semi-transparent</div>
+                    </div>
+                    <div class="edge-item" id="css-zindex" style="position:relative;z-index:50">
+                        <div class="edge-label">z-index: 50</div>
+                        <div style="color:var(--text-primary)">High z-index</div>
+                    </div>
+                    <div class="edge-item" id="css-overflow" style="overflow:hidden;max-height:40px">
+                        <div class="edge-label">overflow: hidden</div>
+                        <div style="color:var(--text-primary)">This content is clipped because the container has overflow hidden and a max-height of 40px set on it.</div>
+                    </div>
+                    <div class="edge-item" id="css-border-radius" style="border-radius:50%">
+                        <div class="edge-label">border-radius: 50%</div>
+                        <div style="color:var(--text-primary);text-align:center">Circle</div>
+                    </div>
+                    <div class="edge-item" id="css-gradient" style="background:linear-gradient(135deg,#0ea5e9,#8b5cf6);border-radius:8px;padding:12px">
+                        <div class="edge-label" style="color:rgba(255,255,255,0.7)">Gradient BG</div>
+                        <div style="color:white;font-weight:600">Linear gradient</div>
+                    </div>
+                    <div class="edge-item" id="css-box-shadow" style="box-shadow:0 4px 20px rgba(14,165,233,0.4)">
+                        <div class="edge-label">box-shadow</div>
+                        <div style="color:var(--text-primary)">Glowing shadow</div>
+                    </div>
+                    <div class="edge-item" id="css-text-decoration" style="text-decoration:line-through;color:#ef4444">
+                        <div class="edge-label">text-decoration</div>
+                        <div>Strikethrough text</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== CONDITIONAL SCENARIOS ========== -->
+        <div class="section-label">Conditional Scenarios</div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h2>If/Else Assertion Targets</h2>
+                <span class="badge">conditional logic</span>
+            </div>
+            <p style="margin-bottom:16px;font-size:13px;color:var(--text-tertiary)">Interactive elements where the displayed state depends on conditions. Use these for if/else assertion testing — click controls to change state, then verify the resulting condition.</p>
+
+            <div class="state-grid">
+                <!-- Scenario 1: User role determines permissions display -->
+                <div class="state-item" id="scenario-role">
+                    <div class="state-item-label">User Role &rarr; Permissions</div>
+                    <select id="role-selector" style="padding:6px 10px;background:var(--bg-input);border:1px solid var(--border-default);border-radius:6px;color:var(--text-primary);font-size:13px;margin-bottom:8px;width:100%">
+                        <option value="admin">Admin</option>
+                        <option value="editor">Editor</option>
+                        <option value="viewer" selected>Viewer</option>
+                        <option value="guest">Guest</option>
+                    </select>
+                    <div id="role-permissions" style="font-size:12px;line-height:1.6">
+                        <div id="perm-read" data-perm="true" style="color:#10b981">&#10003; Read</div>
+                        <div id="perm-write" data-perm="false" style="color:#ef4444">&#10007; Write</div>
+                        <div id="perm-delete" data-perm="false" style="color:#ef4444">&#10007; Delete</div>
+                        <div id="perm-admin" data-perm="false" style="color:#ef4444">&#10007; Admin Panel</div>
+                    </div>
+                    <div id="role-badge" class="status-pill pill-info" style="margin-top:8px;font-size:11px" data-role="viewer">Viewer</div>
+                </div>
+
+                <!-- Scenario 2: Temperature threshold alert -->
+                <div class="state-item" id="scenario-temp">
+                    <div class="state-item-label">Server Temperature</div>
+                    <input type="range" id="temp-slider" min="30" max="100" value="55" style="width:100%;margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span id="temp-value" style="font-size:20px;font-weight:800;color:#10b981">55&deg;C</span>
+                        <span id="temp-status" class="status-pill pill-success" data-temp-status="normal">Normal</span>
+                    </div>
+                    <div id="temp-message" style="margin-top:8px;font-size:12px;color:var(--text-tertiary)">Server temperature is within normal range.</div>
+                    <div class="progress-bar" style="margin-top:8px">
+                        <div id="temp-bar" class="progress-fill green" style="width:55%"></div>
+                    </div>
+                </div>
+
+                <!-- Scenario 3: Password strength -->
+                <div class="state-item" id="scenario-password">
+                    <div class="state-item-label">Password Strength</div>
+                    <input type="text" id="pwd-input" placeholder="Type a password..." style="padding:8px 12px;width:100%;background:var(--bg-input);border:1px solid var(--border-default);border-radius:6px;color:var(--text-primary);font-size:13px;box-sizing:border-box;margin-bottom:8px">
+                    <div class="progress-bar"><div id="pwd-bar" class="progress-fill red" style="width:0%"></div></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:6px">
+                        <span id="pwd-label" style="font-size:12px;font-weight:600;color:#ef4444">No password</span>
+                        <span id="pwd-score" style="font-size:12px;color:var(--text-muted)">Score: 0/5</span>
+                    </div>
+                    <div id="pwd-criteria" style="margin-top:8px;font-size:11px;line-height:1.8">
+                        <div id="pwd-length" data-met="false" style="color:#ef4444">&#10007; At least 8 characters</div>
+                        <div id="pwd-upper" data-met="false" style="color:#ef4444">&#10007; Contains uppercase</div>
+                        <div id="pwd-lower" data-met="false" style="color:#ef4444">&#10007; Contains lowercase</div>
+                        <div id="pwd-number" data-met="false" style="color:#ef4444">&#10007; Contains number</div>
+                        <div id="pwd-special" data-met="false" style="color:#ef4444">&#10007; Contains special char</div>
+                    </div>
+                </div>
+
+                <!-- Scenario 4: Inventory stock level -->
+                <div class="state-item" id="scenario-stock">
+                    <div class="state-item-label">Inventory Stock Level</div>
+                    <input type="number" id="stock-input" value="25" min="0" max="500" style="padding:8px 12px;width:100%;background:var(--bg-input);border:1px solid var(--border-default);border-radius:6px;color:var(--text-primary);font-size:13px;box-sizing:border-box;margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span id="stock-badge" class="status-pill pill-warning" data-stock-level="low">Low Stock</span>
+                        <span id="stock-action" style="font-size:12px;font-weight:600;color:#f59e0b">Reorder recommended</span>
+                    </div>
+                    <div id="stock-details" style="margin-top:8px;font-size:12px;color:var(--text-tertiary)">
+                        <div id="stock-warehouse" data-visible="true">Warehouse: 25 units</div>
+                        <div id="stock-reorder" data-visible="true" style="color:#f59e0b;font-weight:600">&#9888; Below reorder point (50 units)</div>
+                        <div id="stock-auto-order" data-visible="false" style="display:none;color:#ef4444;font-weight:600">&#128680; Auto-order triggered</div>
+                    </div>
+                </div>
+
+                <!-- Scenario 5: Build status pipeline -->
+                <div class="state-item" id="scenario-build">
+                    <div class="state-item-label">Build Pipeline Status</div>
+                    <select id="build-selector" style="padding:6px 10px;background:var(--bg-input);border:1px solid var(--border-default);border-radius:6px;color:var(--text-primary);font-size:13px;margin-bottom:8px;width:100%">
+                        <option value="success">Success</option>
+                        <option value="running" selected>Running</option>
+                        <option value="failed">Failed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+                        <span id="build-icon" style="font-size:18px">&#9203;</span>
+                        <span id="build-status" style="font-size:14px;font-weight:700;color:#3b82f6">Running</span>
+                    </div>
+                    <div id="build-steps" style="font-size:12px;line-height:1.8">
+                        <div id="step-checkout" data-step-status="done" style="color:#10b981">&#10003; Checkout</div>
+                        <div id="step-install" data-step-status="done" style="color:#10b981">&#10003; Install dependencies</div>
+                        <div id="step-lint" data-step-status="done" style="color:#10b981">&#10003; Lint</div>
+                        <div id="step-test" data-step-status="running" style="color:#3b82f6">&#9654; Running tests...</div>
+                        <div id="step-build" data-step-status="pending" style="color:var(--text-muted)">&#9675; Build</div>
+                        <div id="step-deploy" data-step-status="pending" style="color:var(--text-muted)">&#9675; Deploy</div>
+                    </div>
+                    <div id="build-action-area" style="margin-top:10px">
+                        <button id="build-retry" style="display:none;padding:6px 14px;background:#f59e0b;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Retry Build</button>
+                        <button id="build-cancel" style="padding:6px 14px;background:transparent;border:1px solid var(--border-default);border-radius:6px;color:var(--text-secondary);font-size:12px;cursor:pointer">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Scenario 6: Time-of-day greeting -->
+                <div class="state-item" id="scenario-greeting">
+                    <div class="state-item-label">Time-Based Greeting</div>
+                    <div style="margin-bottom:8px">
+                        <span id="greeting-icon" style="font-size:24px">&#127780;</span>
+                        <span id="greeting-text" style="font-size:16px;font-weight:700;color:var(--text-primary);margin-left:6px">Good afternoon</span>
+                    </div>
+                    <div id="greeting-message" style="font-size:12px;color:var(--text-tertiary)">The sun is still up. Time for focused work.</div>
+                    <div id="greeting-theme" style="margin-top:8px;font-size:11px" class="status-pill pill-info" data-time-period="afternoon">Afternoon</div>
+                    <div style="margin-top:8px;font-size:11px;color:var(--text-muted)">
+                        Suggestions: <span id="greeting-suggestions" data-suggestions="review,standup">Code review, standup prep</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ========== SETTINGS — Shadow > Shadow > Shadow (3 levels) + Iframe ========== -->
@@ -787,6 +1626,558 @@ function openTaskModal() {
 function closeTaskModal() {
     document.getElementById('taskModal').classList.remove('open');
 }
+</script>
+
+<!-- Interactive elements: clock, counter, countdown, range, select-all, indeterminate, toggle, random color, auto-increment -->
+<script>
+(function() {
+    // Live clock
+    function updateClock() {
+        var now = new Date();
+        var el = document.getElementById('live-clock');
+        if (el) el.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Counter
+    var count = 0;
+    var countEl = document.getElementById('counter-value');
+    document.getElementById('counter-inc').addEventListener('click', function() { count++; countEl.textContent = count; countEl.dataset.value = count; });
+    document.getElementById('counter-dec').addEventListener('click', function() { count--; countEl.textContent = count; countEl.dataset.value = count; });
+
+    // Countdown (30s)
+    var cdVal = 30;
+    var cdEl = document.getElementById('countdown-value');
+    var cdBar = document.getElementById('countdown-bar');
+    setInterval(function() {
+        if (cdVal > 0) cdVal--;
+        else cdVal = 30;
+        if (cdEl) { cdEl.textContent = cdVal; cdEl.dataset.value = cdVal; }
+        if (cdBar) cdBar.style.width = ((cdVal / 30) * 100) + '%';
+    }, 1000);
+
+    // Auto-increment
+    var autoVal = 1;
+    var autoEl = document.getElementById('auto-increment');
+    setInterval(function() {
+        autoVal++;
+        if (autoEl) { autoEl.textContent = autoVal; autoEl.dataset.value = autoVal; }
+    }, 2000);
+
+    // Random color (every 5s)
+    function randColor() {
+        var hex = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+        var box = document.getElementById('random-color-box');
+        var val = document.getElementById('random-color-value');
+        if (box) { box.style.background = hex; box.dataset.color = hex; }
+        if (val) val.textContent = hex;
+    }
+    setInterval(randColor, 5000);
+
+    // Toggle text
+    var toggleEl = document.getElementById('toggle-text');
+    if (toggleEl) {
+        toggleEl.addEventListener('click', function() {
+            var isOn = toggleEl.dataset.state === 'on';
+            toggleEl.dataset.state = isOn ? 'off' : 'on';
+            toggleEl.textContent = isOn ? 'Inactive' : 'Active';
+            toggleEl.style.color = isOn ? '#ef4444' : '#10b981';
+        });
+    }
+
+    // Range slider value display
+    var rangeEl = document.getElementById('input-range');
+    var rangeVal = document.getElementById('range-value');
+    if (rangeEl && rangeVal) {
+        rangeEl.addEventListener('input', function() {
+            rangeVal.textContent = rangeEl.value;
+            rangeEl.dataset.value = rangeEl.value;
+        });
+    }
+
+    // Select-all checkbox
+    var selectAll = document.getElementById('selectAll');
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            var checks = document.querySelectorAll('.row-check');
+            checks.forEach(function(c) { c.checked = selectAll.checked; });
+        });
+    }
+
+    // Indeterminate checkbox
+    var indet = document.getElementById('cb-indeterminate');
+    if (indet) indet.indeterminate = true;
+
+    // tabindex element aria-pressed toggle
+    var tabEl = document.getElementById('tabindex-el');
+    if (tabEl) {
+        tabEl.addEventListener('click', function() {
+            var pressed = tabEl.getAttribute('aria-pressed') === 'true';
+            tabEl.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+        });
+    }
+})();
+</script>
+
+<!-- Conditional UI Logic: If/Else Assertion Scenarios -->
+<script>
+(function() {
+    // ===== Conditional Display Logic =====
+    // These scenarios create if/else conditions that affect what's displayed,
+    // giving testers realistic conditional assertion targets.
+
+    // 1. Task overdue detection — tasks with past due dates get a red "OVERDUE" badge
+    var taskCards = document.querySelectorAll('tf-task-card');
+    taskCards.forEach(function(card) {
+        var dueText = card.dataset.due;
+        var done = card.dataset.done === 'true';
+        if (!done && dueText) {
+            var dueDate = new Date(dueText + ', 2026');
+            var today = new Date();
+            if (dueDate < today) {
+                // Overdue: the card's shadow DOM will have a red border
+                var sr = card.shadowRoot;
+                if (sr) {
+                    var taskDiv = sr.getElementById('taskCard');
+                    if (taskDiv) {
+                        taskDiv.dataset.overdue = 'true';
+                        taskDiv.style.boxShadow = 'inset 0 0 0 1px #ef4444';
+                    }
+                    var dueEl = sr.getElementById('taskDue');
+                    if (dueEl) {
+                        dueEl.style.color = '#ef4444';
+                        dueEl.textContent = dueText + ' (OVERDUE)';
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. Team member status affects display
+    var members = document.querySelectorAll('.member-row');
+    members.forEach(function(row) {
+        var statusEl = row.querySelector('.member-status');
+        var nameEl = row.querySelector('.member-name');
+        if (statusEl && nameEl) {
+            var status = statusEl.dataset.status;
+            if (status === 'offline') {
+                nameEl.style.opacity = '0.5';
+                nameEl.dataset.available = 'false';
+            } else if (status === 'away') {
+                nameEl.style.fontStyle = 'italic';
+                nameEl.dataset.available = 'limited';
+            } else {
+                nameEl.dataset.available = 'true';
+            }
+        }
+    });
+
+    // 3. Sprint health conditional indicators
+    var sprintPct = parseInt(document.getElementById('sprintPct').textContent);
+    var sprintIndicator = document.createElement('span');
+    sprintIndicator.id = 'sprint-health-indicator';
+    if (sprintPct >= 80) {
+        sprintIndicator.textContent = 'On Track';
+        sprintIndicator.className = 'status-pill pill-success';
+        sprintIndicator.dataset.health = 'on-track';
+    } else if (sprintPct >= 50) {
+        sprintIndicator.textContent = 'At Risk';
+        sprintIndicator.className = 'status-pill pill-warning';
+        sprintIndicator.dataset.health = 'at-risk';
+    } else {
+        sprintIndicator.textContent = 'Behind Schedule';
+        sprintIndicator.className = 'status-pill pill-error';
+        sprintIndicator.dataset.health = 'behind';
+    }
+    sprintIndicator.style.fontSize = '10px';
+    sprintIndicator.style.marginLeft = '8px';
+    document.getElementById('sprintPct').parentElement.appendChild(sprintIndicator);
+
+    // 4. Bug resolution conditional warning
+    var bugPct = parseInt(document.getElementById('bugPct').textContent);
+    var bugWarning = document.createElement('div');
+    bugWarning.id = 'bug-warning';
+    bugWarning.style.cssText = 'margin-top:8px;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600';
+    if (bugPct < 50) {
+        bugWarning.textContent = 'Critical: Bug resolution rate is below 50%. Immediate action required.';
+        bugWarning.style.background = 'rgba(239,68,68,0.1)';
+        bugWarning.style.color = '#ef4444';
+        bugWarning.dataset.severity = 'critical';
+    } else if (bugPct < 75) {
+        bugWarning.textContent = 'Warning: Bug resolution needs improvement to meet release criteria.';
+        bugWarning.style.background = 'rgba(245,158,11,0.1)';
+        bugWarning.style.color = '#f59e0b';
+        bugWarning.dataset.severity = 'warning';
+    } else {
+        bugWarning.textContent = 'Good: Bug resolution rate is healthy.';
+        bugWarning.style.background = 'rgba(16,185,129,0.1)';
+        bugWarning.style.color = '#10b981';
+        bugWarning.dataset.severity = 'good';
+    }
+    document.getElementById('bugBar').parentElement.parentElement.appendChild(bugWarning);
+
+    // 5. Velocity indicators — show different messages based on team velocity
+    var completed = parseInt(document.getElementById('vel-completed').textContent);
+    var blocked = parseInt(document.getElementById('vel-blocked').textContent);
+    var velocityMsg = document.createElement('div');
+    velocityMsg.id = 'velocity-message';
+    velocityMsg.style.cssText = 'margin-top:14px;padding:10px 14px;border-radius:8px;font-size:12px;line-height:1.5';
+    if (blocked > 0 && completed > blocked * 5) {
+        velocityMsg.innerHTML = '<strong style="color:#f59e0b">&#9888; Blockers Present</strong><br>Team velocity is good but ' + blocked + ' blocked items need attention.';
+        velocityMsg.style.background = 'rgba(245,158,11,0.08)';
+        velocityMsg.style.color = 'var(--text-secondary)';
+        velocityMsg.dataset.velocityStatus = 'warning';
+    } else if (blocked > completed * 0.3) {
+        velocityMsg.innerHTML = '<strong style="color:#ef4444">&#128680; High Block Rate</strong><br>Blocked items exceed 30% of completed work. Escalation needed.';
+        velocityMsg.style.background = 'rgba(239,68,68,0.08)';
+        velocityMsg.style.color = 'var(--text-secondary)';
+        velocityMsg.dataset.velocityStatus = 'critical';
+    } else {
+        velocityMsg.innerHTML = '<strong style="color:#10b981">&#9989; Healthy Velocity</strong><br>Team is performing well with minimal blockers.';
+        velocityMsg.style.background = 'rgba(16,185,129,0.08)';
+        velocityMsg.style.color = 'var(--text-secondary)';
+        velocityMsg.dataset.velocityStatus = 'healthy';
+    }
+    document.getElementById('vel-review').parentElement.parentElement.parentElement.appendChild(velocityMsg);
+
+    // 6. Table row conditional styling based on status
+    var rows = document.querySelectorAll('#activityTable tbody tr');
+    rows.forEach(function(row) {
+        var statusPill = row.querySelector('.status-pill');
+        if (!statusPill) return;
+        var status = statusPill.dataset.status;
+        if (status === 'failed' || status === 'blocked') {
+            row.style.background = 'rgba(239,68,68,0.04)';
+            row.dataset.alert = 'true';
+        } else if (status === 'completed') {
+            row.dataset.alert = 'false';
+        }
+    });
+
+    // 7. Notification count conditional display
+    var notifCount = parseInt(document.getElementById('notifCount').dataset.count);
+    var notifBell = document.getElementById('notifBell');
+    if (notifCount > 0) {
+        notifBell.dataset.hasNotifications = 'true';
+        if (notifCount > 5) {
+            document.getElementById('notifCount').style.background = '#ef4444';
+            notifBell.dataset.urgency = 'high';
+        } else {
+            notifBell.dataset.urgency = 'normal';
+        }
+    } else {
+        notifBell.dataset.hasNotifications = 'false';
+        document.getElementById('notifCount').style.display = 'none';
+    }
+
+    // 8. Milestone conditional: show different message based on current stage
+    var milestones = ['planning', 'development', 'testing', 'staging', 'production'];
+    var activeMilestone = '';
+    milestones.forEach(function(m) {
+        var dot = document.getElementById('ms-' + m);
+        if (dot && dot.classList.contains('active')) activeMilestone = m;
+    });
+    var msMsg = document.createElement('div');
+    msMsg.id = 'milestone-message';
+    msMsg.style.cssText = 'margin-top:14px;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600';
+    if (activeMilestone === 'testing') {
+        msMsg.textContent = 'QA Phase: All features are locked. Only bug fixes accepted.';
+        msMsg.style.background = 'rgba(59,130,246,0.1)';
+        msMsg.style.color = '#3b82f6';
+        msMsg.dataset.phase = 'testing';
+    } else if (activeMilestone === 'development') {
+        msMsg.textContent = 'Active Development: Feature PRs are being merged.';
+        msMsg.style.background = 'rgba(16,185,129,0.1)';
+        msMsg.style.color = '#10b981';
+        msMsg.dataset.phase = 'development';
+    } else if (activeMilestone === 'staging') {
+        msMsg.textContent = 'Staging: Release candidate is being validated.';
+        msMsg.style.background = 'rgba(245,158,11,0.1)';
+        msMsg.style.color = '#f59e0b';
+        msMsg.dataset.phase = 'staging';
+    } else {
+        msMsg.textContent = 'Current phase: ' + (activeMilestone || 'Unknown');
+        msMsg.style.background = 'var(--bg-secondary)';
+        msMsg.style.color = 'var(--text-secondary)';
+        msMsg.dataset.phase = activeMilestone || 'unknown';
+    }
+    var mlTrack = document.querySelector('.milestone-label-row');
+    if (mlTrack) mlTrack.parentElement.appendChild(msMsg);
+
+    // 9. Test pass rate conditional badge color
+    var testPctVal = parseInt(document.getElementById('testPct').textContent);
+    var testBadge = document.querySelector('#testBar').closest('.health-card').querySelector('.pill-purple');
+    if (testBadge) {
+        if (testPctVal >= 95) {
+            testBadge.textContent = 'Excellent';
+            testBadge.className = 'status-pill pill-success';
+            testBadge.style.fontSize = '10px';
+        } else if (testPctVal >= 85) {
+            testBadge.textContent = 'Good';
+            testBadge.className = 'status-pill pill-info';
+            testBadge.style.fontSize = '10px';
+        } else {
+            testBadge.textContent = 'Needs Work';
+            testBadge.className = 'status-pill pill-error';
+            testBadge.style.fontSize = '10px';
+        }
+    }
+
+    // 10. Coverage conditional: highlight progress bar if above/below target
+    var coveragePctVal = parseInt(document.getElementById('coveragePct').textContent);
+    var coverageBar = document.getElementById('coverageBar');
+    if (coveragePctVal >= 80) {
+        coverageBar.dataset.meetsTarget = 'true';
+    } else {
+        coverageBar.dataset.meetsTarget = 'false';
+        coverageBar.className = 'progress-fill red';
+    }
+
+    // 11. Header search — filter task cards dynamically (conditional show/hide)
+    var searchInput = document.getElementById('headerSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            var q = searchInput.value.toLowerCase();
+            taskCards.forEach(function(card) {
+                var title = (card.dataset.title || '').toLowerCase();
+                var tags = (card.dataset.tags || '').toLowerCase();
+                var match = !q || title.indexOf(q) !== -1 || tags.indexOf(q) !== -1;
+                card.style.display = match ? '' : 'none';
+                card.dataset.filtered = match ? 'visible' : 'hidden';
+            });
+            // Update kanban column counts
+            ['todo', 'progress', 'done'].forEach(function(col) {
+                var colEl = document.getElementById('col-' + col);
+                if (!colEl) return;
+                var visible = colEl.querySelectorAll('tf-task-card:not([style*="display: none"])').length;
+                var countEl = document.getElementById('count-' + col);
+                if (countEl) countEl.textContent = visible;
+            });
+        });
+    }
+
+    // 12. Resource allocation conditional: warn if any allocation > 40%
+    var allocations = { frontend: 35, backend: 40, devops: 25 };
+    Object.keys(allocations).forEach(function(key) {
+        var el = document.getElementById('alloc-' + key);
+        if (el && allocations[key] >= 40) {
+            el.style.fontWeight = '800';
+            el.dataset.overloaded = 'true';
+            var warn = document.createElement('span');
+            warn.textContent = ' (High)';
+            warn.style.cssText = 'color:#f59e0b;font-size:10px;font-weight:600';
+            el.appendChild(warn);
+        } else if (el) {
+            el.dataset.overloaded = 'false';
+        }
+    });
+})();
+</script>
+
+<!-- Conditional Scenario Interactivity -->
+<script>
+(function() {
+    // Scenario 1: Role → Permissions
+    var roleSel = document.getElementById('role-selector');
+    function updateRole() {
+        var role = roleSel.value;
+        var perms = {
+            admin:  { read: true, write: true,  delete: true,  admin: true },
+            editor: { read: true, write: true,  delete: false, admin: false },
+            viewer: { read: true, write: false, delete: false, admin: false },
+            guest:  { read: false, write: false, delete: false, admin: false }
+        };
+        var p = perms[role];
+        ['read','write','delete','admin'].forEach(function(k) {
+            var el = document.getElementById('perm-' + k);
+            el.dataset.perm = p[k] ? 'true' : 'false';
+            el.style.color = p[k] ? '#10b981' : '#ef4444';
+            el.textContent = (p[k] ? '\u2713 ' : '\u2717 ') + el.textContent.replace(/^[\u2713\u2717]\s*/, '');
+        });
+        var badge = document.getElementById('role-badge');
+        badge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+        badge.dataset.role = role;
+        var badgeColors = { admin: 'pill-error', editor: 'pill-info', viewer: 'pill-warning', guest: 'pill-orange' };
+        badge.className = 'status-pill ' + (badgeColors[role] || 'pill-info');
+        badge.style.marginTop = '8px';
+        badge.style.fontSize = '11px';
+    }
+    roleSel.addEventListener('change', updateRole);
+    updateRole();
+
+    // Scenario 2: Temperature
+    var tempSlider = document.getElementById('temp-slider');
+    function updateTemp() {
+        var val = parseInt(tempSlider.value);
+        var tempVal = document.getElementById('temp-value');
+        var tempStatus = document.getElementById('temp-status');
+        var tempMsg = document.getElementById('temp-message');
+        var tempBar = document.getElementById('temp-bar');
+        tempVal.textContent = val + '\u00B0C';
+        tempBar.style.width = val + '%';
+        if (val >= 85) {
+            tempVal.style.color = '#ef4444';
+            tempStatus.textContent = 'Critical';
+            tempStatus.className = 'status-pill pill-error';
+            tempStatus.dataset.tempStatus = 'critical';
+            tempMsg.textContent = 'DANGER: Server overheating! Immediate cooling required.';
+            tempMsg.style.color = '#ef4444';
+            tempBar.className = 'progress-fill red';
+        } else if (val >= 70) {
+            tempVal.style.color = '#f59e0b';
+            tempStatus.textContent = 'Warning';
+            tempStatus.className = 'status-pill pill-warning';
+            tempStatus.dataset.tempStatus = 'warning';
+            tempMsg.textContent = 'Temperature elevated. Monitor closely.';
+            tempMsg.style.color = '#f59e0b';
+            tempBar.className = 'progress-fill amber';
+        } else {
+            tempVal.style.color = '#10b981';
+            tempStatus.textContent = 'Normal';
+            tempStatus.className = 'status-pill pill-success';
+            tempStatus.dataset.tempStatus = 'normal';
+            tempMsg.textContent = 'Server temperature is within normal range.';
+            tempMsg.style.color = 'var(--text-tertiary)';
+            tempBar.className = 'progress-fill green';
+        }
+    }
+    tempSlider.addEventListener('input', updateTemp);
+
+    // Scenario 3: Password Strength
+    var pwdInput = document.getElementById('pwd-input');
+    function updatePwd() {
+        var val = pwdInput.value;
+        var score = 0;
+        var criteria = {
+            length: val.length >= 8,
+            upper: /[A-Z]/.test(val),
+            lower: /[a-z]/.test(val),
+            number: /[0-9]/.test(val),
+            special: /[^A-Za-z0-9]/.test(val)
+        };
+        Object.keys(criteria).forEach(function(k) {
+            var el = document.getElementById('pwd-' + k);
+            if (criteria[k]) { score++; el.dataset.met = 'true'; el.style.color = '#10b981'; el.textContent = '\u2713 ' + el.textContent.replace(/^[\u2713\u2717]\s*/, ''); }
+            else { el.dataset.met = 'false'; el.style.color = '#ef4444'; el.textContent = '\u2717 ' + el.textContent.replace(/^[\u2713\u2717]\s*/, ''); }
+        });
+        var bar = document.getElementById('pwd-bar');
+        var label = document.getElementById('pwd-label');
+        var scoreEl = document.getElementById('pwd-score');
+        scoreEl.textContent = 'Score: ' + score + '/5';
+        bar.style.width = (score * 20) + '%';
+        if (!val) { label.textContent = 'No password'; label.style.color = '#ef4444'; bar.className = 'progress-fill red'; }
+        else if (score <= 2) { label.textContent = 'Weak'; label.style.color = '#ef4444'; bar.className = 'progress-fill red'; }
+        else if (score <= 3) { label.textContent = 'Fair'; label.style.color = '#f59e0b'; bar.className = 'progress-fill amber'; }
+        else if (score === 4) { label.textContent = 'Good'; label.style.color = '#3b82f6'; bar.className = 'progress-fill blue'; }
+        else { label.textContent = 'Strong'; label.style.color = '#10b981'; bar.className = 'progress-fill green'; }
+    }
+    pwdInput.addEventListener('input', updatePwd);
+
+    // Scenario 4: Stock Level
+    var stockInput = document.getElementById('stock-input');
+    function updateStock() {
+        var val = parseInt(stockInput.value) || 0;
+        var badge = document.getElementById('stock-badge');
+        var action = document.getElementById('stock-action');
+        var warehouse = document.getElementById('stock-warehouse');
+        var reorder = document.getElementById('stock-reorder');
+        var autoOrder = document.getElementById('stock-auto-order');
+        warehouse.textContent = 'Warehouse: ' + val + ' units';
+        if (val === 0) {
+            badge.textContent = 'Out of Stock'; badge.className = 'status-pill pill-error'; badge.dataset.stockLevel = 'empty';
+            action.textContent = 'Emergency reorder!'; action.style.color = '#ef4444';
+            reorder.style.display = 'block'; reorder.dataset.visible = 'true';
+            autoOrder.style.display = 'block'; autoOrder.dataset.visible = 'true';
+        } else if (val <= 10) {
+            badge.textContent = 'Critical'; badge.className = 'status-pill pill-error'; badge.dataset.stockLevel = 'critical';
+            action.textContent = 'Urgent reorder needed'; action.style.color = '#ef4444';
+            reorder.style.display = 'block'; reorder.dataset.visible = 'true';
+            autoOrder.style.display = 'block'; autoOrder.dataset.visible = 'true';
+        } else if (val <= 50) {
+            badge.textContent = 'Low Stock'; badge.className = 'status-pill pill-warning'; badge.dataset.stockLevel = 'low';
+            action.textContent = 'Reorder recommended'; action.style.color = '#f59e0b';
+            reorder.style.display = 'block'; reorder.dataset.visible = 'true';
+            autoOrder.style.display = 'none'; autoOrder.dataset.visible = 'false';
+        } else if (val <= 200) {
+            badge.textContent = 'In Stock'; badge.className = 'status-pill pill-success'; badge.dataset.stockLevel = 'normal';
+            action.textContent = 'Stock level healthy'; action.style.color = '#10b981';
+            reorder.style.display = 'none'; reorder.dataset.visible = 'false';
+            autoOrder.style.display = 'none'; autoOrder.dataset.visible = 'false';
+        } else {
+            badge.textContent = 'Overstocked'; badge.className = 'status-pill pill-purple'; badge.dataset.stockLevel = 'over';
+            action.textContent = 'Consider reducing orders'; action.style.color = '#8b5cf6';
+            reorder.style.display = 'none'; reorder.dataset.visible = 'false';
+            autoOrder.style.display = 'none'; autoOrder.dataset.visible = 'false';
+        }
+    }
+    stockInput.addEventListener('input', updateStock);
+
+    // Scenario 5: Build Status
+    var buildSel = document.getElementById('build-selector');
+    function updateBuild() {
+        var status = buildSel.value;
+        var icon = document.getElementById('build-icon');
+        var label = document.getElementById('build-status');
+        var retry = document.getElementById('build-retry');
+        var cancel = document.getElementById('build-cancel');
+        var steps = {
+            success:   { checkout:'done', install:'done', lint:'done', test:'done', build:'done', deploy:'done' },
+            running:   { checkout:'done', install:'done', lint:'done', test:'running', build:'pending', deploy:'pending' },
+            failed:    { checkout:'done', install:'done', lint:'done', test:'failed', build:'skipped', deploy:'skipped' },
+            cancelled: { checkout:'done', install:'done', lint:'cancelled', test:'cancelled', build:'cancelled', deploy:'cancelled' }
+        };
+        var icons = { done:'\u2713', running:'\u25B6', failed:'\u2717', pending:'\u25CB', skipped:'\u25CB', cancelled:'\u25CB' };
+        var colors = { done:'#10b981', running:'#3b82f6', failed:'#ef4444', pending:'var(--text-muted)', skipped:'var(--text-muted)', cancelled:'var(--text-muted)' };
+        var statusIcons = { success:'\u2705', running:'\u23F3', failed:'\u274C', cancelled:'\u26D4' };
+        var statusColors = { success:'#10b981', running:'#3b82f6', failed:'#ef4444', cancelled:'#6b7280' };
+        icon.textContent = statusIcons[status];
+        label.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        label.style.color = statusColors[status];
+        var s = steps[status];
+        ['checkout','install','lint','test','build','deploy'].forEach(function(step) {
+            var el = document.getElementById('step-' + step);
+            el.dataset.stepStatus = s[step];
+            el.style.color = colors[s[step]];
+            var text = el.textContent.replace(/^[\u2713\u25B6\u2717\u25CB]\s*/, '');
+            if (s[step] === 'running') text = text.replace(/\.{3}$/, '') + '...';
+            el.textContent = icons[s[step]] + ' ' + text;
+        });
+        retry.style.display = (status === 'failed' || status === 'cancelled') ? 'inline-block' : 'none';
+        cancel.style.display = (status === 'running') ? 'inline-block' : 'none';
+    }
+    buildSel.addEventListener('change', updateBuild);
+    updateBuild();
+
+    // Scenario 6: Time-based Greeting (uses actual time)
+    var hour = new Date().getHours();
+    var greetIcon = document.getElementById('greeting-icon');
+    var greetText = document.getElementById('greeting-text');
+    var greetMsg = document.getElementById('greeting-message');
+    var greetTheme = document.getElementById('greeting-theme');
+    var greetSugg = document.getElementById('greeting-suggestions');
+    if (hour >= 5 && hour < 12) {
+        greetIcon.textContent = '\u2600\uFE0F'; greetText.textContent = 'Good morning';
+        greetMsg.textContent = 'Fresh start! Best time for deep work and complex problem solving.';
+        greetTheme.textContent = 'Morning'; greetTheme.className = 'status-pill pill-success'; greetTheme.dataset.timePeriod = 'morning';
+        greetSugg.textContent = 'Deep work, complex tasks'; greetSugg.dataset.suggestions = 'deep-work,complex-tasks';
+    } else if (hour >= 12 && hour < 17) {
+        greetIcon.textContent = '\uD83C\uDF24'; greetText.textContent = 'Good afternoon';
+        greetMsg.textContent = 'The sun is still up. Time for focused work.';
+        greetTheme.textContent = 'Afternoon'; greetTheme.className = 'status-pill pill-info'; greetTheme.dataset.timePeriod = 'afternoon';
+        greetSugg.textContent = 'Code review, standup prep'; greetSugg.dataset.suggestions = 'review,standup';
+    } else if (hour >= 17 && hour < 21) {
+        greetIcon.textContent = '\uD83C\uDF05'; greetText.textContent = 'Good evening';
+        greetMsg.textContent = 'Winding down. Good time for planning and documentation.';
+        greetTheme.textContent = 'Evening'; greetTheme.className = 'status-pill pill-warning'; greetTheme.dataset.timePeriod = 'evening';
+        greetSugg.textContent = 'Planning, documentation'; greetSugg.dataset.suggestions = 'planning,docs';
+    } else {
+        greetIcon.textContent = '\uD83C\uDF19'; greetText.textContent = 'Good night';
+        greetMsg.textContent = 'Working late? Remember to take breaks and rest well.';
+        greetTheme.textContent = 'Night'; greetTheme.className = 'status-pill pill-purple'; greetTheme.dataset.timePeriod = 'night';
+        greetSugg.textContent = 'Light tasks, breaks'; greetSugg.dataset.suggestions = 'light-tasks,breaks';
+    }
+})();
 </script>
 
 <!-- INPUT VALUE MONITOR SCRIPT (enhanced for Shadow DOM via composedPath) -->
