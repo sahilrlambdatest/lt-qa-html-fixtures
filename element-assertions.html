@@ -132,30 +132,30 @@
         </div>
         <div class="assert-card">
             <h4>Disabled Button</h4>
-            <button id="btn-disabled" disabled data-testid="disabled-btn">Processing...</button>
+            <button id="btn-disabled" disabled data-testid="disabled-btn">Authorize Payment</button>
             <div class="meta">State: <code>disabled</code> | Assert: "button is disabled"</div>
         </div>
         <div class="assert-card">
             <h4>Enabled Input</h4>
-            <input type="text" id="input-enabled" placeholder="Type here..." value="Hello World">
+            <input type="text" id="input-enabled" placeholder="Type here..." value="John Doe">
             <div class="meta">State: <code>enabled</code> | Has value for attribute assertion too</div>
         </div>
         <div class="assert-card">
             <h4>Disabled Input</h4>
-            <input type="text" id="input-disabled" disabled value="Cannot edit this">
-            <div class="meta">State: <code>disabled</code> | value="Cannot edit this"</div>
+            <input type="text" id="input-disabled" disabled value="ORD-2024-0892">
+            <div class="meta">State: <code>disabled</code> | value="ORD-2024-0892"</div>
         </div>
         <div class="assert-card">
             <h4>Disabled Select</h4>
             <select id="select-disabled" disabled>
-                <option value="locked">Locked Option</option>
+                <option value="locked">Enterprise Plan</option>
             </select>
             <div class="meta">State: <code>disabled</code></div>
         </div>
         <div class="assert-card">
             <h4>Readonly Input</h4>
-            <input type="text" id="input-readonly" readonly value="Read-only value">
-            <div class="meta">State: <code>readonly</code> (not disabled, but not editable)</div>
+            <input type="text" id="input-readonly" readonly value="2024-02-15T08:30:00Z">
+            <div class="meta">State: <code>readonly</code> | value="2024-02-15T08:30:00Z"</div>
         </div>
     </div>
 
@@ -163,22 +163,22 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Visible Element</h4>
-            <div id="el-visible" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">I am visible</div>
+            <div id="el-visible" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">Dashboard overview panel</div>
             <div class="meta">State: <code>visible</code></div>
         </div>
         <div class="assert-card">
             <h4>Hidden Element (display:none)</h4>
-            <div id="el-hidden-display" class="hidden-el">I am hidden with display:none</div>
+            <div id="el-hidden-display" class="hidden-el">Supplementary details section</div>
             <div class="meta">State: <code>hidden</code> | CSS: display:none | Element exists in DOM but not visible</div>
         </div>
         <div class="assert-card">
             <h4>Hidden Element (visibility:hidden)</h4>
-            <div id="el-hidden-visibility" class="visibility-hidden">I am hidden with visibility:hidden</div>
+            <div id="el-hidden-visibility" class="visibility-hidden">Off-screen helper content</div>
             <div class="meta">State: <code>hidden</code> | CSS: visibility:hidden | Takes space but invisible</div>
         </div>
         <div class="assert-card">
             <h4>Hidden Element (opacity:0)</h4>
-            <div id="el-hidden-opacity" class="opacity-zero">I am hidden with opacity:0</div>
+            <div id="el-hidden-opacity" class="opacity-zero">Background overlay layer</div>
             <div class="meta">State: <code>hidden</code> (edge case) | CSS: opacity:0</div>
         </div>
     </div>
@@ -192,12 +192,12 @@
         </div>
         <div class="assert-card">
             <h4>Non-Clickable Button (disabled)</h4>
-            <button id="btn-not-clickable" disabled>Cannot Click</button>
+            <button id="btn-not-clickable" disabled>View Only</button>
             <div class="meta">State: <code>not clickable</code> | disabled attribute</div>
         </div>
         <div class="assert-card">
             <h4>Non-Clickable (pointer-events: none)</h4>
-            <button id="btn-pointer-none" style="pointer-events: none; opacity: 0.5;">Pointer Events None</button>
+            <button id="btn-pointer-none" style="pointer-events: none; opacity: 0.5;">Archived Action</button>
             <div class="meta">State: <code>not clickable</code> | CSS: pointer-events:none</div>
         </div>
     </div>
@@ -206,7 +206,7 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Present Element</h4>
-            <div id="el-present" data-testid="present-element">I exist in the DOM</div>
+            <div id="el-present" data-testid="present-element">Account summary widget</div>
             <div class="meta">State: <code>present</code> | Assert: "element is present"</div>
         </div>
         <div class="assert-card">
@@ -216,8 +216,8 @@
         </div>
         <div class="assert-card">
             <h4>Conditionally Present (removable)</h4>
-            <div id="el-removable">I can be removed</div>
-            <button onclick="var e=document.getElementById('el-removable');if(e)e.remove();else{var d=document.createElement('div');d.id='el-removable';d.textContent='I can be removed';this.parentNode.insertBefore(d,this);}">Toggle Presence</button>
+            <div id="el-removable">Promotional banner</div>
+            <button onclick="var e=document.getElementById('el-removable');if(e)e.remove();else{var d=document.createElement('div');d.id='el-removable';d.textContent='Promotional banner';this.parentNode.insertBefore(d,this);}">Toggle Presence</button>
             <div class="meta">Click button to add/remove element from DOM</div>
         </div>
     </div>
@@ -241,7 +241,7 @@
         </div>
         <div class="assert-card">
             <h4>Disabled Checked Checkbox</h4>
-            <label><input type="checkbox" id="cb-disabled-checked" checked disabled> Locked option</label>
+            <label><input type="checkbox" id="cb-disabled-checked" checked disabled> Accept cookies</label>
             <div class="meta">State: <code>checked</code> + <code>disabled</code></div>
         </div>
         <div class="assert-card">
@@ -295,12 +295,12 @@
         </div>
         <div class="assert-card">
             <h4>Button that enables after delay</h4>
-            <button id="btn-becomes-enabled" disabled>Please wait...</button>
+            <button id="btn-becomes-enabled" disabled>Preparing Report</button>
             <div class="meta">Enables after 3 seconds via JS timer</div>
         </div>
         <div class="assert-card">
             <h4>Conflicting assertion target</h4>
-            <button id="btn-conflict-target" data-state="enabled">I am enabled</button>
+            <button id="btn-conflict-target" data-state="enabled">Proceed to Checkout</button>
             <div class="meta">Use for TC-R5-05: Assert enabled (PASS) then assert disabled (FAIL) on same element</div>
         </div>
     </div>
@@ -351,32 +351,32 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>data-testid</h4>
-            <div id="el-data-testid" data-testid="main-content">Main content area</div>
+            <div id="el-data-testid" data-testid="main-content">Project workspace</div>
             <div class="meta">Attr: <code>data-testid="main-content"</code></div>
         </div>
         <div class="assert-card">
             <h4>data-status</h4>
-            <div id="el-data-status" data-status="active">Active item</div>
+            <div id="el-data-status" data-status="active">Sprint tracker widget</div>
             <div class="meta">Attr: <code>data-status="active"</code> | For equals operator</div>
         </div>
         <div class="assert-card">
             <h4>data-count (numeric)</h4>
-            <div id="el-data-count" data-count="8">Items: 8</div>
+            <div id="el-data-count" data-count="8">Cart summary</div>
             <div class="meta">Attr: <code>data-count="8"</code> | For gt/lt operators (8 > 5 = PASS)</div>
         </div>
         <div class="assert-card">
             <h4>data-index (numeric)</h4>
-            <div id="el-data-index" data-index="3">Index: 3</div>
+            <div id="el-data-index" data-index="3">Navigation breadcrumb</div>
             <div class="meta">Attr: <code>data-index="3"</code> | For lt operator (3 < 10 = PASS)</div>
         </div>
         <div class="assert-card">
             <h4>data-score (boundary)</h4>
-            <div id="el-data-score" data-score="5">Score: 5</div>
+            <div id="el-data-score" data-score="5">Review rating</div>
             <div class="meta">Attr: <code>data-score="5"</code> | Boundary: 5 >= 5 PASS, 5 > 5 FAIL</div>
         </div>
         <div class="assert-card">
             <h4>data-priority (numeric)</h4>
-            <div id="el-data-priority" data-priority="3">Priority: 3</div>
+            <div id="el-data-priority" data-priority="3">Task queue item</div>
             <div class="meta">Attr: <code>data-priority="3"</code> | For lte operator (3 <= 5 = PASS)</div>
         </div>
         <div class="assert-card">
@@ -420,7 +420,7 @@
         </div>
         <div class="assert-card">
             <h4>type attribute</h4>
-            <input type="text" id="input-type-text" placeholder="Type is text">
+            <input type="text" id="input-type-text" placeholder="Enter keywords...">
             <div class="meta">Attr: <code>type="text"</code> | not_equals "password"</div>
         </div>
         <div class="assert-card">
@@ -454,7 +454,7 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Element without data-testid</h4>
-            <div id="el-no-testid">I have no data-testid attribute</div>
+            <div id="el-no-testid">Sidebar info panel</div>
             <div class="meta">Assert "data-testid equals main-content" should FAIL (attr not present)</div>
         </div>
     </div>
@@ -473,27 +473,27 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>background-color: blue</h4>
-            <div id="css-bg-blue" style="background-color: blue; color: white; padding: 12px; border-radius: var(--radius-sm);">Blue background</div>
+            <div id="css-bg-blue" style="background-color: blue; color: white; padding: 12px; border-radius: var(--radius-sm);">Notification banner</div>
             <div class="meta">CSS: <code>background-color: blue</code><br>Computed: <code>rgb(0, 0, 255)</code><br>Assert "background-color is blue" = PASS (normalization)</div>
         </div>
         <div class="assert-card">
             <h4>color: red (via hex)</h4>
-            <div id="css-color-red-hex" style="color: #ff0000; font-size: 16px; font-weight: bold;">Red text via hex #ff0000</div>
+            <div id="css-color-red-hex" style="color: #ff0000; font-size: 16px; font-weight: bold;">Urgent alert message</div>
             <div class="meta">CSS: <code>color: #ff0000</code><br>Assert "color is red" = PASS (hex &harr; named)</div>
         </div>
         <div class="assert-card">
             <h4>color: red (via rgb)</h4>
-            <div id="css-color-red-rgb" style="color: rgb(255, 0, 0); font-size: 16px;">Red text via rgb(255,0,0)</div>
+            <div id="css-color-red-rgb" style="color: rgb(255, 0, 0); font-size: 16px;">Error notification text</div>
             <div class="meta">CSS: <code>color: rgb(255,0,0)</code><br>Assert "color is red" = PASS (rgb &harr; named)</div>
         </div>
         <div class="assert-card">
             <h4>color: named "red"</h4>
-            <div id="css-color-red-named" style="color: red; font-size: 16px;">Red text via named color</div>
+            <div id="css-color-red-named" style="color: red; font-size: 16px;">System warning label</div>
             <div class="meta">CSS: <code>color: red</code><br>All three red variants should match</div>
         </div>
         <div class="assert-card">
             <h4>border-color: green</h4>
-            <div id="css-border-green" style="border: 3px solid green; padding: 12px; border-radius: var(--radius-sm);">Green border</div>
+            <div id="css-border-green" style="border: 3px solid green; padding: 12px; border-radius: var(--radius-sm);">Validated input container</div>
             <div class="meta">CSS: <code>border-color: green</code></div>
         </div>
         <div class="assert-card">
@@ -512,32 +512,32 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>font-size: 16px</h4>
-            <div id="css-fontsize-16" style="font-size: 16px;">Text at 16px</div>
+            <div id="css-fontsize-16" style="font-size: 16px;">Standard paragraph content</div>
             <div class="meta">CSS: <code>font-size: 16px</code></div>
         </div>
         <div class="assert-card">
             <h4>font-size: 24px</h4>
-            <div id="css-fontsize-24" style="font-size: 24px;">Text at 24px</div>
+            <div id="css-fontsize-24" style="font-size: 24px;">Section heading text</div>
             <div class="meta">CSS: <code>font-size: 24px</code></div>
         </div>
         <div class="assert-card">
             <h4>font-family: Arial</h4>
-            <div id="css-fontfamily" style="font-family: 'Arial', sans-serif;">Text in Arial</div>
+            <div id="css-fontfamily" style="font-family: 'Arial', sans-serif;">System notification copy</div>
             <div class="meta">CSS: <code>font-family: "Arial", sans-serif</code><br>Assert "contains Arial" = PASS (quotes stripped)</div>
         </div>
         <div class="assert-card">
             <h4>font-weight: normal (400)</h4>
-            <div id="css-fontweight-normal" style="font-weight: 400;">Normal weight text (400)</div>
+            <div id="css-fontweight-normal" style="font-weight: 400;">Terms and conditions text</div>
             <div class="meta">CSS: <code>font-weight: 400</code><br>Assert "font-weight is normal" = PASS (400 = normal)</div>
         </div>
         <div class="assert-card">
             <h4>font-weight: bold (700)</h4>
-            <div id="css-fontweight-bold" style="font-weight: 700;">Bold weight text (700)</div>
+            <div id="css-fontweight-bold" style="font-weight: 700;">Important announcement</div>
             <div class="meta">CSS: <code>font-weight: 700</code><br>Assert "font-weight is bold" = PASS (700 = bold)</div>
         </div>
         <div class="assert-card">
             <h4>font-style: italic</h4>
-            <div id="css-fontstyle" style="font-style: italic;">Italic text</div>
+            <div id="css-fontstyle" style="font-style: italic;">Author attribution</div>
             <div class="meta">CSS: <code>font-style: italic</code></div>
         </div>
     </div>
@@ -551,39 +551,39 @@
         </div>
         <div class="assert-card">
             <h4>display: block</h4>
-            <div id="css-display-block" style="display: block; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">Visible block</div>
+            <div id="css-display-block" style="display: block; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">Feature description panel</div>
             <div class="meta">CSS: <code>display: block</code></div>
         </div>
         <div class="assert-card">
             <h4>display: flex</h4>
             <div id="css-display-flex" style="display: flex; gap: 8px; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">
-                <span>Flex</span><span>Items</span>
+                <span>Dashboard</span><span>Layout</span>
             </div>
             <div class="meta">CSS: <code>display: flex</code></div>
         </div>
         <div class="assert-card">
             <h4>visibility: hidden</h4>
-            <div id="css-visibility-hidden" style="visibility: hidden; height: 32px; background: var(--bg-tertiary);">Hidden via visibility</div>
+            <div id="css-visibility-hidden" style="visibility: hidden; height: 32px; background: var(--bg-tertiary);">Supplementary layer</div>
             <div class="meta">CSS: <code>visibility: hidden</code> | Takes space, invisible</div>
         </div>
         <div class="assert-card">
             <h4>visibility: visible</h4>
-            <div id="css-visibility-visible" style="visibility: visible; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">Visible content</div>
+            <div id="css-visibility-visible" style="visibility: visible; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm);">Dashboard metrics area</div>
             <div class="meta">CSS: <code>visibility: visible</code></div>
         </div>
         <div class="assert-card">
             <h4>opacity: 0.5</h4>
-            <div id="css-opacity-half" style="opacity: 0.5; padding: 12px; background: var(--accent); color: #fff; border-radius: var(--radius-sm);">50% opacity overlay</div>
+            <div id="css-opacity-half" style="opacity: 0.5; padding: 12px; background: var(--accent); color: #fff; border-radius: var(--radius-sm);">Watermark layer</div>
             <div class="meta">CSS: <code>opacity: 0.5</code></div>
         </div>
         <div class="assert-card">
             <h4>opacity: 0</h4>
-            <div id="css-opacity-zero" style="opacity: 0; height: 32px;">Fully transparent</div>
+            <div id="css-opacity-zero" style="opacity: 0; height: 32px;">Tracking beacon element</div>
             <div class="meta">CSS: <code>opacity: 0</code> | Edge case: invisible but in layout</div>
         </div>
         <div class="assert-card">
             <h4>opacity: 1</h4>
-            <div id="css-opacity-full" style="opacity: 1; padding: 8px; background: var(--accent); color: #fff; border-radius: var(--radius-sm);">Full opacity</div>
+            <div id="css-opacity-full" style="opacity: 1; padding: 8px; background: var(--accent); color: #fff; border-radius: var(--radius-sm);">Primary action zone</div>
             <div class="meta">CSS: <code>opacity: 1</code></div>
         </div>
     </div>
@@ -615,17 +615,17 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>NOT disabled</h4>
-            <button id="btn-not-disabled">Active Button</button>
+            <button id="btn-not-disabled">Run Analysis</button>
             <div class="meta">Assert: "button is NOT disabled" = PASS</div>
         </div>
         <div class="assert-card">
             <h4>NOT checked</h4>
-            <label><input type="checkbox" id="cb-not-checked"> Unchecked option</label>
+            <label><input type="checkbox" id="cb-not-checked"> Opt-in for beta</label>
             <div class="meta">Assert: "checkbox is NOT checked" = PASS</div>
         </div>
         <div class="assert-card">
             <h4>NOT visible (hidden element)</h4>
-            <div id="el-not-visible" style="display:none;">Hidden</div>
+            <div id="el-not-visible" style="display:none;">Background service status</div>
             <div class="meta">Assert: "element is NOT visible" = PASS</div>
         </div>
         <div class="assert-card">
@@ -687,7 +687,7 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Empty attribute value</h4>
-            <div id="el-empty-attr" data-value="">Element with data-value=""</div>
+            <div id="el-empty-attr" data-value="">Placeholder container</div>
             <div class="meta">Attr: <code>data-value=""</code> (empty string)<br>TC-R2-01: Assert "data-value equals empty"</div>
         </div>
         <div class="assert-card">
@@ -787,7 +787,7 @@
                 <button id="modal-cancel-btn" onclick="document.getElementById('assertModal').classList.remove('open')" style="margin-left:8px;">Cancel</button>
             </div>
             <input type="text" id="modal-input" placeholder="Enter value in modal" data-context="modal">
-            <div id="modal-status" data-status="open" style="font-size:12px;color:var(--text-muted);margin-top:8px;">Modal is open</div>
+            <div id="modal-status" data-status="open" style="font-size:12px;color:var(--text-muted);margin-top:8px;">Dialog information footer</div>
             <div class="meta" style="margin-top:12px;">TC-R2-05: Assert on elements inside modal overlay<br>
             button enabled, input placeholder, data-action, data-status</div>
         </div>
@@ -861,7 +861,7 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Will FAIL: Assert enabled on disabled button</h4>
-            <button id="fc-disabled-btn" disabled>I am disabled</button>
+            <button id="fc-disabled-btn" disabled>Finalize Order</button>
             <div class="meta">Assert "button is enabled" = <span class="state-badge fail">FAIL</span><br>
             Use with: Fail immediately / Fail but continue / Warn but continue</div>
         </div>
@@ -883,8 +883,8 @@
         </div>
         <div class="assert-card">
             <h4>Multi-step test: Step 1 fails, Step 2 continues</h4>
-            <button id="fc-step1-target" disabled>Step 1 target (disabled)</button>
-            <button id="fc-step2-target" onclick="this.textContent='Clicked!'">Step 2 target (clickable)</button>
+            <button id="fc-step1-target" disabled>Approve Changes</button>
+            <button id="fc-step2-target" onclick="this.textContent='Clicked!'">Send Feedback</button>
             <div class="meta">TC-051/052/053: Test failure condition behaviors<br>
             Step 1: Assert enabled (FAIL) | Step 2: Click (should execute with "fail but continue")</div>
         </div>
@@ -952,32 +952,32 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Target 1: State</h4>
-            <button id="consec-1" data-order="1">Enabled Button #1</button>
+            <button id="consec-1" data-order="1">Deploy Changes</button>
             <div class="meta">Assert: enabled</div>
         </div>
         <div class="assert-card">
             <h4>Target 2: Attribute</h4>
-            <div id="consec-2" data-order="2" data-value="alpha">Alpha Value</div>
+            <div id="consec-2" data-order="2" data-value="alpha">Configuration preset</div>
             <div class="meta">Assert: data-value equals alpha</div>
         </div>
         <div class="assert-card">
             <h4>Target 3: CSS</h4>
-            <div id="consec-3" data-order="3" style="color: green; font-size: 18px;">Green Text</div>
+            <div id="consec-3" data-order="3" style="color: green; font-size: 18px;">Sprint milestone</div>
             <div class="meta">Assert: color is green</div>
         </div>
         <div class="assert-card">
             <h4>Target 4: Checkbox</h4>
-            <label><input type="checkbox" id="consec-4" data-order="4" checked> Checked Item</label>
+            <label><input type="checkbox" id="consec-4" data-order="4" checked> Enable logging</label>
             <div class="meta">Assert: checked</div>
         </div>
         <div class="assert-card">
             <h4>Target 5: Negation</h4>
-            <button id="consec-5" data-order="5">Not Disabled</button>
+            <button id="consec-5" data-order="5">Sync Repository</button>
             <div class="meta">Assert: NOT disabled</div>
         </div>
         <div class="assert-card">
             <h4>Target 6: Numeric</h4>
-            <div id="consec-6" data-order="6" data-count="42">Count: 42</div>
+            <div id="consec-6" data-order="6" data-count="42">Notification center</div>
             <div class="meta">Assert: data-count > 10</div>
         </div>
         <div class="assert-card">
@@ -1010,7 +1010,7 @@
         </div>
         <div class="assert-card">
             <h4>Target for undefined variable test</h4>
-            <div id="var-undefined-test" data-attr="test-value">Test Value</div>
+            <div id="var-undefined-test" data-attr="test-value">Settings entry</div>
             <div class="meta">TC-R5-03: Assert "attr contains {{nonExistent}}"<br>Should ERROR: variable not defined</div>
         </div>
     </div>
@@ -1038,7 +1038,7 @@
         </div>
         <div class="assert-card">
             <h4>Ambiguous assertion target</h4>
-            <div id="ambig-element" style="opacity: 1; visibility: visible;">Looks Enabled</div>
+            <div id="ambig-element" style="opacity: 1; visibility: visible;">Configuration widget</div>
             <div class="meta">TC-068: Ambiguous NL: "Assert the element looks enabled"<br>Low-confidence classification &rarr; fallback to visual assertion</div>
         </div>
         <div class="assert-card">
@@ -1261,11 +1261,11 @@
         <div class="assert-card">
             <h4>Fieldset Disabled — Inherited by children</h4>
             <fieldset disabled id="disabled-fieldset" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px;">
-                <legend style="font-size: 12px; color: var(--text-tertiary); padding: 0 6px;">Disabled Fieldset</legend>
-                <button id="inherited-disabled-btn" style="margin: 4px 0;">Inherited Disabled Btn</button>
-                <input id="inherited-disabled-input" type="text" value="Inherited disabled" placeholder="Can't type here" style="margin: 4px 0;">
+                <legend style="font-size: 12px; color: var(--text-tertiary); padding: 0 6px;">Billing Details</legend>
+                <button id="inherited-disabled-btn" style="margin: 4px 0;">Update Payment</button>
+                <input id="inherited-disabled-input" type="text" value="ACME Corp" placeholder="Enter company" style="margin: 4px 0;">
                 <select id="inherited-disabled-select" style="margin: 4px 0;">
-                    <option>Locked Option</option>
+                    <option>Annual Plan</option>
                 </select>
             </fieldset>
             <div class="meta">
@@ -1281,7 +1281,7 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Required Field</h4>
-            <input id="required-field" type="text" required placeholder="This field is required" style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+            <input id="required-field" type="text" required placeholder="Enter company name" style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
             <div class="meta">
                 <code>has_required</code> = true<br>
                 <code>required</code> attribute present<br>
@@ -1290,7 +1290,7 @@
         </div>
         <div class="assert-card">
             <h4>Readonly Field</h4>
-            <input id="readonly-field" type="text" readonly value="Read-only content" style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-secondary);">
+            <input id="readonly-field" type="text" readonly value="TF-2024-RELEASE" style="width: 100%; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-secondary);">
             <div class="meta">
                 <code>has_readonly</code> = true<br>
                 <code>readonly</code> attribute present<br>
@@ -1376,7 +1376,7 @@
         <div class="assert-card">
             <h4>Aria-Hidden Element</h4>
             <div id="el-aria-hidden" aria-hidden="true" style="padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-muted);">
-                This is aria-hidden
+                Decorative separator content
             </div>
             <div class="meta">
                 ARIA-07: <code>aria-hidden</code> = "true"
@@ -1574,7 +1574,7 @@
                 <input id="signup-email" type="email" placeholder="Email" aria-required="true" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
                 <input id="signup-password" type="password" name="password" placeholder="Password" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
                 <input id="signup-age" type="number" value="25" placeholder="Age" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary); width: 100px;">
-                <input id="signup-disabled-email" type="email" disabled placeholder="Cannot type" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-muted);">
+                <input id="signup-disabled-email" type="email" disabled placeholder="backup@company.com" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-muted);">
             </form>
             <div class="meta">
                 DOM-09: Email <code>type</code> = "email"<br>
@@ -1594,7 +1594,7 @@
             <h4>Enabled / Disabled Buttons</h4>
             <div class="demo-row">
                 <button id="eval-submit-btn" style="padding: 6px 14px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer;">Submit</button>
-                <button id="eval-disabled-btn" disabled style="padding: 6px 14px; background: var(--bg-tertiary); color: var(--text-muted); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">Submit (Disabled)</button>
+                <button id="eval-disabled-btn" disabled style="padding: 6px 14px; background: var(--bg-tertiary); color: var(--text-muted); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">Publish Draft</button>
             </div>
             <div class="meta">
                 ES-01: Submit button <code>disabled</code> = false<br>
@@ -1607,7 +1607,7 @@
             <h4>Enabled / Disabled Inputs</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
                 <input id="eval-username" type="text" placeholder="Username" value="" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
-                <input id="eval-disabled-email" type="email" disabled placeholder="Cannot type" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-muted);">
+                <input id="eval-disabled-email" type="email" disabled placeholder="team@company.com" style="padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-muted);">
             </div>
             <div class="meta">
                 ES-03: Username input <code>disabled</code> = false<br>
@@ -1652,9 +1652,9 @@
         <div class="assert-card">
             <h4>Text Colors</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <span id="eval-text-blue" style="color: rgb(37, 99, 235); font-size: 14px;">This text is blue</span>
-                <span id="eval-text-red" style="color: rgb(239, 68, 68); font-size: 14px;">This text is red</span>
-                <span id="eval-text-green" style="color: rgb(22, 163, 74); font-size: 14px;">This text is green</span>
+                <span id="eval-text-blue" style="color: rgb(37, 99, 235); font-size: 14px;">Priority notification</span>
+                <span id="eval-text-red" style="color: rgb(239, 68, 68); font-size: 14px;">Overdue task warning</span>
+                <span id="eval-text-green" style="color: rgb(22, 163, 74); font-size: 14px;">Build passed message</span>
             </div>
             <div class="meta">
                 CSS-01: Blue <code>color</code> = "rgb(37, 99, 235)"<br>
@@ -1665,8 +1665,8 @@
         <div class="assert-card">
             <h4>Background Colors</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div id="eval-bg-yellow" style="background-color: rgb(253, 224, 71); padding: 6px 10px; border-radius: var(--radius-sm); color: #000; font-size: 13px;">Yellow background</div>
-                <div id="eval-bg-indigo" style="background-color: rgb(99, 102, 241); padding: 6px 10px; border-radius: var(--radius-sm); color: #fff; font-size: 13px;">Indigo background</div>
+                <div id="eval-bg-yellow" style="background-color: rgb(253, 224, 71); padding: 6px 10px; border-radius: var(--radius-sm); color: #000; font-size: 13px;">Caution advisory panel</div>
+                <div id="eval-bg-indigo" style="background-color: rgb(99, 102, 241); padding: 6px 10px; border-radius: var(--radius-sm); color: #fff; font-size: 13px;">Feature highlight banner</div>
             </div>
             <div class="meta">
                 CSS-04: Yellow <code>background-color</code> = "rgb(253, 224, 71)"<br>
@@ -1676,8 +1676,8 @@
         <div class="assert-card">
             <h4>Border Colors</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div id="eval-border-red" style="border: 3px solid rgb(239, 68, 68); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 13px;">Red border</div>
-                <div id="eval-border-green" style="border: 3px solid rgb(22, 163, 74); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 13px;">Green border</div>
+                <div id="eval-border-red" style="border: 3px solid rgb(239, 68, 68); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 13px;">Validation error field</div>
+                <div id="eval-border-green" style="border: 3px solid rgb(22, 163, 74); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 13px;">Verified status indicator</div>
             </div>
             <div class="meta">
                 CSS-06: Red <code>border-color</code> contains "rgb(239, 68, 68)"<br>
@@ -1687,8 +1687,8 @@
         <div class="assert-card">
             <h4>Font Sizes</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <span id="eval-fs-large" style="font-size: 24px;">Large text (24px)</span>
-                <span id="eval-fs-small" style="font-size: 12px;">Small text (12px)</span>
+                <span id="eval-fs-large" style="font-size: 24px;">Section heading content</span>
+                <span id="eval-fs-small" style="font-size: 12px;">Footnote disclaimer</span>
             </div>
             <div class="meta">
                 CSS-08: Large <code>font-size</code> = "24px"<br>
@@ -1698,8 +1698,8 @@
         <div class="assert-card">
             <h4>Font Families</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <span id="eval-ff-serif" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px;">Serif font (Georgia)</span>
-                <span id="eval-ff-mono" style="font-family: 'Courier New', Courier, monospace; font-size: 14px;">Monospace font (Courier New)</span>
+                <span id="eval-ff-serif" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px;">Editorial column text</span>
+                <span id="eval-ff-mono" style="font-family: 'Courier New', Courier, monospace; font-size: 14px;">Code snippet display</span>
             </div>
             <div class="meta">
                 CSS-10: Serif <code>font-family</code> contains "Georgia"<br>
@@ -1709,8 +1709,8 @@
         <div class="assert-card">
             <h4>Font Weights</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <span id="eval-fw-bold" style="font-weight: 700; font-size: 14px;">Bold text (700)</span>
-                <span id="eval-fw-normal" style="font-weight: 400; font-size: 14px;">Normal text (400)</span>
+                <span id="eval-fw-bold" style="font-weight: 700; font-size: 14px;">Key announcement</span>
+                <span id="eval-fw-normal" style="font-weight: 400; font-size: 14px;">Standard description copy</span>
             </div>
             <div class="meta">
                 CSS-12: Bold <code>font-weight</code> = "700"<br>
@@ -1720,8 +1720,8 @@
         <div class="assert-card">
             <h4>Font Style &amp; Opacity</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <span id="eval-italic" style="font-style: italic; font-size: 14px;">Italic text</span>
-                <div id="eval-opacity-50" style="opacity: 0.5; padding: 4px 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px;">50% opacity</div>
+                <span id="eval-italic" style="font-style: italic; font-size: 14px;">Author attribution</span>
+                <div id="eval-opacity-50" style="opacity: 0.5; padding: 4px 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px;">Watermark overlay</div>
             </div>
             <div class="meta">
                 CSS-14: <code>font-style</code> = "italic"<br>
@@ -1731,7 +1731,7 @@
         <div class="assert-card">
             <h4>Display Types</h4>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div id="eval-display-block" style="display: block; padding: 4px 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px;">Block element</div>
+                <div id="eval-display-block" style="display: block; padding: 4px 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px;">Content section panel</div>
             </div>
             <div class="meta">
                 CSS-18: <code>display</code> = "block"

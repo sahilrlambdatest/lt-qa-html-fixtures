@@ -837,7 +837,7 @@
                         <input type="email" id="settings-email" value="sahil@teamflow.dev" placeholder="Email" name="email" aria-required="true" data-cy="settings-email">
                     </div>
                     <div class="input-demo" style="margin-bottom:10px">
-                        <label for="settings-bio">Bio (readonly)</label>
+                        <label for="settings-bio">Bio</label>
                         <input type="text" id="settings-bio" value="Engineering Lead @ TeamFlow" readonly data-qa="profile-bio">
                     </div>
                     <div class="input-demo" style="margin-bottom:10px">
@@ -1024,7 +1024,7 @@
                     </div>
                     <div style="background:var(--bg-secondary);padding:10px;border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--border-subtle)">
                         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:4px">aria-required</div>
-                        <input id="aria-required-field" type="text" placeholder="Required field" aria-required="true" style="padding:6px 10px;border:1px solid var(--border-default);border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-primary);width:100%;font-size:12px;box-sizing:border-box">
+                        <input id="aria-required-field" type="text" placeholder="Enter your response" aria-required="true" style="padding:6px 10px;border:1px solid var(--border-default);border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-primary);width:100%;font-size:12px;box-sizing:border-box">
                     </div>
                 </div>
             </div>
@@ -1111,7 +1111,7 @@
                     <button class="btn-danger-demo" id="btn-danger" data-variant="danger">Danger</button>
                     <button class="btn-success-demo" id="btn-success-action" data-variant="success">Approve</button>
                     <button class="btn-ghost-demo" id="btn-ghost" data-variant="ghost">Ghost Link</button>
-                    <button class="btn-primary-demo" id="btn-disabled" data-variant="primary" disabled style="opacity:0.5;cursor:not-allowed">Disabled</button>
+                    <button class="btn-primary-demo" id="btn-disabled" data-variant="primary" disabled style="opacity:0.5;cursor:not-allowed">Archive Project</button>
                     <button class="btn-secondary-demo" id="btn-loading" data-variant="secondary" data-loading="true">
                         <span style="opacity:0.6">Loading...</span>
                     </button>
@@ -1127,54 +1127,54 @@
             <div class="state-grid">
                 <div class="state-item">
                     <div class="state-item-label">Visible Element</div>
-                    <div id="state-visible" data-visibility="visible" style="color:var(--text-primary)">I am visible</div>
+                    <div id="state-visible" data-visibility="visible" style="color:var(--text-primary)">Account preferences</div>
                 </div>
                 <div class="state-item">
                     <div class="state-item-label">display: none</div>
                     <div id="state-display-none-wrapper">
-                        <span id="state-display-none" style="display:none" data-visibility="hidden-display">Hidden by display:none</span>
+                        <span id="state-display-none" style="display:none" data-visibility="hidden-display">Auxiliary metadata</span>
                         <span style="font-size:12px;color:var(--text-muted);font-style:italic">(hidden element present in DOM)</span>
                     </div>
                 </div>
                 <div class="state-item">
                     <div class="state-item-label">visibility: hidden</div>
                     <div id="state-visibility-hidden-wrapper">
-                        <span id="state-visibility-hidden" style="visibility:hidden" data-visibility="hidden-visibility">Hidden by visibility:hidden</span>
+                        <span id="state-visibility-hidden" style="visibility:hidden" data-visibility="hidden-visibility">Layout spacer block</span>
                         <span style="font-size:12px;color:var(--text-muted);font-style:italic">(occupies space but invisible)</span>
                     </div>
                 </div>
                 <div class="state-item">
                     <div class="state-item-label">opacity: 0</div>
                     <div id="state-opacity-zero-wrapper">
-                        <span id="state-opacity-zero" style="opacity:0" data-visibility="hidden-opacity">Hidden by opacity:0</span>
+                        <span id="state-opacity-zero" style="opacity:0" data-visibility="hidden-opacity">Background tracker</span>
                         <span style="font-size:12px;color:var(--text-muted);font-style:italic">(transparent but interactable)</span>
                     </div>
                 </div>
                 <div class="state-item">
                     <div class="state-item-label">aria-hidden="true"</div>
-                    <div id="state-aria-hidden" aria-hidden="true" data-visibility="aria-hidden">Accessible hidden (aria-hidden=true)</div>
+                    <div id="state-aria-hidden" aria-hidden="true" data-visibility="aria-hidden">Decorative flourish</div>
                     <span style="font-size:12px;color:var(--text-muted);font-style:italic">(visually present, hidden from screen readers)</span>
                 </div>
                 <div class="state-item">
                     <div class="state-item-label">Off-screen</div>
-                    <div id="state-offscreen" style="position:absolute;left:-9999px" data-visibility="offscreen">Off-screen positioned element</div>
+                    <div id="state-offscreen" style="position:absolute;left:-9999px" data-visibility="offscreen">Skip navigation link</div>
                     <span style="font-size:12px;color:var(--text-muted);font-style:italic">(positioned off-screen)</span>
                 </div>
                 <div class="state-item">
                     <div class="state-item-label">Checkbox States</div>
                     <div style="display:flex;flex-direction:column;gap:6px">
-                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-checked" checked data-state="checked"> Checked</label>
-                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-unchecked" data-state="unchecked"> Unchecked</label>
-                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-indeterminate" data-state="indeterminate"> Indeterminate</label>
-                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-disabled" disabled checked data-state="disabled"> Disabled checked</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-checked" checked data-state="checked"> Accept cookies</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-unchecked" data-state="unchecked"> Marketing emails</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-indeterminate" data-state="indeterminate"> Select notifications</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="checkbox" id="cb-disabled" disabled checked data-state="disabled"> Terms accepted</label>
                     </div>
                 </div>
                 <div class="state-item">
                     <div class="state-item-label">Radio States</div>
                     <div style="display:flex;flex-direction:column;gap:6px">
-                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-demo" id="radio-selected" value="selected" checked data-state="selected"> Selected</label>
-                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-demo" id="radio-unselected" value="unselected" data-state="unselected"> Not selected</label>
-                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-disabled" id="radio-disabled" value="disabled" disabled data-state="disabled"> Disabled</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-demo" id="radio-selected" value="selected" checked data-state="selected"> Standard shipping</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-demo" id="radio-unselected" value="unselected" data-state="unselected"> Express shipping</label>
+                        <label style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><input type="radio" name="radio-disabled" id="radio-disabled" value="disabled" disabled data-state="disabled"> Same-day delivery</label>
                     </div>
                 </div>
             </div>
@@ -1197,16 +1197,16 @@
                     <span id="invalid-hint" style="font-size:11px;color:#ef4444">Please enter a valid email</span>
                 </div>
                 <div class="input-demo">
-                    <label for="input-required">Required Field</label>
-                    <input type="text" id="input-required" required placeholder="This field is required" data-state="required" aria-required="true">
+                    <label for="input-required">Project Name</label>
+                    <input type="text" id="input-required" required placeholder="Enter project name" data-state="required" aria-required="true">
                 </div>
                 <div class="input-demo">
-                    <label for="input-readonly">Read-only</label>
-                    <input type="text" id="input-readonly" value="Cannot edit this" readonly data-state="readonly">
+                    <label for="input-readonly">Account ID</label>
+                    <input type="text" id="input-readonly" value="ACC-2024-00892" readonly data-state="readonly">
                 </div>
                 <div class="input-demo">
-                    <label for="input-disabled">Disabled</label>
-                    <input type="text" id="input-disabled" value="Disabled input" disabled data-state="disabled">
+                    <label for="input-disabled">Organization</label>
+                    <input type="text" id="input-disabled" value="LambdaTest Inc." disabled data-state="disabled">
                 </div>
                 <div class="input-demo">
                     <label for="input-maxlength">Max Length (20)</label>
@@ -1304,27 +1304,27 @@
                 <div class="edge-grid">
                     <div class="edge-item" id="data-attr-testid" data-testid="task-card-main" data-qa="primary-element">
                         <div class="edge-label">data-testid</div>
-                        <code style="font-size:12px;color:var(--accent)">data-testid="task-card-main"</code>
+                        <code style="font-size:12px;color:var(--accent)">Primary task element</code>
                     </div>
                     <div class="edge-item" id="data-attr-custom" data-custom-field="custom-value-123" data-priority="high" data-category="frontend">
                         <div class="edge-label">Multiple data-*</div>
-                        <code style="font-size:12px;color:var(--accent)">data-custom-field, data-priority, data-category</code>
+                        <code style="font-size:12px;color:var(--accent)">Multi-attribute component</code>
                     </div>
                     <div class="edge-item" id="aria-label-el" aria-label="Important notification area" role="alert">
                         <div class="edge-label">aria-label + role</div>
-                        <code style="font-size:12px;color:var(--accent)">aria-label="Important notification area" role="alert"</code>
+                        <code style="font-size:12px;color:var(--accent)">System announcements</code>
                     </div>
                     <div class="edge-item" id="aria-live-el" aria-live="polite" aria-atomic="true">
                         <div class="edge-label">aria-live="polite"</div>
-                        <span id="aria-live-content" style="font-size:13px;color:var(--text-secondary)">Live region: updates announced to screen readers</span>
+                        <span id="aria-live-content" style="font-size:13px;color:var(--text-secondary)">Deployment status will appear here</span>
                     </div>
                     <div class="edge-item" id="data-json" data-config='{"theme":"dark","lang":"en","debug":false}'>
                         <div class="edge-label">JSON in data-*</div>
-                        <code style="font-size:12px;color:var(--accent)">data-config='{"theme":"dark",...}'</code>
+                        <code style="font-size:12px;color:var(--accent)">Configuration payload</code>
                     </div>
                     <div class="edge-item" id="tabindex-el" tabindex="0" role="button" aria-pressed="false">
                         <div class="edge-label">tabindex + role</div>
-                        <code style="font-size:12px;color:var(--accent)">tabindex="0" role="button" aria-pressed="false"</code>
+                        <code style="font-size:12px;color:var(--accent)">Interactive control</code>
                     </div>
                 </div>
             </div>
@@ -1369,7 +1369,7 @@
                     <div class="edge-item">
                         <div class="edge-label">Nested Spans</div>
                         <div id="text-nested" data-text="nested">
-                            <span id="span-outer" style="color:#ef4444">Red <span id="span-middle" style="color:#10b981">Green <span id="span-inner" style="color:#3b82f6">Blue</span></span></span>
+                            <span id="span-outer" style="color:#ef4444">Alert <span id="span-middle" style="color:#10b981">Status <span id="span-inner" style="color:#3b82f6">Info</span></span></span>
                         </div>
                     </div>
                     <div class="edge-item">
@@ -1401,35 +1401,35 @@ Line 3</pre>
                 <div class="edge-grid">
                     <div class="edge-item" id="css-transform" style="transform:rotate(5deg)">
                         <div class="edge-label">transform: rotate(5deg)</div>
-                        <div style="color:var(--text-primary)">Rotated element</div>
+                        <div style="color:var(--text-primary)">Notification badge</div>
                     </div>
                     <div class="edge-item" id="css-opacity" style="opacity:0.6">
                         <div class="edge-label">opacity: 0.6</div>
-                        <div style="color:var(--text-primary)">Semi-transparent</div>
+                        <div style="color:var(--text-primary)">Muted content area</div>
                     </div>
                     <div class="edge-item" id="css-zindex" style="position:relative;z-index:50">
                         <div class="edge-label">z-index: 50</div>
-                        <div style="color:var(--text-primary)">High z-index</div>
+                        <div style="color:var(--text-primary)">Overlay panel</div>
                     </div>
                     <div class="edge-item" id="css-overflow" style="overflow:hidden;max-height:40px">
                         <div class="edge-label">overflow: hidden</div>
-                        <div style="color:var(--text-primary)">This content is clipped because the container has overflow hidden and a max-height of 40px set on it.</div>
+                        <div style="color:var(--text-primary)">This is a long paragraph of release notes that extends beyond the visible area of the container. Additional details about the deployment are available in the full changelog.</div>
                     </div>
                     <div class="edge-item" id="css-border-radius" style="border-radius:50%">
                         <div class="edge-label">border-radius: 50%</div>
-                        <div style="color:var(--text-primary);text-align:center">Circle</div>
+                        <div style="color:var(--text-primary);text-align:center">Avatar</div>
                     </div>
                     <div class="edge-item" id="css-gradient" style="background:linear-gradient(135deg,#0ea5e9,#8b5cf6);border-radius:8px;padding:12px">
                         <div class="edge-label" style="color:rgba(255,255,255,0.7)">Gradient BG</div>
-                        <div style="color:white;font-weight:600">Linear gradient</div>
+                        <div style="color:white;font-weight:600">Premium banner</div>
                     </div>
                     <div class="edge-item" id="css-box-shadow" style="box-shadow:0 4px 20px rgba(14,165,233,0.4)">
                         <div class="edge-label">box-shadow</div>
-                        <div style="color:var(--text-primary)">Glowing shadow</div>
+                        <div style="color:var(--text-primary)">Highlighted card</div>
                     </div>
                     <div class="edge-item" id="css-text-decoration" style="text-decoration:line-through;color:#ef4444">
                         <div class="edge-label">text-decoration</div>
-                        <div>Strikethrough text</div>
+                        <div>Deprecated feature</div>
                     </div>
                 </div>
             </div>
@@ -1439,51 +1439,51 @@ Line 3</pre>
                 <div class="edge-grid">
                     <div class="edge-item" id="font-serif" style="font-family:Georgia,'Times New Roman',serif;font-size:16px">
                         <div class="edge-label">font-family: Georgia</div>
-                        <div>Serif font (Georgia)</div>
+                        <div>Editorial excerpt</div>
                     </div>
                     <div class="edge-item" id="font-mono" style="font-family:'Courier New',Courier,monospace;font-size:14px">
                         <div class="edge-label">font-family: Courier New</div>
-                        <div>Monospace font (Courier New)</div>
+                        <div>Log output display</div>
                     </div>
                     <div class="edge-item" id="font-sans" style="font-family:Arial,Helvetica,sans-serif;font-size:14px">
                         <div class="edge-label">font-family: Arial</div>
-                        <div>Sans-serif font (Arial)</div>
+                        <div>Navigation label</div>
                     </div>
                     <div class="edge-item" id="font-bold" style="font-weight:700">
                         <div class="edge-label">font-weight: 700</div>
-                        <div style="font-weight:700;color:var(--text-primary)">Bold text (700)</div>
+                        <div style="font-weight:700;color:var(--text-primary)">Key metric label</div>
                     </div>
                     <div class="edge-item" id="font-normal" style="font-weight:400">
                         <div class="edge-label">font-weight: 400</div>
-                        <div style="font-weight:400;color:var(--text-primary)">Normal text (400)</div>
+                        <div style="font-weight:400;color:var(--text-primary)">Description paragraph</div>
                     </div>
                     <div class="edge-item" id="font-light" style="font-weight:300">
                         <div class="edge-label">font-weight: 300</div>
-                        <div style="font-weight:300;color:var(--text-primary)">Light text (300)</div>
+                        <div style="font-weight:300;color:var(--text-primary)">Supplementary note</div>
                     </div>
                     <div class="edge-item" id="font-italic" style="font-style:italic">
                         <div class="edge-label">font-style: italic</div>
-                        <div style="font-style:italic;color:var(--text-primary)">Italic text</div>
+                        <div style="font-style:italic;color:var(--text-primary)">Author attribution</div>
                     </div>
                     <div class="edge-item" id="font-normal-style" style="font-style:normal">
                         <div class="edge-label">font-style: normal</div>
-                        <div style="font-style:normal;color:var(--text-primary)">Normal style text</div>
+                        <div style="font-style:normal;color:var(--text-primary)">Body content copy</div>
                     </div>
                     <div class="edge-item" id="font-size-24" style="font-size:24px">
                         <div class="edge-label">font-size: 24px</div>
-                        <div style="font-size:24px;color:var(--text-primary)">Large text (24px)</div>
+                        <div style="font-size:24px;color:var(--text-primary)">Section heading</div>
                     </div>
                     <div class="edge-item" id="font-size-12" style="font-size:12px">
                         <div class="edge-label">font-size: 12px</div>
-                        <div style="font-size:12px;color:var(--text-primary)">Small text (12px)</div>
+                        <div style="font-size:12px;color:var(--text-primary)">Legal disclaimer</div>
                     </div>
                     <div class="edge-item" id="font-size-18" style="font-size:18px">
                         <div class="edge-label">font-size: 18px</div>
-                        <div style="font-size:18px;color:var(--text-primary)">Medium text (18px)</div>
+                        <div style="font-size:18px;color:var(--text-primary)">Subtitle content</div>
                     </div>
                     <div class="edge-item" id="font-size-36" style="font-size:36px;line-height:1.1">
                         <div class="edge-label" style="font-size:10px">font-size: 36px</div>
-                        <div style="font-size:36px;color:var(--text-primary)">Heading</div>
+                        <div style="font-size:36px;color:var(--text-primary)">Welcome</div>
                     </div>
                 </div>
             </div>
@@ -1493,51 +1493,51 @@ Line 3</pre>
                 <div class="edge-grid">
                     <div class="edge-item">
                         <div class="edge-label">color: rgb(37, 99, 235)</div>
-                        <div id="color-blue-text" style="color:rgb(37,99,235);font-size:14px;font-weight:600">This text is blue</div>
+                        <div id="color-blue-text" style="color:rgb(37,99,235);font-size:14px;font-weight:600">Priority notification</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">color: rgb(239, 68, 68)</div>
-                        <div id="color-red-text" style="color:rgb(239,68,68);font-size:14px;font-weight:600">This text is red</div>
+                        <div id="color-red-text" style="color:rgb(239,68,68);font-size:14px;font-weight:600">Overdue deadline alert</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">color: rgb(22, 163, 74)</div>
-                        <div id="color-green-text" style="color:rgb(22,163,74);font-size:14px;font-weight:600">This text is green</div>
+                        <div id="color-green-text" style="color:rgb(22,163,74);font-size:14px;font-weight:600">Build passed message</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">background: rgb(253, 224, 71)</div>
-                        <div id="color-yellow-bg" style="background-color:rgb(253,224,71);color:#000;padding:6px 10px;border-radius:4px;font-size:13px">Yellow background</div>
+                        <div id="color-yellow-bg" style="background-color:rgb(253,224,71);color:#000;padding:6px 10px;border-radius:4px;font-size:13px">Warning advisory card</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">background: rgb(99, 102, 241)</div>
-                        <div id="color-indigo-bg" style="background-color:rgb(99,102,241);color:#fff;padding:6px 10px;border-radius:4px;font-size:13px">Indigo background</div>
+                        <div id="color-indigo-bg" style="background-color:rgb(99,102,241);color:#fff;padding:6px 10px;border-radius:4px;font-size:13px">Feature highlight panel</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">border: rgb(239, 68, 68)</div>
-                        <div id="color-red-border" style="border:3px solid rgb(239,68,68);padding:6px 10px;border-radius:4px;font-size:13px;color:var(--text-primary)">Red border</div>
+                        <div id="color-red-border" style="border:3px solid rgb(239,68,68);padding:6px 10px;border-radius:4px;font-size:13px;color:var(--text-primary)">Invalid field container</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">border: rgb(22, 163, 74)</div>
-                        <div id="color-green-border" style="border:3px solid rgb(22,163,74);padding:6px 10px;border-radius:4px;font-size:13px;color:var(--text-primary)">Green border</div>
+                        <div id="color-green-border" style="border:3px solid rgb(22,163,74);padding:6px 10px;border-radius:4px;font-size:13px;color:var(--text-primary)">Verified field container</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">display: block</div>
-                        <div id="display-block-el" style="display:block;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">Block element</div>
+                        <div id="display-block-el" style="display:block;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">Content section</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">display: inline</div>
-                        <span id="display-inline-el" style="display:inline;padding:2px 8px;background:var(--bg-tertiary);border-radius:3px;font-size:13px">Inline element</span>
+                        <span id="display-inline-el" style="display:inline;padding:2px 8px;background:var(--bg-tertiary);border-radius:3px;font-size:13px">Tag chip</span>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">visibility: visible</div>
-                        <div id="visibility-visible-el" style="visibility:visible;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">This element is visible</div>
+                        <div id="visibility-visible-el" style="visibility:visible;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">Dashboard configuration</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">opacity: 0.5</div>
-                        <div id="opacity-half-el" style="opacity:0.5;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">50% opacity</div>
+                        <div id="opacity-half-el" style="opacity:0.5;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">Watermark overlay</div>
                     </div>
                     <div class="edge-item">
                         <div class="edge-label">opacity: 1</div>
-                        <div id="opacity-full-el" style="opacity:1;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">100% opacity</div>
+                        <div id="opacity-full-el" style="opacity:1;padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;font-size:13px">Featured section</div>
                     </div>
                 </div>
             </div>
