@@ -168,17 +168,17 @@
         </div>
         <div class="assert-card">
             <h4>Hidden Element (display:none)</h4>
-            <div id="el-hidden-display" class="hidden-el">Supplementary details section</div>
+            <div id="el-hidden-display" class="hidden-el" aria-label="Supplementary details section">Supplementary details section</div>
             <div class="meta">State: <code>hidden</code> | CSS: display:none | Element exists in DOM but not visible</div>
         </div>
         <div class="assert-card">
             <h4>Hidden Element (visibility:hidden)</h4>
-            <div id="el-hidden-visibility" class="visibility-hidden">Off-screen helper content</div>
+            <div id="el-hidden-visibility" class="visibility-hidden" aria-label="Off-screen helper content">Off-screen helper content</div>
             <div class="meta">State: <code>hidden</code> | CSS: visibility:hidden | Takes space but invisible</div>
         </div>
         <div class="assert-card">
             <h4>Hidden Element (opacity:0)</h4>
-            <div id="el-hidden-opacity" class="opacity-zero">Background overlay layer</div>
+            <div id="el-hidden-opacity" class="opacity-zero" aria-label="Background overlay layer">Background overlay layer</div>
             <div class="meta">State: <code>hidden</code> (edge case) | CSS: opacity:0</div>
         </div>
     </div>
@@ -454,7 +454,7 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Element without data-testid</h4>
-            <div id="el-no-testid">Sidebar info panel</div>
+            <div id="el-no-testid">I have no data-testid attribute</div>
             <div class="meta">Assert "data-testid equals main-content" should FAIL (attr not present)</div>
         </div>
     </div>
@@ -578,7 +578,7 @@
         </div>
         <div class="assert-card">
             <h4>opacity: 0</h4>
-            <div id="css-opacity-zero" style="opacity: 0; height: 32px;">Tracking beacon element</div>
+            <div id="css-opacity-zero" aria-label="Tracking beacon element" style="opacity: 0; height: 32px;">Tracking beacon element</div>
             <div class="meta">CSS: <code>opacity: 0</code> | Edge case: invisible but in layout</div>
         </div>
         <div class="assert-card">
@@ -625,7 +625,7 @@
         </div>
         <div class="assert-card">
             <h4>NOT visible (hidden element)</h4>
-            <div id="el-not-visible" style="display:none;">Background service status</div>
+            <div id="el-not-visible" aria-label="Background service status" style="display:none;">Background service status</div>
             <div class="meta">Assert: "element is NOT visible" = PASS</div>
         </div>
         <div class="assert-card">
@@ -687,7 +687,7 @@
     <div class="assertion-grid">
         <div class="assert-card">
             <h4>Empty attribute value</h4>
-            <div id="el-empty-attr" data-value="">Placeholder container</div>
+            <div id="el-empty-attr" data-value="">Empty attribute</div>
             <div class="meta">Attr: <code>data-value=""</code> (empty string)<br>TC-R2-01: Assert "data-value equals empty"</div>
         </div>
         <div class="assert-card">
@@ -1010,7 +1010,7 @@
         </div>
         <div class="assert-card">
             <h4>Target for undefined variable test</h4>
-            <div id="var-undefined-test" data-attr="test-value">Settings entry</div>
+            <div id="var-undefined-test" data-attr="test-value">Test Value</div>
             <div class="meta">TC-R5-03: Assert "attr contains {{nonExistent}}"<br>Should ERROR: variable not defined</div>
         </div>
     </div>
@@ -1035,6 +1035,11 @@
                 <code>"Assert button is enabled"</code> &rarr; ASSERTION<br>
                 Same element, different classification
             </div>
+        </div>
+        <div class="assert-card">
+            <h4>Conditional result target</h4>
+            <div id="looks-enabled-target" style="opacity: 1; visibility: visible;">Looks Enabled</div>
+            <div class="meta">TC-R5-03: After clicking Action Button, verify this element's visual properties</div>
         </div>
         <div class="assert-card">
             <h4>Ambiguous assertion target</h4>
@@ -1375,8 +1380,8 @@
         </div>
         <div class="assert-card">
             <h4>Aria-Hidden Element</h4>
-            <div id="el-aria-hidden" aria-hidden="true" style="padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-muted);">
-                Decorative separator content
+            <div id="el-aria-hidden" aria-hidden="true" aria-label="This is aria-hidden" style="padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-muted);">
+                This is aria-hidden
             </div>
             <div class="meta">
                 ARIA-07: <code>aria-hidden</code> = "true"
