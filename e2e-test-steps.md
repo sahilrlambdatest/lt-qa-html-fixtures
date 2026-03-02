@@ -225,11 +225,11 @@
 132. Assert the src of the LambdaTest Logo image does not end with ".png"
 133. Assert the href of the "Go to Dashboard" link does not end with ".html"
 134. **[N]** Assert the src of the LambdaTest Logo image does not end with ".svg"
-135. **[N]** Assert the href of the "Secure Link" does not start with "https://"
+135. **[N]** Assert the href of the "Secure Link" does not start with "https://"           //////failed
 136. **[N]** Assert the "Run Analysis" button is disabled
 137. **[N]** Assert the "Opt-in for beta" checkbox is checked
 138. **[N]** Assert the type of the text input does not equal "text"
-139. **[N]** Assert the href of the "Production Link" does not contain "lambdatest"
+139. **[N]** Assert the href of the "Production Link" does not contain "lambdatest"       ////failed
 
 ---
 
@@ -250,9 +250,16 @@
 145. Assert the data-value of the "Empty attribute" element equals ""
 146. Assert the data-label of the "Unicode text" element contains "Café"
 147. Assert the data-emoji of the "Emoji data" element contains "🚀"
-148. Assert the data-content of the "Entities text" element contains "$99"
+148. Assert the data-content of the "Entities text" element contains "$99"                           ////failed
 149. **[N]** Assert the data-value of the "Empty attribute" element equals "something"
 150. **[N]** Assert the data-label of the "Unicode text" element contains "Tokyo"
+
+#### Long Value UI Overflow
+
+151. Assert the href of the "Long URL Link" contains "test-cases/export"
+152. Assert the href of the "Long URL Link" starts with "https://stage-test-manager-api"
+153. Assert the data-config of the "Long Data Config" element contains "assertion-benchmark"
+154. Assert the data-config of the "Long Data Config" element contains "01K9YV6J5R53VADHSR1XXQGNV2"
 
 #### Dynamic Elements
 
@@ -278,10 +285,10 @@
 162. Click the "Open Modal" button
 163. Assert the modal submit button is enabled
 164. Assert the data-action of the modal submit button equals "submit"
-165. Assert the data-context of the modal input equals "modal"
+165. Assert the data-context of the modal input equals "modal"                      ///need to test again
 166. Assert the data-status of the modal status element equals "open"
 167. Click the "Cancel" button in the modal
-168. **[N]** Assert the data-action of the modal submit button equals "cancel"
+168. **[N]** Assert the data-action of the modal submit button equals "cancel"     //// need to verify got empty variable
 169. **[N]** Assert the data-status of the modal status element equals "closed"
 
 ---
@@ -290,10 +297,10 @@
 
 170. Assert the enabled button inside the iframe is enabled
 171. Assert the disabled button inside the iframe is disabled
-172. Assert the placeholder of the iframe input equals "Iframe input field"
-173. Assert the data-context of the iframe input equals "iframe"
+172. Assert the placeholder of the iframe input equals "Iframe input field"         ///failing
+173. Assert the data-context of the iframe input equals "iframe"                   ///need to test again
 174. Assert the role of the iframe status element equals "status"
-175. Assert the data-status of the iframe status element equals "active"
+175. Assert the data-status of the iframe status element equals "active"            ///failing
 176. **[N]** Assert the disabled button inside the iframe is enabled
 177. **[N]** Assert the data-context of the iframe input equals "main"
 178. **[N]** Assert the data-status of the iframe status element equals "inactive"
@@ -427,7 +434,7 @@
 251. Assert the "Update Payment" button inside the disabled fieldset is disabled
 252. Assert the input inside the disabled fieldset is disabled
 253. Assert the select inside the disabled fieldset is disabled
-254. **[N]** Assert the "Update Payment" button inside the disabled fieldset is enabled
+254. **[N]** Assert the "Update Payment" button inside the disabled fieldset is enabled      //// UI issue empty assertion instruction
 
 #### Boolean Attributes
 
@@ -680,7 +687,7 @@
 > Account Settings → Role Permissions
 
 410. Select "Viewer" from the User Role dropdown
-411. If the role badge text equals "Viewer" then assert the Read permission has data-perm equal to "true"
+411. If the role badge text equals "Viewer" then assert the Read permission has data-perm equal to "true"      /// in dom its in capital to lowercase git false assertion
 412. If the role badge text equals "Viewer" then assert the Write permission has data-perm equal to "false"
 413. If the role badge text equals "Viewer" then assert the Delete permission has data-perm equal to "false"
 414. If the role badge text equals "Viewer" then assert the Admin Panel permission has data-perm equal to "false"

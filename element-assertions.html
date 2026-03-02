@@ -716,6 +716,16 @@
             <div id="el-500-attr">500 chars boundary</div>
             <div class="meta">Boundary test: exactly 500 chars should NOT be truncated</div>
         </div>
+        <div class="assert-card">
+            <h4>Long URL attribute (UI overflow test)</h4>
+            <a id="el-long-url" href="https://stage-test-manager-api.lambdatestinternal.com/api/v1/projects/01K9YV6J5R53VADHSR1XXQGNV2/test-cases/export?format=csv&include_steps=true&include_attachments=true&filter_status=active&filter_priority=high,medium&filter_suite=regression,smoke&filter_tags=assertion,element-state&sort_by=created_at&sort_order=desc&page=1&per_page=500&workspace_id=ws-default-001&team_id=team-qa-automation-2024&session_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMzQ1Iiwicm9sZSI6ImFkbWluIn0" data-testid="long-url-link">Long URL Link</a>
+            <div class="meta">TC-UI-01: href >400 chars — tests UI text overflow on assertion result display</div>
+        </div>
+        <div class="assert-card">
+            <h4>Long data attribute value (UI overflow test)</h4>
+            <div id="el-long-data-value" data-config='{"project":"01K9YV6J5R53VADHSR1XXQGNV2","environment":"staging","base_url":"https://stage-test-manager-api.lambdatestinternal.com","auth":{"type":"bearer","token":"eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyLTk4NzY1In0"},"filters":{"status":["active","in-review"],"priority":["high","critical"],"tags":["regression","assertion-benchmark"]}}'>Long Data Config</div>
+            <div class="meta">TC-UI-02: data-config JSON >350 chars — tests UI overflow with structured data</div>
+        </div>
     </div>
 
     <h3>Dynamic Elements</h3>
