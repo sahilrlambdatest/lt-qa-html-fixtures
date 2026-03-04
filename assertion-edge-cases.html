@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>Assertion Edge Cases</title>
+    <link rel="stylesheet" href="design-system.css">
+    <style>
+        .assertion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+        .assert-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; position: relative; }
+        .assert-card h4 { margin: 0 0 8px; font-size: 13px; color: var(--text-primary); font-weight: 600; }
+        .assert-card .meta { font-size: 11px; color: var(--text-tertiary); margin-top: 8px; font-family: var(--font-mono); line-height: 1.6; }
+        .assert-card .meta code { background: var(--bg-tertiary); padding: 1px 5px; border-radius: 3px; color: var(--accent); }
+        .inherited-parent { color: rgb(220, 38, 38); font-size: 20px; }
+        .uppercase-text { text-transform: uppercase; }
+        .hidden-el { display: none; }
+    </style>
+</head>
+<body class="has-monitor">
+
+<div class="page-wrapper">
+    <header class="page-header">
+        <h1>Assertion Edge Cases</h1>
+        <p class="subtitle">Edge cases not covered in the main assertion pages — boolean attrs, case sensitivity, whitespace, numerics, SVG, inheritance, disambiguation</p>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: BOOLEAN ATTRIBUTE EDGE CASES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="boolean-attrs">
+        <h2>Section 1 — Boolean Attribute Edge Cases</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">HTML boolean attributes: presence = true, regardless of value. <code>disabled="false"</code> is STILL disabled.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>disabled (no value)</h4>
+                <button id="btn-disabled-bare" disabled>Bare Disabled</button>
+                <div class="meta">HTML: <code>&lt;button disabled&gt;</code><br>Expected: is disabled = true</div>
+            </div>
+            <div class="assert-card">
+                <h4>disabled="disabled"</h4>
+                <button id="btn-disabled-disabled" disabled="disabled">Disabled Equals Disabled</button>
+                <div class="meta">HTML: <code>disabled="disabled"</code><br>Expected: is disabled = true</div>
+            </div>
+            <div class="assert-card">
+                <h4>disabled="false" (STILL disabled!)</h4>
+                <button id="btn-disabled-false" disabled="false">Disabled False</button>
+                <div class="meta">HTML: <code>disabled="false"</code><br>⚠️ In HTML, presence = true. This IS disabled despite value "false"</div>
+            </div>
+            <div class="assert-card">
+                <h4>disabled="" (empty string)</h4>
+                <button id="btn-disabled-empty" disabled="">Disabled Empty</button>
+                <div class="meta">HTML: <code>disabled=""</code><br>Expected: is disabled = true (empty string = present)</div>
+            </div>
+            <div class="assert-card">
+                <h4>Not disabled (control)</h4>
+                <button id="btn-not-disabled">Not Disabled</button>
+                <div class="meta">No disabled attribute<br>Expected: is enabled = true</div>
+            </div>
+            <div class="assert-card">
+                <h4>aria-disabled="true" (not natively disabled)</h4>
+                <button id="btn-aria-disabled" aria-disabled="true" style="opacity:0.5;pointer-events:none;">Aria Disabled Only</button>
+                <div class="meta">HTML: <code>aria-disabled="true"</code> but NO native <code>disabled</code><br>⚠️ Is this "disabled" to the assertion engine?</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: CASE SENSITIVITY -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="case-sensitivity">
+        <h2>Section 2 — Case Sensitivity</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Tests whether assertion operators are case-sensitive or case-insensitive.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>Mixed case data attribute</h4>
+                <div id="case-mixed" data-status="Active" data-role="Admin">Case Mixed Element</div>
+                <div class="meta"><code>data-status="Active"</code> (capital A)<br><code>data-role="Admin"</code> (capital A)</div>
+            </div>
+            <div class="assert-card">
+                <h4>All uppercase data attribute</h4>
+                <div id="case-upper" data-code="ERR_TIMEOUT" data-env="PRODUCTION">Case Upper Element</div>
+                <div class="meta"><code>data-code="ERR_TIMEOUT"</code><br><code>data-env="PRODUCTION"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>All lowercase data attribute</h4>
+                <div id="case-lower" data-code="err_timeout" data-env="production">Case Lower Element</div>
+                <div class="meta"><code>data-code="err_timeout"</code><br><code>data-env="production"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>Mixed case href</h4>
+                <a id="case-link" href="https://App.LambdaTest.com/Dashboard">Dashboard Link</a>
+                <div class="meta"><code>href="https://App.LambdaTest.com/Dashboard"</code><br>Test: contains "lambdatest" vs "LambdaTest"</div>
+            </div>
+            <div class="assert-card">
+                <h4>Case in aria-label</h4>
+                <button id="case-aria" aria-label="Close Dialog">Close Case Button</button>
+                <div class="meta"><code>aria-label="Close Dialog"</code> (both capitals)<br>Test: equals "close dialog" vs "Close Dialog"</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: WHITESPACE IN ATTRIBUTES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="whitespace">
+        <h2>Section 3 — Whitespace in Attribute Values</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Tests leading, trailing, and internal whitespace in attribute values.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>Leading spaces</h4>
+                <div id="ws-leading" data-role="   admin">Leading Spaces Element</div>
+                <div class="meta"><code>data-role="   admin"</code> (3 leading spaces)</div>
+            </div>
+            <div class="assert-card">
+                <h4>Trailing spaces</h4>
+                <div id="ws-trailing" data-role="editor   ">Trailing Spaces Element</div>
+                <div class="meta"><code>data-role="editor   "</code> (3 trailing spaces)</div>
+            </div>
+            <div class="assert-card">
+                <h4>Both leading and trailing</h4>
+                <div id="ws-both" data-value="  hello world  ">Padded Value Element</div>
+                <div class="meta"><code>data-value="  hello world  "</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>Multiple internal spaces</h4>
+                <div id="ws-internal" data-label="New    York    City">Multi Space Element</div>
+                <div class="meta"><code>data-label="New    York    City"</code> (4 spaces each)</div>
+            </div>
+            <div class="assert-card">
+                <h4>Tab and newline in attribute</h4>
+                <div id="ws-special" data-note="line1&#10;line2&#9;tabbed">Special Whitespace Element</div>
+                <div class="meta"><code>data-note</code> contains newline and tab characters</div>
+            </div>
+            <div class="assert-card">
+                <h4>Only whitespace</h4>
+                <div id="ws-only" data-value="   ">Whitespace Only Element</div>
+                <div class="meta"><code>data-value="   "</code> (3 spaces, no text)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: NUMERIC EDGE CASES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="numeric-edges">
+        <h2>Section 4 — Numeric Edge Cases</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Zero, negative, decimal, leading zeros — boundary conditions for numeric operators.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>Zero value</h4>
+                <div id="num-zero" data-count="0" data-score="0">Zero Count Element</div>
+                <div class="meta"><code>data-count="0"</code><br>Test: equals "0", greater than "-1", at most "0"</div>
+            </div>
+            <div class="assert-card">
+                <h4>Negative number</h4>
+                <div id="num-negative" data-temperature="-15" data-offset="-3">Negative Value Element</div>
+                <div class="meta"><code>data-temperature="-15"</code><br>Test: greater than "-20", less than "0"</div>
+            </div>
+            <div class="assert-card">
+                <h4>Decimal number</h4>
+                <div id="num-decimal" data-rating="4.7" data-price="19.99">Decimal Value Element</div>
+                <div class="meta"><code>data-rating="4.7"</code>, <code>data-price="19.99"</code><br>Test: greater than "4", at least "4.7"</div>
+            </div>
+            <div class="assert-card">
+                <h4>Leading zeros</h4>
+                <div id="num-leading-zero" data-code="007" data-zip="01234">Leading Zero Element</div>
+                <div class="meta"><code>data-code="007"</code><br>⚠️ String "007" vs number 7 — how does engine compare?</div>
+            </div>
+            <div class="assert-card">
+                <h4>Very large number</h4>
+                <div id="num-large" data-bytes="9999999999" data-id="12345678901234">Large Number Element</div>
+                <div class="meta"><code>data-bytes="9999999999"</code><br>Test: greater than "9999999998"</div>
+            </div>
+            <div class="assert-card">
+                <h4>Boundary: at least / at most same value</h4>
+                <div id="num-boundary" data-level="50">Boundary Element</div>
+                <div class="meta"><code>data-level="50"</code><br>at least "50" = PASS, at most "50" = PASS, greater than "50" = FAIL</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: EMPTY vs MISSING ATTRIBUTE -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="empty-vs-missing">
+        <h2>Section 5 — Empty vs Missing Attribute</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Distinguishing between attribute present with empty value vs attribute completely absent.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>aria-label="" (present, empty)</h4>
+                <button id="attr-empty-aria" aria-label="">Empty Aria Label</button>
+                <div class="meta"><code>aria-label=""</code><br>"has aria-label" = true, "equals empty" = true</div>
+            </div>
+            <div class="assert-card">
+                <h4>No aria-label (absent)</h4>
+                <button id="attr-missing-aria">No Aria Label</button>
+                <div class="meta">No aria-label attribute at all<br>"has aria-label" = false</div>
+            </div>
+            <div class="assert-card">
+                <h4>data-value="" (present, empty)</h4>
+                <div id="attr-empty-data" data-value="">Empty Data Value</div>
+                <div class="meta"><code>data-value=""</code><br>"has data-value" = true, "equals empty string" = true</div>
+            </div>
+            <div class="assert-card">
+                <h4>No data-value (absent)</h4>
+                <div id="attr-missing-data">No Data Value</div>
+                <div class="meta">No data-value attribute<br>"has data-value" = false</div>
+            </div>
+            <div class="assert-card">
+                <h4>src="" (present, empty)</h4>
+                <img id="attr-empty-src" src="" alt="Empty Src Image" style="width:40px;height:40px;background:var(--bg-tertiary);border:1px dashed var(--border-subtle);">
+                <div class="meta"><code>src=""</code><br>"has src" = true, "src equals empty" = true</div>
+            </div>
+            <div class="assert-card">
+                <h4>Multiple empty attributes</h4>
+                <div id="attr-multi-empty" data-a="" data-b="" data-c="">Multi Empty Attrs</div>
+                <div class="meta">3 empty data attributes<br>All "has" = true, all "equals empty" = true</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: CSS INHERITED VALUES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="css-inheritance">
+        <h2>Section 6 — CSS Inherited Values</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Child elements inheriting CSS from parent — computed style should reflect inherited value.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>Color inherited from parent</h4>
+                <div class="inherited-parent" id="inherit-parent">
+                    <span id="inherit-child-color">Inherited Color Child</span>
+                </div>
+                <div class="meta">Parent: <code>color: rgb(220, 38, 38)</code><br>Child has no color set — inherits from parent</div>
+            </div>
+            <div class="assert-card">
+                <h4>Font-size inherited from parent</h4>
+                <div class="inherited-parent" id="inherit-font-parent">
+                    <span id="inherit-child-font">Inherited Font Child</span>
+                </div>
+                <div class="meta">Parent: <code>font-size: 20px</code><br>Child inherits 20px from parent</div>
+            </div>
+            <div class="assert-card">
+                <h4>Child overrides parent</h4>
+                <div class="inherited-parent">
+                    <span id="override-child" style="color: rgb(37, 99, 235); font-size: 14px;">Override Child</span>
+                </div>
+                <div class="meta">Parent: red/20px, Child: <code>color: rgb(37, 99, 235); font-size: 14px</code><br>Child overrides both</div>
+            </div>
+            <div class="assert-card">
+                <h4>Deeply nested inheritance (3 levels)</h4>
+                <div style="color: rgb(22, 163, 74);">
+                    <div>
+                        <span id="deep-inherit">Deep Inherited Text</span>
+                    </div>
+                </div>
+                <div class="meta">Grandparent: <code>color: rgb(22, 163, 74)</code><br>3 levels deep — color still inherited</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 7: RGBA & COLOR FORMATS -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="color-formats">
+        <h2>Section 7 — RGBA & Advanced Color Formats</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Semi-transparent colors, HSL, and format normalization edge cases.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>RGBA semi-transparent background</h4>
+                <div id="color-rgba-bg" style="background-color: rgba(239, 68, 68, 0.5); padding: 12px; border-radius: var(--radius-sm); color: #fff;">RGBA Background</div>
+                <div class="meta"><code>background-color: rgba(239, 68, 68, 0.5)</code><br>Alpha = 0.5 — does engine return alpha?</div>
+            </div>
+            <div class="assert-card">
+                <h4>RGBA fully opaque (alpha = 1)</h4>
+                <div id="color-rgba-opaque" style="background-color: rgba(59, 130, 246, 1); padding: 12px; border-radius: var(--radius-sm); color: #fff;">RGBA Opaque</div>
+                <div class="meta"><code>rgba(59, 130, 246, 1)</code><br>⚠️ May normalize to <code>rgb(59, 130, 246)</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>RGBA zero alpha (fully transparent)</h4>
+                <div id="color-rgba-transparent" style="background-color: rgba(0, 0, 0, 0); padding: 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-subtle);">RGBA Transparent</div>
+                <div class="meta"><code>rgba(0, 0, 0, 0)</code><br>Fully transparent — engine must still return value</div>
+            </div>
+            <div class="assert-card">
+                <h4>HSL color</h4>
+                <div id="color-hsl" style="color: hsl(280, 67%, 55%); font-size: 16px; font-weight: 700;">HSL Color Text</div>
+                <div class="meta"><code>color: hsl(280, 67%, 55%)</code><br>⚠️ Browser may normalize to rgb()</div>
+            </div>
+            <div class="assert-card">
+                <h4>CSS named color with alpha</h4>
+                <div id="color-named-alpha" style="background-color: rgba(255, 0, 0, 0.3); padding: 12px; border-radius: var(--radius-sm);">Named Alpha Color</div>
+                <div class="meta"><code>rgba(255, 0, 0, 0.3)</code><br>Red at 30% opacity</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 8: SVG ATTRIBUTES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="svg-attrs">
+        <h2>Section 8 — SVG Attribute Assertions</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">SVG-specific attributes — viewBox, stroke, fill, stroke-width, d path.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>SVG with viewBox and stroke</h4>
+                <svg id="svg-icon-check" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="rgb(34, 197, 94)" stroke-width="2" stroke-linecap="round" aria-label="Check icon">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <div class="meta"><code>viewBox="0 0 24 24"</code>, <code>stroke="rgb(34, 197, 94)"</code>, <code>stroke-width="2"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>SVG with fill color</h4>
+                <svg id="svg-icon-circle" viewBox="0 0 24 24" width="40" height="40" aria-label="Status circle">
+                    <circle cx="12" cy="12" r="10" fill="rgb(239, 68, 68)" stroke="none"></circle>
+                </svg>
+                <div class="meta"><code>fill="rgb(239, 68, 68)"</code> on circle element<br><code>stroke="none"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>SVG with path d attribute</h4>
+                <svg id="svg-icon-arrow" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" aria-label="Arrow icon">
+                    <path id="svg-arrow-path" d="M5 12h14M12 5l7 7-7 7"></path>
+                </svg>
+                <div class="meta"><code>d="M5 12h14M12 5l7 7-7 7"</code><br>Contains: "M5 12h14"</div>
+            </div>
+            <div class="assert-card">
+                <h4>SVG with data attributes</h4>
+                <svg id="svg-data" viewBox="0 0 24 24" width="40" height="40" data-icon="settings" data-size="md" aria-label="Settings icon">
+                    <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42" fill="none" stroke="currentColor" stroke-width="2"></path>
+                </svg>
+                <div class="meta"><code>data-icon="settings"</code>, <code>data-size="md"</code></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 9: DISAMBIGUATION (SAME TEXT) -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="disambiguation">
+        <h2>Section 9 — Same Text Disambiguation</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Multiple elements share identical visible text — resolver must pick the correct one.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>Delete button (danger context)</h4>
+                <button id="btn-delete-danger" data-action="confirm-delete" data-context="danger">Delete</button>
+                <div class="meta"><code>data-action="confirm-delete"</code><br><code>data-context="danger"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>Delete button (undo context)</h4>
+                <button id="btn-delete-undo" data-action="undo-delete" data-context="undo">Delete</button>
+                <div class="meta"><code>data-action="undo-delete"</code><br><code>data-context="undo"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>Submit button (form A)</h4>
+                <button id="btn-submit-a" data-form="form-a" type="submit">Submit</button>
+                <div class="meta"><code>data-form="form-a"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>Submit button (form B)</h4>
+                <button id="btn-submit-b" data-form="form-b" type="submit">Submit</button>
+                <div class="meta"><code>data-form="form-b"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>Status text (section A)</h4>
+                <span id="status-section-a" data-section="header">Active</span>
+                <div class="meta"><code>data-section="header"</code><br>Text: "Active"</div>
+            </div>
+            <div class="assert-card">
+                <h4>Status text (section B)</h4>
+                <span id="status-section-b" data-section="sidebar">Active</span>
+                <div class="meta"><code>data-section="sidebar"</code><br>Text: "Active" — same as above</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 10: TEXT TRANSFORM -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="text-transform">
+        <h2>Section 10 — Text Transform & Contenteditable</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">CSS text-transform changes visual rendering without changing DOM text. Contenteditable divs have no .value.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>text-transform: uppercase</h4>
+                <div id="tt-upper" class="uppercase-text" style="font-weight: 600; font-size: 14px;">viewer role label</div>
+                <div class="meta">DOM text: "viewer role label"<br>Renders as: "VIEWER ROLE LABEL"<br>CSS: <code>text-transform: uppercase</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>text-transform: capitalize</h4>
+                <div id="tt-capitalize" style="text-transform: capitalize; font-size: 14px;">john doe smith</div>
+                <div class="meta">DOM text: "john doe smith"<br>Renders as: "John Doe Smith"<br>CSS: <code>text-transform: capitalize</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>text-transform: lowercase</h4>
+                <div id="tt-lower" style="text-transform: lowercase; font-size: 14px;">ERROR_CODE_TIMEOUT</div>
+                <div class="meta">DOM text: "ERROR_CODE_TIMEOUT"<br>Renders as: "error_code_timeout"<br>CSS: <code>text-transform: lowercase</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>Contenteditable div</h4>
+                <div id="ce-editable" contenteditable="true" data-editable="true" style="padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); min-height: 40px; background: var(--bg-secondary);">Edit this text</div>
+                <div class="meta"><code>contenteditable="true"</code><br>No .value — text is in .textContent / .innerText</div>
+            </div>
+            <div class="assert-card">
+                <h4>Contenteditable="false"</h4>
+                <div id="ce-readonly" contenteditable="false" data-editable="false" style="padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-tertiary);">Non-editable content</div>
+                <div class="meta"><code>contenteditable="false"</code></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 11: HIDDEN ELEMENT ATTRIBUTES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="hidden-attrs">
+        <h2>Section 11 — Attributes on Hidden Elements</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Elements invisible via CSS but still have readable DOM attributes.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>display:none with data attributes</h4>
+                <div id="hidden-data" class="hidden-el" aria-label="Hidden Config" data-status="archived" data-priority="low">Hidden Config Element</div>
+                <div class="meta"><code>display:none</code><br><code>data-status="archived"</code>, <code>data-priority="low"</code><br>Invisible but attributes readable</div>
+            </div>
+            <div class="assert-card">
+                <h4>visibility:hidden with data attributes</h4>
+                <div id="hidden-vis-data" aria-label="Invisible Status" style="visibility: hidden; height: 32px;" data-state="pending" data-version="2.1">Invisible Status Element</div>
+                <div class="meta"><code>visibility:hidden</code><br><code>data-state="pending"</code>, <code>data-version="2.1"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>opacity:0 with aria attributes</h4>
+                <div id="hidden-opacity-aria" aria-label="Ghost Element" style="opacity: 0; height: 32px;" role="status" aria-live="polite" data-count="42">Ghost Element</div>
+                <div class="meta"><code>opacity:0</code><br><code>role="status"</code>, <code>data-count="42"</code></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 12: CSS COMPUTED vs AUTHORED -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="css-computed">
+        <h2>Section 12 — CSS Computed vs Authored</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Authored CSS values get normalized to computed values by the browser.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>font-weight: bold → 700</h4>
+                <div id="css-bold" style="font-weight: bold; font-size: 16px;">Bold Text Computed</div>
+                <div class="meta">Authored: <code>font-weight: bold</code><br>Computed: <code>700</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>font-weight: normal → 400</h4>
+                <div id="css-normal" style="font-weight: normal; font-size: 16px;">Normal Text Computed</div>
+                <div class="meta">Authored: <code>font-weight: normal</code><br>Computed: <code>400</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>font-weight: lighter</h4>
+                <div id="css-lighter" style="font-weight: lighter; font-size: 16px;">Lighter Text Computed</div>
+                <div class="meta">Authored: <code>font-weight: lighter</code><br>Computed: depends on parent (typically 100 or 300)</div>
+            </div>
+            <div class="assert-card">
+                <h4>display: inline-block</h4>
+                <span id="css-inline-block" style="display: inline-block; padding: 4px 12px; background: var(--accent); color: #fff; border-radius: var(--radius-sm);">Inline Block Tag</span>
+                <div class="meta">Authored: <code>display: inline-block</code><br>Computed: <code>inline-block</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>opacity as percentage → decimal</h4>
+                <div id="css-opacity-pct" style="opacity: 0.75; padding: 8px; background: var(--accent); color: #fff; border-radius: var(--radius-sm);">75% Opacity</div>
+                <div class="meta">Authored: <code>opacity: 0.75</code><br>Computed: <code>0.75</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>font-size: 1.5em → px</h4>
+                <div style="font-size: 16px;">
+                    <span id="css-em-size" style="font-size: 1.5em;">Em Sized Text</span>
+                </div>
+                <div class="meta">Authored: <code>font-size: 1.5em</code> (parent 16px)<br>Computed: <code>24px</code></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 13: INTERACTION THEN ASSERT -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="interaction-assert">
+        <h2>Section 13 — Assert After Interaction</h2>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Assert attributes/state after user interactions beyond simple click-to-disable.</p>
+
+        <div class="assertion-grid">
+            <div class="assert-card">
+                <h4>Checkbox toggle → data attribute changes</h4>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input id="ia-checkbox" type="checkbox" data-state="unchecked" onchange="this.dataset.state = this.checked ? 'checked' : 'unchecked'">
+                    <span>Toggle Data State</span>
+                </label>
+                <div class="meta">Click checkbox → <code>data-state</code> changes from "unchecked" to "checked"</div>
+            </div>
+            <div class="assert-card">
+                <h4>Dropdown selection → text changes</h4>
+                <select id="ia-select" data-selected="none" onchange="this.dataset.selected = this.value; document.getElementById('ia-select-display').textContent = this.value;">
+                    <option value="none">-- Select --</option>
+                    <option value="option-a">Option A</option>
+                    <option value="option-b">Option B</option>
+                    <option value="option-c">Option C</option>
+                </select>
+                <div id="ia-select-display" style="margin-top:4px;font-size:13px;">none</div>
+                <div class="meta">Select "Option B" → <code>data-selected="option-b"</code></div>
+            </div>
+            <div class="assert-card">
+                <h4>Type in input → value assertion</h4>
+                <input id="ia-input" type="text" placeholder="Type something..." data-filled="false" oninput="this.dataset.filled = this.value.length > 0 ? 'true' : 'false'" style="width:100%;padding:6px 8px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);">
+                <div class="meta">Type text → <code>data-filled</code> changes to "true"<br>Assert the value of the input contains typed text</div>
+            </div>
+            <div class="assert-card">
+                <h4>Button click → counter increments</h4>
+                <button id="ia-counter-btn" data-clicks="0" onclick="var c = parseInt(this.dataset.clicks)+1; this.dataset.clicks=c; document.getElementById('ia-counter-display').textContent='Clicks: '+c;">Click Counter</button>
+                <div id="ia-counter-display" style="margin-top:4px;font-size:13px;">Clicks: 0</div>
+                <div class="meta">Click 3 times → <code>data-clicks="3"</code><br>Test: is greater than "2", is at most "3"</div>
+            </div>
+            <div class="assert-card">
+                <h4>Double click → state change</h4>
+                <button id="ia-dblclick" data-state="idle" ondblclick="this.dataset.state='activated'; this.textContent='Activated!';">Double Click Me</button>
+                <div class="meta">Double click → <code>data-state="activated"</code></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
