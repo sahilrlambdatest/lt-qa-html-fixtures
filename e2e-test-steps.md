@@ -45,7 +45,7 @@
 4. Assert the "John Doe" input is enabled
 5. Assert the "ORD-2024-0892" input is disabled
 6. Assert the "Enterprise Plan" select is disabled
-7. Assert the "2024-02-15T08:30:00Z" input has a readonly attribute
+7. Assert the "2024-02-15T08:30:00Z" input has a readonly attribute    ///// failed in mobile android
 8. **[N]** Assert the "Submit Order" button is disabled
 9. **[N]** Assert the "Authorize Payment" button is enabled
 10. **[N]** Assert the "ORD-2024-0892" input is enabled
@@ -173,7 +173,7 @@
 
 #### Color Normalization
 
-97. Assert the color of the "Urgent alert message" element equals "rgb(255, 0, 0)"
+97. Assert the color of the "Urgent alert message" element equals "rgb(255, 0, 0)"       // sometimes it taking grey in android browser
 98. Assert the color of the "Error notification text" element equals "rgb(255, 0, 0)"
 99. Assert the color of the "System warning label" element equals "rgb(255, 0, 0)"
 100. Assert the border-color of the "Validated input container" element contains "rgb(0, 128, 0)"
@@ -258,8 +258,8 @@
 
 151. Assert the href of the "Long URL Link" contains "test-cases/export"
 152. Assert the href of the "Long URL Link" starts with "https://stage-test-manager-api"
-153. Assert the data-config of the "Long Data Config" element contains "assertion-benchmark"
-154. Assert the data-config of the "Long Data Config" element contains "01K9YV6J5R53VADHSR1XXQGNV2"
+153. Assert the data-config of the "Long Data Config" element contains "assertion-benchmark"               //empty variable in mobile
+154. Assert the data-config of the "Long Data Config" element contains "01K9YV6J5R53VADHSR1XXQGNV2"        //empty variable in mobile
 
 #### Dynamic Elements
 
@@ -276,7 +276,7 @@
 
 #### XSS Safety
 
-161. Assert the data-content of the "XSS test element" contains "script"
+161. Assert the data-content of the "XSS test element" contains "script"        //empty variable in mobile
 
 ---
 
@@ -285,7 +285,7 @@
 162. Click the "Open Modal" button
 163. Assert the modal submit button is enabled
 164. Assert the data-action of the modal submit button equals "submit"
-165. Assert the data-context of the modal input equals "modal"                      ///need to test again
+165. Assert the data-context of the modal input equals "modal"                     
 166. Assert the data-status of the modal status element equals "open"
 167. Click the "Cancel" button in the modal
 168. **[N]** Assert the data-action of the modal submit button equals "cancel"     //// need to verify got empty variable
@@ -297,10 +297,10 @@
 
 170. Assert the enabled button inside the iframe is enabled
 171. Assert the disabled button inside the iframe is disabled
-172. Assert the placeholder of the iframe input equals "Iframe input field"         ///failing
-173. Assert the data-context of the iframe input equals "iframe"                   ///need to test again
+172. Assert the placeholder of the iframe input equals "Iframe input field"        
+173. Assert the data-context of the iframe input equals "iframe"                 
 174. Assert the role of the iframe status element equals "status"
-175. Assert the data-status of the iframe status element equals "active"            ///failing
+175. Assert the data-status of the iframe status element equals "active"           
 176. **[N]** Assert the disabled button inside the iframe is enabled
 177. **[N]** Assert the data-context of the iframe input equals "main"
 178. **[N]** Assert the data-status of the iframe status element equals "inactive"
@@ -332,7 +332,7 @@
 ### Section 11 — Mixed Multi-Attribute (`#mixed-assertions`)
 
 188. Assert the "Add to Cart" button is enabled
-189. Assert the data-action of the "Add to Cart" button equals "primary"
+189. Assert the data-action of the "Add to Cart" button equals "primary"           / empty variable in mobile browser
 190. Assert the aria-label of the "Add to Cart" button equals "Add to cart"
 191. Assert the font-size of the "Add to Cart" button equals "14px"
 192. Assert the font-weight of the "Add to Cart" button equals "600"
