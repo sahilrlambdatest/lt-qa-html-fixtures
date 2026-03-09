@@ -1755,6 +1755,228 @@
     </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 18: ENABLED/DISABLED EDGE CASES — Variables & If/Else -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-card" id="enabled-disabled-edge-cases">
+    <div class="section-card-header">
+        <h2>18. Enabled/Disabled Edge Cases — Variables & If/Else</h2>
+        <span class="badge">LLM PROMPT TRAPS</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Edge cases designed to test LLM prompt accuracy with variable storage, if/else branching, readonly vs disabled, inherited states, and calendar date logic.</p>
+
+    <!-- 18a — Readonly vs Disabled Confusion -->
+    <h3>18a. Readonly vs Disabled Confusion Targets</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Readonly Input (looks disabled but isn't)</h4>
+            <input type="text" id="ec-readonly-input" readonly value="INV-2026-7734" style="width:100%;padding:6px 8px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);background:var(--bg-tertiary);color:var(--text-secondary);opacity:0.6;">
+            <div class="meta">
+                EC-01: <code>readonly</code> = true, <code>disabled</code> = false<br>
+                Trap: opacity 0.6 makes it look disabled, but it's readonly<br>
+                Read disabled → should be null/false<br>
+                Read readonly → should be true
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Disabled Input (no readonly)</h4>
+            <input type="text" id="ec-disabled-input" disabled value="CLOSED-ACC-001" style="width:100%;padding:6px 8px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);">
+            <div class="meta">
+                EC-02: <code>disabled</code> = true, <code>readonly</code> = false<br>
+                Trap: LLM might conflate disabled with readonly
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Both Readonly AND Disabled</h4>
+            <input type="text" id="ec-both-ro-disabled" readonly disabled value="ARCHIVED-2024" style="width:100%;padding:6px 8px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);">
+            <div class="meta">
+                EC-03: Both <code>readonly</code> and <code>disabled</code> = true<br>
+                Trap: Rare combo — LLM must report both correctly
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Neither Readonly nor Disabled (editable)</h4>
+            <input type="text" id="ec-editable-input" value="Edit me freely" style="width:100%;padding:6px 8px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);">
+            <div class="meta">
+                EC-04: Both <code>readonly</code> and <code>disabled</code> = false<br>
+                Enabled + editable baseline
+            </div>
+        </div>
+    </div>
+
+    <!-- 18b — Conditional Enable Chain -->
+    <h3>18b. Conditional Enable Chain (A enables B enables C)</h3>
+    <div class="assertion-grid">
+        <div class="assert-card" style="max-width:100%;grid-column:1/-1;">
+            <h4>Order Processing Pipeline</h4>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <div>
+                    <label style="font-size:12px;color:var(--text-secondary);">Step 1: Verify Identity</label><br>
+                    <button id="ec-chain-step1" data-step="verify" data-chain-state="ready" onclick="this.disabled=true;this.textContent='Verified ✓';this.setAttribute('data-chain-state','done');document.getElementById('ec-chain-step2').disabled=false;document.getElementById('ec-chain-step2').setAttribute('data-chain-state','ready');">Verify Identity</button>
+                </div>
+                <span style="color:var(--text-muted);">→</span>
+                <div>
+                    <label style="font-size:12px;color:var(--text-secondary);">Step 2: Approve Order</label><br>
+                    <button id="ec-chain-step2" disabled data-step="approve" data-chain-state="blocked" onclick="this.disabled=true;this.textContent='Approved ✓';this.setAttribute('data-chain-state','done');document.getElementById('ec-chain-step3').disabled=false;document.getElementById('ec-chain-step3').setAttribute('data-chain-state','ready');">Approve Order</button>
+                </div>
+                <span style="color:var(--text-muted);">→</span>
+                <div>
+                    <label style="font-size:12px;color:var(--text-secondary);">Step 3: Ship Order</label><br>
+                    <button id="ec-chain-step3" disabled data-step="ship" data-chain-state="blocked" onclick="this.disabled=true;this.textContent='Shipped ✓';this.setAttribute('data-chain-state','done');">Ship Order</button>
+                </div>
+            </div>
+            <div class="meta">
+                EC-05: Initially only Step 1 is enabled, Steps 2 & 3 are disabled<br>
+                After Step 1 click: Step 1 disabled, Step 2 enabled, Step 3 still disabled<br>
+                After Step 2 click: Steps 1 & 2 disabled, Step 3 enabled<br>
+                Trap: LLM must understand sequential enable chain
+            </div>
+        </div>
+    </div>
+
+    <!-- 18c — Inherited Disabled Edge Cases -->
+    <h3>18c. Inherited Disabled — Tricky Cases</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Fieldset Disabled with One Escaped Child</h4>
+            <fieldset disabled id="ec-fieldset-partial" style="border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:12px;">
+                <legend style="font-size:12px;color:var(--text-tertiary);padding:0 6px;">Payment Section</legend>
+                <input id="ec-fieldset-child-disabled" type="text" value="4111-XXXX-XXXX" placeholder="Card number" style="margin:4px 0;">
+                <button id="ec-fieldset-child-btn" style="margin:4px 0;">Process Payment</button>
+            </fieldset>
+            <!-- Button OUTSIDE the fieldset but visually close -->
+            <button id="ec-outside-fieldset-btn" style="margin:4px 0;">Cancel Payment</button>
+            <div class="meta">
+                EC-06: Children inside fieldset are disabled via inheritance<br>
+                EC-07: "Cancel Payment" is OUTSIDE fieldset — it's enabled<br>
+                Trap: LLM might think all nearby elements are disabled
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Aria-disabled (not truly disabled)</h4>
+            <button id="ec-aria-disabled-btn" aria-disabled="true" style="opacity:0.5;cursor:not-allowed;">View Report</button>
+            <div class="meta">
+                EC-08: <code>aria-disabled="true"</code> but NO <code>disabled</code> attribute<br>
+                Trap: Semantically disabled for assistive tech, but NOT functionally disabled<br>
+                <code>disabled</code> property = false, <code>aria-disabled</code> = "true"
+            </div>
+        </div>
+    </div>
+
+    <!-- 18d — Calendar Edge Cases -->
+    <h3>18d. Calendar Date Enabled/Disabled Edge Cases</h3>
+    <div class="assertion-grid">
+        <div class="assert-card" style="max-width:100%;grid-column:1/-1;">
+            <h4>Booking Calendar — Variable & If/Else Test Surface</h4>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+                <button onclick="navigateEdgeCal(-1)" style="padding:4px 10px;">&#9664;</button>
+                <h4 style="margin:0;" id="ec-cal-month"></h4>
+                <button onclick="navigateEdgeCal(1)" style="padding:4px 10px;">&#9654;</button>
+            </div>
+            <div id="ec-cal-grid" class="date-grid"></div>
+            <div id="ec-cal-status" style="margin-top:8px;font-size:13px;color:var(--text-secondary);"></div>
+            <div class="meta" style="margin-top:12px;">
+                Calendar rules:<br>
+                • Past dates: <code>disabled</code>, <code>aria-disabled="true"</code>, <code>data-date-state="past"</code><br>
+                • Today: <code>enabled</code>, class <code>today</code>, <code>data-date-state="today"</code><br>
+                • Future dates: <code>enabled</code>, <code>data-date-state="future"</code><br>
+                • 3rd day from today: <code>data-special="3rd-from-today"</code>, <code>data-date-state="future"</code><br>
+                • 7th day from today: <code>data-special="7th-from-today"</code>, <code>data-date-state="future"</code><br>
+                • Weekends (Sat/Sun): <code>data-weekend="true"</code> (still enabled if future)<br>
+                • Last day of month: <code>data-month-boundary="last"</code><br>
+                • First day of month: <code>data-month-boundary="first"</code><br>
+                EC-09 through EC-25: Variable reads and if/else assertions on dates
+            </div>
+        </div>
+    </div>
+
+    <!-- 18e — State Toggle with Variable Capture -->
+    <h3>18e. Toggle State Capture — Before/After</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Feature Toggle (captures state in data attrs)</h4>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button id="ec-feature-toggle" data-feature="notifications" data-state="enabled" data-toggle-count="0"
+                    onclick="var s=this.getAttribute('data-state');var ns=s==='enabled'?'disabled':'enabled';this.setAttribute('data-state',ns);this.textContent=ns==='enabled'?'Notifications: ON':'Notifications: OFF';var c=parseInt(this.getAttribute('data-toggle-count'))+1;this.setAttribute('data-toggle-count',c);document.getElementById('ec-dependent-panel').style.display=ns==='enabled'?'block':'none';document.getElementById('ec-dependent-panel').setAttribute('data-visible',ns==='enabled'?'true':'false');">
+                    Notifications: ON
+                </button>
+            </div>
+            <div id="ec-dependent-panel" data-visible="true" style="margin-top:8px;padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);font-size:13px;">
+                Notification preferences panel (visible when ON)
+            </div>
+            <div class="meta">
+                EC-26: Initial state: <code>data-state="enabled"</code>, panel visible<br>
+                After click: <code>data-state="disabled"</code>, panel hidden<br>
+                <code>data-toggle-count</code> increments each click<br>
+                Trap: "data-state" is a custom attr, NOT the HTML disabled property
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Quantity Stepper (min/max boundaries)</h4>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <button id="ec-qty-minus" data-action="decrease" onclick="var inp=document.getElementById('ec-qty-value');var v=parseInt(inp.value)-1;if(v>=0){inp.value=v;inp.setAttribute('data-qty',v);}if(v<=0){this.disabled=true;}document.getElementById('ec-qty-plus').disabled=false;">−</button>
+                <input type="number" id="ec-qty-value" value="1" min="0" max="5" data-qty="1" style="width:50px;text-align:center;padding:4px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);" readonly>
+                <button id="ec-qty-plus" data-action="increase" onclick="var inp=document.getElementById('ec-qty-value');var v=parseInt(inp.value)+1;if(v<=5){inp.value=v;inp.setAttribute('data-qty',v);}if(v>=5){this.disabled=true;}document.getElementById('ec-qty-minus').disabled=false;">+</button>
+            </div>
+            <div class="meta">
+                EC-27: At qty=0 → minus button disabled, plus enabled<br>
+                At qty=5 → plus button disabled, minus enabled<br>
+                At qty=1-4 → both enabled<br>
+                Input is <code>readonly</code> (not disabled)<br>
+                Trap: min/max boundary enables/disables buttons dynamically
+            </div>
+        </div>
+    </div>
+
+    <!-- 18f — Ambiguous State Patterns -->
+    <h3>18f. Ambiguous State Patterns</h3>
+    <div class="assertion-grid">
+        <div class="assert-card">
+            <h4>Visually Disabled but Enabled (CSS trick)</h4>
+            <button id="ec-css-fake-disabled" style="opacity:0.4;cursor:not-allowed;pointer-events:none;padding:6px 14px;background:var(--bg-tertiary);color:var(--text-muted);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);">
+                Generate Report
+            </button>
+            <div class="meta">
+                EC-28: NO <code>disabled</code> attribute — it's enabled in the DOM<br>
+                But CSS makes it look disabled (opacity 0.4, cursor not-allowed, pointer-events none)<br>
+                Trap: LLM must check DOM, not visual appearance
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>Visually Enabled but Disabled (styled disabled)</h4>
+            <button id="ec-styled-disabled" disabled style="opacity:1;cursor:pointer;padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);">
+                Submit Application
+            </button>
+            <div class="meta">
+                EC-29: HAS <code>disabled</code> attribute — truly disabled<br>
+                But CSS overrides make it look clickable (opacity 1, cursor pointer, accent bg)<br>
+                Trap: LLM must check DOM, not visual cues
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>data-disabled vs disabled attribute</h4>
+            <button id="ec-data-disabled" data-disabled="true" style="padding:6px 14px;background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);">
+                Archive Project
+            </button>
+            <div class="meta">
+                EC-30: <code>data-disabled="true"</code> (custom attr) but NO <code>disabled</code> attr<br>
+                Element is functionally ENABLED<br>
+                Trap: LLM must distinguish data-disabled from disabled
+            </div>
+        </div>
+        <div class="assert-card">
+            <h4>disabled="" vs disabled="false"</h4>
+            <button id="ec-disabled-empty" disabled="" style="padding:6px 14px;">Paused Task</button>
+            <button id="ec-disabled-false" disabled="false" style="padding:6px 14px;margin-top:4px;">Flagged Item</button>
+            <div class="meta">
+                EC-31: <code>disabled=""</code> → disabled (boolean attr, presence = true)<br>
+                EC-32: <code>disabled="false"</code> → STILL disabled! Boolean attr ignores value<br>
+                Trap: LLM might think disabled="false" means enabled
+            </div>
+        </div>
+    </div>
+</div>
+
 </main>
 
 <footer class="site-footer">
@@ -2134,6 +2356,106 @@ function simulateNavigation() {
         '</div>'
     ].join('\n');
 })();
+
+// === Section 18d: Edge Case Calendar ===
+var ecCalOffset = 0;
+function renderEdgeCal() {
+    var today = new Date();
+    var month = new Date(today.getFullYear(), today.getMonth() + ecCalOffset, 1);
+    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('ec-cal-month').textContent = monthNames[month.getMonth()] + ' ' + month.getFullYear();
+
+    var grid = document.getElementById('ec-cal-grid');
+    grid.innerHTML = '';
+
+    // Day headers
+    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(function(d) {
+        var h = document.createElement('div');
+        h.style.cssText = 'font-size:11px;color:var(--text-muted);text-align:center;font-weight:600;';
+        h.textContent = d;
+        grid.appendChild(h);
+    });
+
+    var firstDay = month.getDay();
+    var daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+    var todayDate = today.getDate();
+    var todayMonth = today.getMonth();
+    var todayYear = today.getFullYear();
+
+    // Empty cells before first day
+    for (var i = 0; i < firstDay; i++) {
+        var empty = document.createElement('div');
+        empty.className = 'date-cell';
+        empty.style.visibility = 'hidden';
+        grid.appendChild(empty);
+    }
+
+    // Date cells
+    for (var d = 1; d <= daysInMonth; d++) {
+        var cell = document.createElement('div');
+        cell.className = 'date-cell';
+        cell.textContent = d;
+        cell.setAttribute('data-date', d);
+        cell.setAttribute('data-full-date', month.getFullYear() + '-' + String(month.getMonth() + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'));
+
+        var cellDate = new Date(month.getFullYear(), month.getMonth(), d);
+        var isToday = (d === todayDate && month.getMonth() === todayMonth && month.getFullYear() === todayYear);
+        var isPast = cellDate < new Date(todayYear, todayMonth, todayDate);
+        var dayOfWeek = cellDate.getDay();
+        var isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+        var diff = Math.floor((cellDate - new Date(todayYear, todayMonth, todayDate)) / (1000*60*60*24));
+
+        // Weekend marker
+        if (isWeekend) cell.setAttribute('data-weekend', 'true');
+
+        // Month boundary markers
+        if (d === 1) cell.setAttribute('data-month-boundary', 'first');
+        if (d === daysInMonth) cell.setAttribute('data-month-boundary', 'last');
+
+        if (isToday) {
+            cell.classList.add('today');
+            cell.setAttribute('data-date-state', 'today');
+            cell.setAttribute('data-enabled', 'true');
+            cell.onclick = function() {
+                grid.querySelectorAll('.selected').forEach(function(s) { s.classList.remove('selected'); });
+                this.classList.add('selected');
+                document.getElementById('ec-cal-status').textContent = 'Selected: ' + this.getAttribute('data-full-date');
+            };
+        } else if (isPast) {
+            cell.setAttribute('disabled', '');
+            cell.setAttribute('aria-disabled', 'true');
+            cell.setAttribute('data-date-state', 'past');
+        } else {
+            cell.setAttribute('data-date-state', 'future');
+            cell.setAttribute('data-enabled', 'true');
+            cell.onclick = function() {
+                grid.querySelectorAll('.selected').forEach(function(s) { s.classList.remove('selected'); });
+                this.classList.add('selected');
+                document.getElementById('ec-cal-status').textContent = 'Selected: ' + this.getAttribute('data-full-date');
+            };
+        }
+
+        // Special date markers
+        if (diff === 3) {
+            cell.setAttribute('data-special', '3rd-from-today');
+            cell.setAttribute('title', '3rd date from today');
+        }
+        if (diff === 7) {
+            cell.setAttribute('data-special', '7th-from-today');
+            cell.setAttribute('title', '7th date from today');
+        }
+        if (diff === 1) {
+            cell.setAttribute('data-special', 'tomorrow');
+        }
+        if (diff === -1) {
+            cell.setAttribute('data-special', 'yesterday');
+        }
+
+        grid.appendChild(cell);
+    }
+}
+function navigateEdgeCal(dir) { ecCalOffset += dir; renderEdgeCal(); }
+renderEdgeCal();
 </script>
 </body>
 </html>
