@@ -303,10 +303,11 @@ document.getElementById('themeToggle').addEventListener('click', function() {
         var prefixes = ['Action', 'Control', 'Field', 'Widget', 'Component', 'Input', 'Button', 'Element'];
         return prefixes[Math.floor(Math.random() * prefixes.length)] + ' ' + randomStr(4);
     }
-    function randomBtnText() {
-        var texts = ['Submit', 'Click', 'Press', 'Tap', 'Go', 'Run', 'Send', 'OK', 'Do It', 'Fire'];
-        return texts[Math.floor(Math.random() * texts.length)] + ' ' + randomStr(3);
-    }
+    var btnLabels = [
+        ['Submit Form', 'Save Changes', 'Confirm Order', 'Place Order', 'Create Account', 'Sign Up Now', 'Add to Cart', 'Checkout Now', 'Subscribe', 'Register'],
+        ['Cancel', 'Go Back', 'Reset Form', 'Clear All', 'Undo Changes', 'Discard', 'Skip Step', 'Not Now', 'Decline', 'Remove Item'],
+        ['Learn More', 'View Details', 'See Pricing', 'Get Started', 'Contact Us', 'Download Report', 'Read More', 'Explore Plans', 'View Demo', 'Open Dashboard']
+    ];
 
     /* Define 3 buttons at fixed positions */
     var elements = [
@@ -330,7 +331,8 @@ document.getElementById('themeToggle').addEventListener('click', function() {
         var dataAttrName = randomDataAttr();
         var dataAttrVal = randomStr(6);
         var ariaLabel = randomAriaLabel();
-        var btnText = randomBtnText();
+        var pool = btnLabels[el.position - 1];
+        var btnText = pool[Math.floor(Math.random() * pool.length)];
 
         var widget = document.createElement('button');
         widget.textContent = btnText;
