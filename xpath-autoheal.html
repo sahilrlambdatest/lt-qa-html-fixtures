@@ -167,20 +167,18 @@
     <!-- SECTION 1: XPath Stable Button -->
     <div class="test-section fade-in">
         <h2>XPath Stable Button</h2>
-        <p class="desc">The button text changes every 3 seconds via a timer, but the absolute XPath (<code>/html/body/main/div[2]/div[1]/div/button</code>) remains the same. Use this to verify that XPath-based selectors still locate the element even when visible text changes.</p>
+        <p class="desc">The button text changes on every page load / refresh, but the absolute XPath (<code>/html/body/main/div[2]/div[1]/div/button</code>) remains the same. Use this to verify that XPath-based selectors still locate the element even when visible text changes.</p>
 
         <div class="button-row">
             <div id="xpath-stable-container">
                 <button class="test-btn primary" id="xpathStableBtn">Click Me</button>
             </div>
-            <span class="timer-display" id="timerDisplay">Next change in: 3s</span>
+            <span class="timer-display" id="currentLabel"></span>
             <button class="refresh-btn" id="refreshBtn" onclick="location.reload()">&#8635; Refresh Page</button>
         </div>
 
-        <div class="change-log" id="changeLog"></div>
-
         <div class="info-box">
-            <strong>How it works:</strong> Every 3 seconds, the button text cycles through random labels (e.g., "Submit", "Proceed", "Continue", "Go", "Execute", "Confirm", "Send", "Apply", "Save", "Next"). The <code>id</code>, <code>class</code>, and DOM position never change &mdash; only the visible text and <code>data-label</code> attribute change. The absolute XPath always resolves to the same element.
+            <strong>How it works:</strong> On every page load or refresh, the button text is randomly picked from a pool of labels (e.g., "Submit", "Proceed", "Continue", "Go", "Execute", "Confirm", "Send", "Apply", "Save", "Next"). The <code>id</code>, <code>class</code>, and DOM position never change &mdash; only the visible text and <code>data-label</code> attribute change. The absolute XPath always resolves to the same element.
         </div>
     </div>
 
@@ -224,42 +222,11 @@ document.getElementById('themeToggle').addEventListener('click', function() {
         'Trigger', 'Run', 'Process', 'Accept', 'Done'
     ];
     var btn = document.getElementById('xpathStableBtn');
-    var timerDisplay = document.getElementById('timerDisplay');
-    var changeLog = document.getElementById('changeLog');
-    var interval = 3;
-    var countdown = interval;
-    var changeCount = 0;
-
-    function pickRandom() {
-        var current = btn.textContent;
-        var next;
-        do {
-            next = labels[Math.floor(Math.random() * labels.length)];
-        } while (next === current);
-        return next;
-    }
-
-    function logChange(oldText, newText) {
-        changeCount++;
-        var entry = document.createElement('div');
-        entry.className = 'entry';
-        var ts = new Date().toLocaleTimeString();
-        entry.textContent = '[' + ts + '] #' + changeCount + ': "' + oldText + '" -> "' + newText + '"';
-        changeLog.insertBefore(entry, changeLog.firstChild);
-    }
-
-    setInterval(function() {
-        countdown--;
-        if (countdown <= 0) {
-            var oldText = btn.textContent;
-            var newText = pickRandom();
-            btn.textContent = newText;
-            btn.setAttribute('data-label', newText.toLowerCase().replace(/\s+/g, '-'));
-            logChange(oldText, newText);
-            countdown = interval;
-        }
-        timerDisplay.textContent = 'Next change in: ' + countdown + 's | Changes: ' + changeCount;
-    }, 1000);
+    var currentLabelSpan = document.getElementById('currentLabel');
+    var picked = labels[Math.floor(Math.random() * labels.length)];
+    btn.textContent = picked;
+    btn.setAttribute('data-label', picked.toLowerCase().replace(/\s+/g, '-'));
+    currentLabelSpan.textContent = 'Current label: "' + picked + '"';
 })();
 
 /* ══════════════════════════════════════════════
