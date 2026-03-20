@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>XPath Stability & AutoHeal Test | LT QA Fixtures</title>
+    <link rel="stylesheet" href="design-system.css">
+    <style>
+        .test-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+        .test-section h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .test-section .desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .button-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .test-btn {
+            padding: 12px 28px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all var(--transition-fast);
+        }
+        .test-btn:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+        }
+        .test-btn.primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .test-btn.primary:hover {
+            opacity: 0.9;
+        }
+        .timer-display {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-family: var(--font-mono, monospace);
+            min-width: 180px;
+        }
+        .refresh-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all var(--transition-fast);
+        }
+        .refresh-btn:hover {
+            border-color: var(--accent);
+        }
+        .autoheal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .autoheal-element {
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-primary);
+            text-align: center;
+            transition: all var(--transition-fast);
+        }
+        .autoheal-element:hover {
+            border-color: var(--accent);
+        }
+        .autoheal-element .label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        .autoheal-element .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+        .info-box {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .info-box code {
+            background: var(--bg-secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--accent);
+        }
+        .change-log {
+            margin-top: 16px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 12px;
+            font-family: var(--font-mono, monospace);
+            color: var(--text-tertiary);
+            line-height: 1.8;
+        }
+        .change-log .entry {
+            padding: 2px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+    </style>
+</head>
+<body>
+<script>(function(){var t=localStorage.getItem('lt-theme')||(window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();</script>
+
+<div class="top-bar"></div>
+<div class="glow-container"><div class="glow-inner"></div></div>
+<div class="glow-container glow-2"><div class="glow-inner"></div></div>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">LT</div>
+            <div class="logo-text">QA Fixtures <span>v1.0</span></div>
+        </a>
+        <nav class="header-nav">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="icon-sun">&#9728;</span>
+                <span class="icon-moon">&#9790;</span>
+            </button>
+            <a href="index.html" class="header-btn">&#8592; Back</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <div class="page-hero fade-in">
+        <h1>XPath Stability & AutoHeal Test</h1>
+        <p class="subtitle">Test XPath stability with changing button labels and AutoHeal with randomized attributes on every visit.</p>
+    </div>
+
+    <!-- SECTION 1: XPath Stable Button -->
+    <div class="test-section fade-in">
+        <h2>XPath Stable Button</h2>
+        <p class="desc">The button text changes every 3 seconds via a timer, but the absolute XPath (<code>/html/body/main/div[2]/div[1]/div/button</code>) remains the same. Use this to verify that XPath-based selectors still locate the element even when visible text changes.</p>
+
+        <div class="button-row">
+            <div id="xpath-stable-container">
+                <button class="test-btn primary" id="xpathStableBtn">Click Me</button>
+            </div>
+            <span class="timer-display" id="timerDisplay">Next change in: 3s</span>
+            <button class="refresh-btn" id="refreshBtn" onclick="location.reload()">&#8635; Refresh Page</button>
+        </div>
+
+        <div class="change-log" id="changeLog"></div>
+
+        <div class="info-box">
+            <strong>How it works:</strong> Every 3 seconds, the button text cycles through random labels (e.g., "Submit", "Proceed", "Continue", "Go", "Execute", "Confirm", "Send", "Apply", "Save", "Next"). The <code>id</code>, <code>class</code>, and DOM position never change &mdash; only the visible text and <code>data-label</code> attribute change. The absolute XPath always resolves to the same element.
+        </div>
+    </div>
+
+    <!-- SECTION 2: AutoHeal Trigger -->
+    <div class="test-section fade-in">
+        <h2>AutoHeal Test Elements</h2>
+        <p class="desc">These elements have fixed visual positions and purpose, but every attribute (id, class, name, data-*, aria-label, placeholder text) is randomized on each page load. Any XPath or CSS selector from a previous visit will break, forcing AutoHeal to engage.</p>
+
+        <button class="refresh-btn" onclick="location.reload()" style="margin-bottom: 20px;">&#8635; Reload to Randomize</button>
+
+        <div class="autoheal-grid" id="autohealGrid">
+            <!-- Elements are generated by JS below -->
+        </div>
+
+        <div class="info-box" id="autohealInfo"></div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    LT QA HTML Test Fixtures &mdash; Built for <a href="#">KaneAI</a> AutoHeal & XPath Testing
+</footer>
+
+<script>
+/* ── Theme Toggle ── */
+document.getElementById('themeToggle').addEventListener('click', function() {
+    var html = document.documentElement;
+    var current = html.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('lt-theme', next);
+});
+
+/* ══════════════════════════════════════════════
+   SECTION 1: XPath Stable Button with Timer
+   ══════════════════════════════════════════════ */
+(function() {
+    var labels = [
+        'Click Me', 'Submit', 'Proceed', 'Continue', 'Go',
+        'Execute', 'Confirm', 'Send', 'Apply', 'Save',
+        'Next', 'Start', 'Begin', 'Launch', 'Activate',
+        'Trigger', 'Run', 'Process', 'Accept', 'Done'
+    ];
+    var btn = document.getElementById('xpathStableBtn');
+    var timerDisplay = document.getElementById('timerDisplay');
+    var changeLog = document.getElementById('changeLog');
+    var interval = 3;
+    var countdown = interval;
+    var changeCount = 0;
+
+    function pickRandom() {
+        var current = btn.textContent;
+        var next;
+        do {
+            next = labels[Math.floor(Math.random() * labels.length)];
+        } while (next === current);
+        return next;
+    }
+
+    function logChange(oldText, newText) {
+        changeCount++;
+        var entry = document.createElement('div');
+        entry.className = 'entry';
+        var ts = new Date().toLocaleTimeString();
+        entry.textContent = '[' + ts + '] #' + changeCount + ': "' + oldText + '" -> "' + newText + '"';
+        changeLog.insertBefore(entry, changeLog.firstChild);
+    }
+
+    setInterval(function() {
+        countdown--;
+        if (countdown <= 0) {
+            var oldText = btn.textContent;
+            var newText = pickRandom();
+            btn.textContent = newText;
+            btn.setAttribute('data-label', newText.toLowerCase().replace(/\s+/g, '-'));
+            logChange(oldText, newText);
+            countdown = interval;
+        }
+        timerDisplay.textContent = 'Next change in: ' + countdown + 's | Changes: ' + changeCount;
+    }, 1000);
+})();
+
+/* ══════════════════════════════════════════════
+   SECTION 2: AutoHeal - Randomized Attributes
+   ══════════════════════════════════════════════ */
+(function() {
+    var grid = document.getElementById('autohealGrid');
+    var infoBox = document.getElementById('autohealInfo');
+
+    function randomStr(len) {
+        var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        var s = '';
+        for (var i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+        return s;
+    }
+
+    function randomId() { return 'el-' + randomStr(8); }
+    function randomClass() { return 'cls-' + randomStr(6) + ' grp-' + randomStr(4); }
+    function randomName() { return 'field_' + randomStr(7); }
+    function randomDataAttr() { return 'data-ref-' + randomStr(5); }
+    function randomAriaLabel() {
+        var prefixes = ['Action', 'Control', 'Field', 'Widget', 'Component', 'Input', 'Button', 'Element'];
+        return prefixes[Math.floor(Math.random() * prefixes.length)] + ' ' + randomStr(4);
+    }
+    function randomPlaceholder() {
+        var bases = ['Enter value', 'Type here', 'Input text', 'Write something', 'Your answer', 'Fill in'];
+        return bases[Math.floor(Math.random() * bases.length)] + ' ' + randomStr(3);
+    }
+    function randomBtnText() {
+        var texts = ['Submit', 'Click', 'Press', 'Tap', 'Go', 'Run', 'Send', 'OK', 'Do It', 'Fire'];
+        return texts[Math.floor(Math.random() * texts.length)] + ' ' + randomStr(3);
+    }
+    function randomLinkText() {
+        var texts = ['Learn more', 'See details', 'View info', 'Open link', 'Navigate', 'Explore'];
+        return texts[Math.floor(Math.random() * texts.length)] + ' ' + randomStr(3);
+    }
+
+    /* Define the fixed-position elements with their types */
+    var elements = [
+        { type: 'button', position: 1, purpose: 'Primary Action Button' },
+        { type: 'input-text', position: 2, purpose: 'Text Input Field' },
+        { type: 'checkbox', position: 3, purpose: 'Checkbox Toggle' },
+        { type: 'select', position: 4, purpose: 'Dropdown Select' },
+        { type: 'link', position: 5, purpose: 'Navigation Link' },
+        { type: 'button', position: 6, purpose: 'Secondary Action Button' },
+        { type: 'input-text', position: 7, purpose: 'Search Input Field' },
+        { type: 'textarea', position: 8, purpose: 'Text Area' },
+    ];
+
+    var generatedInfo = [];
+
+    elements.forEach(function(el) {
+        var card = document.createElement('div');
+        card.className = 'autoheal-element';
+
+        var label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = 'Position ' + el.position + ' - ' + el.purpose;
+        card.appendChild(label);
+
+        var id = randomId();
+        var cls = randomClass();
+        var name = randomName();
+        var dataAttrName = randomDataAttr();
+        var dataAttrVal = randomStr(6);
+        var ariaLabel = randomAriaLabel();
+
+        var widget;
+        var infoEntry = {
+            position: el.position,
+            purpose: el.purpose,
+            id: id,
+            class: cls,
+            name: name
+        };
+
+        if (el.type === 'button') {
+            widget = document.createElement('button');
+            var btnText = randomBtnText();
+            widget.textContent = btnText;
+            widget.className = 'test-btn ' + cls;
+            widget.id = id;
+            widget.name = name;
+            widget.setAttribute(dataAttrName, dataAttrVal);
+            widget.setAttribute('aria-label', ariaLabel);
+            infoEntry.text = btnText;
+            infoEntry.ariaLabel = ariaLabel;
+        } else if (el.type === 'input-text') {
+            widget = document.createElement('input');
+            widget.type = 'text';
+            var ph = randomPlaceholder();
+            widget.placeholder = ph;
+            widget.className = cls;
+            widget.id = id;
+            widget.name = name;
+            widget.setAttribute(dataAttrName, dataAttrVal);
+            widget.setAttribute('aria-label', ariaLabel);
+            widget.style.cssText = 'padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);width:100%;box-sizing:border-box;font-size:14px;';
+            infoEntry.placeholder = ph;
+            infoEntry.ariaLabel = ariaLabel;
+        } else if (el.type === 'checkbox') {
+            var wrapper = document.createElement('label');
+            wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--text-primary);justify-content:center;';
+            widget = document.createElement('input');
+            widget.type = 'checkbox';
+            widget.className = cls;
+            widget.id = id;
+            widget.name = name;
+            widget.setAttribute(dataAttrName, dataAttrVal);
+            widget.setAttribute('aria-label', ariaLabel);
+            var cbLabel = document.createElement('span');
+            var cbText = 'Option ' + randomStr(4);
+            cbLabel.textContent = cbText;
+            wrapper.appendChild(widget);
+            wrapper.appendChild(cbLabel);
+            widget = wrapper;
+            infoEntry.labelText = cbText;
+            infoEntry.ariaLabel = ariaLabel;
+        } else if (el.type === 'select') {
+            widget = document.createElement('select');
+            widget.className = cls;
+            widget.id = id;
+            widget.name = name;
+            widget.setAttribute(dataAttrName, dataAttrVal);
+            widget.setAttribute('aria-label', ariaLabel);
+            widget.style.cssText = 'padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);width:100%;font-size:14px;';
+            var optTexts = [];
+            for (var i = 0; i < 3; i++) {
+                var opt = document.createElement('option');
+                var optText = 'Choice ' + randomStr(4);
+                opt.value = 'val-' + randomStr(5);
+                opt.textContent = optText;
+                widget.appendChild(opt);
+                optTexts.push(optText);
+            }
+            infoEntry.options = optTexts;
+            infoEntry.ariaLabel = ariaLabel;
+        } else if (el.type === 'link') {
+            widget = document.createElement('a');
+            widget.href = '#pos-' + randomStr(5);
+            var linkText = randomLinkText();
+            widget.textContent = linkText;
+            widget.className = cls;
+            widget.id = id;
+            widget.name = name;
+            widget.setAttribute(dataAttrName, dataAttrVal);
+            widget.setAttribute('aria-label', ariaLabel);
+            widget.style.cssText = 'color:var(--accent);font-weight:600;font-size:14px;text-decoration:underline;';
+            infoEntry.text = linkText;
+            infoEntry.ariaLabel = ariaLabel;
+        } else if (el.type === 'textarea') {
+            widget = document.createElement('textarea');
+            var taPh = randomPlaceholder();
+            widget.placeholder = taPh;
+            widget.className = cls;
+            widget.id = id;
+            widget.name = name;
+            widget.setAttribute(dataAttrName, dataAttrVal);
+            widget.setAttribute('aria-label', ariaLabel);
+            widget.rows = 3;
+            widget.style.cssText = 'padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);width:100%;box-sizing:border-box;font-size:14px;resize:vertical;';
+            infoEntry.placeholder = taPh;
+            infoEntry.ariaLabel = ariaLabel;
+        }
+
+        card.appendChild(widget);
+
+        /* Show generated attributes below the element */
+        var attrDisplay = document.createElement('div');
+        attrDisplay.className = 'value';
+        attrDisplay.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono,monospace);text-align:left;';
+        attrDisplay.innerHTML = 'id="' + id + '"<br>class="' + cls + '"<br>name="' + name + '"';
+        card.appendChild(attrDisplay);
+
+        grid.appendChild(card);
+        generatedInfo.push(infoEntry);
+    });
+
+    /* Show summary info */
+    infoBox.innerHTML = '<strong>How it works:</strong> On every page load, each element gets a fresh random <code>id</code>, <code>class</code>, <code>name</code>, <code>data-*</code> attribute, <code>aria-label</code>, visible text, and placeholder. The DOM position (grid slot) and element type remain fixed. Any CSS selector or XPath built from previous attributes will fail, requiring AutoHeal to re-identify elements by position, type, or visual similarity.<br><br>' +
+        '<strong>This page load\'s seed:</strong> <code>' + Date.now() + '</code> &mdash; reload to get completely different attributes.';
+
+})();
+</script>
+<script>
+(function() {
+    var g1 = document.querySelector('.glow-container:not(.glow-2)');
+    var g2 = document.querySelector('.glow-container.glow-2');
+    if (!g1) return;
+    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    var cx = mx, cy = my, cx2 = mx, cy2 = my;
+    g1.style.transform = 'translate(' + (mx - 400) + 'px,' + (my - 400) + 'px)';
+    if (g2) g2.style.transform = 'translate(' + (mx - 300) + 'px,' + (my - 300) + 'px)';
+    document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
+    (function loop() {
+        cx += (mx - cx) * 0.08;
+        cy += (my - cy) * 0.08;
+        cx2 += (mx - cx2) * 0.035;
+        cy2 += (my - cy2) * 0.035;
+        g1.style.transform = 'translate(' + (cx - 400) + 'px,' + (cy - 400) + 'px)';
+        if (g2) g2.style.transform = 'translate(' + (cx2 - 300) + 'px,' + (cy2 - 300) + 'px)';
+        requestAnimationFrame(loop);
+    })();
+})();
+</script>
+</body>
+</html>
