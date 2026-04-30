@@ -28,9 +28,9 @@
   --chip:#1a2240;--rip:rgba(124,92,255,.16);
   background:#0b1020;color:#e7ecff;color-scheme:dark;
   display:block;font-size:13.5px;line-height:1.45;
-  min-height:calc(100vh - 30px);width:100%
+  min-height:calc(100vh - 110px);width:100%
 }
-.acme-app .app{height:calc(100vh - 30px)}
+.acme-app .app{height:calc(100vh - 110px)}
 .acme-app h1,.acme-app h2,.acme-app h3{color:#fff}
 .acme-app *{box-sizing:border-box}
 .acme-app a{color:var(--accent);text-decoration:none}
@@ -213,14 +213,24 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
 .menu button:hover{background:#172248;color:#fff}
 .menu .div{height:1px;background:var(--line);margin:4px 0}
 
-/* ---- click-info bar — full-width strip fixed at the very bottom ---- */
-#clickInfo{position:fixed;left:0;right:0;bottom:0;height:30px;
-  background:#0d1430;border-top:1px solid var(--line);
-  padding:0 14px;font-size:12px;z-index:400;
-  display:flex;align-items:center;gap:8px;color:#dfe4ff;
-  box-shadow:0 -2px 8px rgba(0,0,0,.45)}
-#clickInfo::before{content:'▸';color:var(--pri);font-weight:700;flex-shrink:0}
-#clickInfo .msg{flex:1;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ---- click-info log — fixed bottom panel showing every interaction ---- */
+#clickInfo{position:fixed;left:0;right:0;bottom:0;
+  background:#0a1024;border-top:1px solid var(--line);
+  padding:6px 10px;font-size:11.5px;z-index:400;color:#dfe4ff;
+  box-shadow:0 -2px 10px rgba(0,0,0,.5);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  height:110px;overflow-y:auto;line-height:1.5}
+#clickInfo .ci-header{color:#7d88b3;font-size:9.5px;text-transform:uppercase;
+  letter-spacing:.6px;font-weight:700;padding-bottom:3px;border-bottom:1px solid #1f2a44;margin-bottom:4px}
+#clickInfo .entry{padding:3px 4px;border-bottom:1px dashed rgba(31,42,68,.6);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+#clickInfo .entry:last-child{border-bottom:0}
+#clickInfo .entry.latest{background:rgba(124,92,255,.07);border-radius:4px;color:#fff}
+#clickInfo .tm{color:#7d88b3;flex-shrink:0;font-weight:600}
+#clickInfo .sel{color:#86e3aa}
+#clickInfo .txt{color:#ffcf7a}
+#clickInfo .meta{color:#a8c0ff}
+#clickInfo .pos{color:#5b6691;margin-left:auto;flex-shrink:0;font-size:10.5px}
+#clickInfo .empty{color:#5b6691;text-align:center;padding:10px 0}
 
 /* ---- icon-only quick grid ---- */
 .tile-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
@@ -1193,7 +1203,10 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
 </div>
 
 <!-- ============ TOASTS ============ -->
-<div id="clickInfo"><span class="msg">Tap any element — info shows here</span></div>
+<div id="clickInfo">
+  <div class="ci-header">▸ Interaction log — every click captured here</div>
+  <div class="empty" id="ciEmpty">Click any element on the page…</div>
+</div>
 
 <div class="statusbar">
   <span><span class="ok">●</span> Connected · region us-east-1</span>
@@ -1205,8 +1218,59 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
 function $(s,c){return (c||document).querySelector(s)}
 function $$(s,c){return Array.from((c||document).querySelectorAll(s))}
 
-/* ---- click-info bar (fixed at bottom; never auto-hides) ---- */
-function toast(msg){var ci=document.querySelector('#clickInfo .msg');if(ci)ci.textContent=msg;}
+/* ---- click-info log (captures every click with full element details) ---- */
+function toast(msg){/* legacy hook — entries come from the global click capture below */}
+
+(function(){
+  var ci = document.getElementById('clickInfo');
+  if(!ci) return;
+  function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  function describe(el, e){
+    var tag = el.tagName.toLowerCase();
+    var clsArr = (typeof el.className === 'string' ? el.className : (el.className && el.className.baseVal) || '').toString().trim().split(/\s+/).filter(Boolean).slice(0,3);
+    var sel = tag + (el.id ? '#'+el.id : '') + (clsArr.length ? '.'+clsArr.join('.') : '');
+    var text = (el.textContent||'').replace(/\s+/g,' ').trim().slice(0,40);
+    var ds = el.dataset || {};
+    var meta = [];
+    ['act','hit','tip','rowact','dupact','plan','tab','nav','step','page','crumb','sw','color','pill','rmtag','star','cat'].forEach(function(k){
+      if(ds[k]) meta.push('data-'+k.replace(/[A-Z]/g,function(c){return '-'+c.toLowerCase()})+'="'+ds[k]+'"');
+    });
+    if(el.getAttribute('aria-label')) meta.push('aria-label="'+el.getAttribute('aria-label')+'"');
+    if(el.getAttribute('role')) meta.push('role="'+el.getAttribute('role')+'"');
+    if(el.getAttribute('aria-hidden')==='true') meta.push('aria-hidden');
+    if(el.disabled) meta.push('disabled');
+    if(el.tagName==='INPUT' && el.type) meta.push('type="'+el.type+'"');
+    if(el.tagName==='A' && el.href) meta.push('href="'+el.getAttribute('href')+'"');
+    return {sel:sel, text:text, meta:meta.join(' '), x:Math.round(e.clientX), y:Math.round(e.clientY)};
+  }
+  function append(d){
+    var empty = document.getElementById('ciEmpty');
+    if(empty) empty.remove();
+    // demote previous "latest"
+    var prev = ci.querySelector('.entry.latest'); if(prev) prev.classList.remove('latest');
+    var t = new Date().toTimeString().slice(0,8);
+    var row = document.createElement('div');
+    row.className = 'entry latest';
+    row.innerHTML = '<span class="tm">'+t+'</span>'
+      + '<span class="sel">&lt;'+escapeHtml(d.sel)+'&gt;</span>'
+      + (d.text ? ' <span class="txt">"'+escapeHtml(d.text)+'"</span>' : '')
+      + (d.meta ? ' <span class="meta">'+escapeHtml(d.meta)+'</span>' : '')
+      + '<span class="pos">@'+d.x+','+d.y+'</span>';
+    // header is first child; insert entry after header
+    var header = ci.firstElementChild;
+    if(header && header.classList.contains('ci-header')) header.after(row);
+    else ci.insertBefore(row, ci.firstChild);
+    // keep last 30 entries
+    var entries = ci.querySelectorAll('.entry');
+    if(entries.length > 30) entries[entries.length-1].remove();
+  }
+  document.addEventListener('click', function(e){
+    if(e.target.closest('#clickInfo')) return; // ignore self-clicks
+    var t = e.target.closest('button, a, input, textarea, select, [data-act], [data-hit], [data-tip], [data-rowact], [data-dupact], [contenteditable], .layer, .editable, .ocard, .tile, .chip, .pill, .ab, .ib, .step, .page-btn, .swatch, .star, .tagc, .ctx-block, .checkbox-row, .sortrow, label.sw, .seg-pill button');
+    if(!t) return;
+    append(describe(t, e));
+  }, true);
+})();
 
 /* ---- view switching ---- */
 function switchView(name){
