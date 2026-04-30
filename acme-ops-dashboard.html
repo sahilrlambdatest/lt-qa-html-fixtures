@@ -28,9 +28,9 @@
   --chip:#1a2240;--rip:rgba(124,92,255,.16);
   background:#0b1020;color:#e7ecff;color-scheme:dark;
   display:block;font-size:13.5px;line-height:1.45;
-  min-height:100vh;width:100%
+  min-height:calc(100vh - 30px);width:100%
 }
-.acme-app .app{height:100vh}
+.acme-app .app{height:calc(100vh - 30px)}
 .acme-app h1,.acme-app h2,.acme-app h3{color:#fff}
 .acme-app *{box-sizing:border-box}
 .acme-app a{color:var(--accent);text-decoration:none}
@@ -213,12 +213,14 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
 .menu button:hover{background:#172248;color:#fff}
 .menu .div{height:1px;background:var(--line);margin:4px 0}
 
-/* ---- toast ---- */
-.toast-stack{position:fixed;bottom:18px;right:18px;display:flex;flex-direction:column;gap:8px;z-index:400;max-width:320px}
-.toast{background:#11193a;border:1px solid var(--line);border-left:3px solid var(--pri);
-  padding:10px 13px;border-radius:8px;font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.45);
-  animation:tin .18s ease-out}
-@keyframes tin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+/* ---- click-info bar — full-width strip fixed at the very bottom ---- */
+#clickInfo{position:fixed;left:0;right:0;bottom:0;height:30px;
+  background:#0d1430;border-top:1px solid var(--line);
+  padding:0 14px;font-size:12px;z-index:400;
+  display:flex;align-items:center;gap:8px;color:#dfe4ff;
+  box-shadow:0 -2px 8px rgba(0,0,0,.45)}
+#clickInfo::before{content:'▸';color:var(--pri);font-weight:700;flex-shrink:0}
+#clickInfo .msg{flex:1;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---- icon-only quick grid ---- */
 .tile-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
@@ -1191,7 +1193,7 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
 </div>
 
 <!-- ============ TOASTS ============ -->
-<div class="toast-stack" id="toasts"></div>
+<div id="clickInfo"><span class="msg">Tap any element — info shows here</span></div>
 
 <div class="statusbar">
   <span><span class="ok">●</span> Connected · region us-east-1</span>
@@ -1203,8 +1205,8 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
 function $(s,c){return (c||document).querySelector(s)}
 function $$(s,c){return Array.from((c||document).querySelectorAll(s))}
 
-/* ---- toast (no-op: popups disabled) ---- */
-function toast(msg){/* no-op */}
+/* ---- click-info bar (fixed at bottom; never auto-hides) ---- */
+function toast(msg){var ci=document.querySelector('#clickInfo .msg');if(ci)ci.textContent=msg;}
 
 /* ---- view switching ---- */
 function switchView(name){
