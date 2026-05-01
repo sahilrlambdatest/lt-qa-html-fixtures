@@ -213,6 +213,28 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
 .menu button:hover{background:#172248;color:#fff}
 .menu .div{height:1px;background:var(--line);margin:4px 0}
 
+/* ---- advanced (more traps) view ---- */
+.hov-row{display:flex;align-items:center;gap:8px;padding:10px 4px;border-bottom:1px solid var(--line);font-size:13px}
+.hov-row:last-child{border-bottom:0}
+.hov-actions{opacity:0;transition:opacity .15s;display:flex;gap:4px}
+.hov-row:hover .hov-actions{opacity:1}
+.hov-actions button{width:28px;height:28px;border-radius:5px;background:#262a48;border:1px solid var(--line);color:#dfe4ff;cursor:pointer;font-size:13px}
+.hov-actions button:hover{background:#2f3458}
+.skel-bar{height:14px;background:linear-gradient(90deg,#1a2240 0%,#2a3257 50%,#1a2240 100%);background-size:200% 100%;border-radius:4px;margin-bottom:8px;animation:skelShine 1.2s linear infinite}
+.skel-bar:nth-child(1){width:80%}
+.skel-bar:nth-child(2){width:60%}
+.skel-bar:nth-child(3){width:90%}
+@keyframes skelShine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+#bulkBar.show{display:flex !important}
+#bulkBody tr td{padding:8px 12px;border-bottom:1px solid var(--line)}
+#bulkBody tr:last-child td{border-bottom:0}
+#spinBtn[data-state="submitting"]{background:#2a3257;color:#a8c0ff;cursor:wait}
+#spinBtn[data-state="done"]{background:#103a22;color:#7be7a8}
+#vf1Submit:not(:disabled){opacity:1}
+#vf2e.invalid{border-color:var(--err)}
+.otp{background:#0a1024;border:1px solid var(--line);border-radius:6px;color:#fff}
+.otp:focus{border-color:var(--pri);box-shadow:0 0 0 2px rgba(124,92,255,.18)}
+
 /* ---- click-info log — fixed bottom panel showing every interaction ---- */
 #clickInfo{position:fixed;left:0;right:0;bottom:0;
   background:#0a1024;border-top:1px solid var(--line);
@@ -491,6 +513,10 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
       <a data-view="forms">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
         Forms &amp; Inputs
+      </a>
+      <a data-view="advanced">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        More traps
       </a>
     </nav>
     <div class="group">Library</div>
@@ -1163,6 +1189,157 @@ td .chip.err{background:#3a1010;color:#ff9a9a}
       </section>
     </div>
 
+    <!-- =============== ADVANCED / MORE TRAPS =============== -->
+    <div class="view" data-view="advanced">
+      <div class="page-head"><h1>More traps</h1><span class="pill">Advanced edge cases</span></div>
+      <p style="color:var(--mute2);margin:0 0 14px;font-size:13px">Form-state, hover-only, loading, bulk actions, RTL, a11y traps. Each one targets a different class of prompt-accuracy failure.</p>
+
+      <div class="split">
+        <section>
+          <!-- N1: Submit disabled until valid -->
+          <div class="section-title">N1 · Submit disabled until form valid</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Submit stays disabled until <b>both</b> fields are filled. Recording-time prompt vs replay state mismatch.</p>
+          <div class="card">
+            <form id="vf1" autocomplete="off">
+              <label style="font-size:12px;color:var(--mute);display:block;margin:4px 0">Email <span style="color:var(--err)">*</span></label>
+              <input type="email" id="vf1e" required placeholder="you@co.com" style="width:100%"/>
+              <label style="font-size:12px;color:var(--mute);display:block;margin:10px 0 4px">Password <span style="color:var(--err)">*</span></label>
+              <input type="password" id="vf1p" required minlength="6" placeholder="6+ chars" style="width:100%"/>
+              <button type="button" id="vf1Submit" class="btn primary" disabled style="margin-top:12px;width:100%">Sign in</button>
+            </form>
+          </div>
+
+          <!-- N2: Inline error -->
+          <div class="section-title">N2 · Inline validation error</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Type something that's not an email — red border + error message appears below.</p>
+          <div class="card">
+            <input type="email" id="vf2e" placeholder="email" style="width:100%"/>
+            <div id="vf2err" style="color:var(--err);font-size:11.5px;margin-top:6px;display:none">▲ Please enter a valid email address</div>
+          </div>
+
+          <!-- N3: Dependent dropdowns -->
+          <div class="section-title">N3 · Dependent dropdowns (Country → State → City)</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Selecting Country populates State; selecting State populates City. Cannot click City until both above are set.</p>
+          <div class="card">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <div><label style="font-size:11px;color:var(--mute);display:block;margin-bottom:4px">Country</label>
+                <select id="ddCountry" style="width:100%"><option value="">— select —</option><option>USA</option><option>India</option><option>Germany</option></select></div>
+              <div><label style="font-size:11px;color:var(--mute);display:block;margin-bottom:4px">State</label>
+                <select id="ddState" style="width:100%" disabled><option>—</option></select></div>
+              <div><label style="font-size:11px;color:var(--mute);display:block;margin-bottom:4px">City</label>
+                <select id="ddCity" style="width:100%" disabled><option>—</option></select></div>
+            </div>
+          </div>
+
+          <!-- O1: OTP -->
+          <div class="section-title">O1 · OTP / PIN entry (6 boxes for 1 code)</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">6 identical inputs that auto-advance. Recording one box ≠ replaying it on another.</p>
+          <div class="card" style="text-align:center">
+            <div id="otpRow" style="display:inline-flex;gap:6px">
+              <input class="otp" maxlength="1" inputmode="numeric" data-otp="0" style="width:38px;height:46px;text-align:center;font-size:18px;font-weight:600;padding:0"/>
+              <input class="otp" maxlength="1" inputmode="numeric" data-otp="1" style="width:38px;height:46px;text-align:center;font-size:18px;font-weight:600;padding:0"/>
+              <input class="otp" maxlength="1" inputmode="numeric" data-otp="2" style="width:38px;height:46px;text-align:center;font-size:18px;font-weight:600;padding:0"/>
+              <input class="otp" maxlength="1" inputmode="numeric" data-otp="3" style="width:38px;height:46px;text-align:center;font-size:18px;font-weight:600;padding:0"/>
+              <input class="otp" maxlength="1" inputmode="numeric" data-otp="4" style="width:38px;height:46px;text-align:center;font-size:18px;font-weight:600;padding:0"/>
+              <input class="otp" maxlength="1" inputmode="numeric" data-otp="5" style="width:38px;height:46px;text-align:center;font-size:18px;font-weight:600;padding:0"/>
+            </div>
+          </div>
+
+          <!-- O2: Native date -->
+          <div class="section-title">O2 · Native date picker</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Browser-native widget; opaque to OCR. Click → native calendar opens.</p>
+          <div class="card">
+            <input type="date" id="natDate" style="width:240px"/>
+          </div>
+
+          <!-- O11: Range slider -->
+          <div class="section-title">O11 · Range slider with drag-thumb</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">No "click X" — you drag the thumb from value A to value B.</p>
+          <div class="card">
+            <input type="range" id="advRange" min="0" max="100" value="40" style="width:100%"/>
+            <div style="text-align:right;font-size:12px;color:var(--mute);margin-top:4px">Value: <span id="advRangeVal">40</span></div>
+          </div>
+        </section>
+
+        <section>
+          <!-- Q1: Skeleton loading -->
+          <div class="section-title">Q1 · Skeleton placeholders → real content</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Click Reload — 3 skeleton bars show for 1.5s, then real content swaps in. Element identity flips after load.</p>
+          <div class="card">
+            <button class="btn" id="skelReload">↻ Reload</button>
+            <div id="skelArea" style="margin-top:10px"></div>
+          </div>
+
+          <!-- Q2: Button spinner -->
+          <div class="section-title">Q2 · Inline spinner replaces button label</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Click Submit — button text becomes "Submitting…" then "Done!" then back. Recorded "Submit" ≠ replay "Submitting…".</p>
+          <div class="card" style="text-align:center">
+            <button class="btn primary" id="spinBtn" data-state="idle" style="min-width:160px">Submit</button>
+          </div>
+
+          <!-- R1 + R2: Bulk select + bar -->
+          <div class="section-title">R1 + R2 · Bulk select + action bar</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Header checkbox toggles all rows. Selecting any row reveals a floating bulk action bar.</p>
+          <div class="card" style="padding:0;overflow:hidden">
+            <table id="bulkTable" style="width:100%;border-collapse:collapse">
+              <thead><tr style="background:#0d1430">
+                <th style="padding:8px 12px;text-align:left"><input type="checkbox" id="bulkAll"/></th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px">Item</th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px">Status</th>
+              </tr></thead>
+              <tbody id="bulkBody"></tbody>
+            </table>
+            <div id="bulkBar" style="display:none;background:#1a1934;padding:8px 12px;border-top:1px solid var(--pri);align-items:center;gap:8px">
+              <span style="flex:1;font-size:13px"><b id="bulkCount">0</b> selected</span>
+              <button class="btn sm" data-act="bulk-archive">Archive</button>
+              <button class="btn sm danger" data-act="bulk-delete">Delete</button>
+            </div>
+          </div>
+
+          <!-- L1 + L2: Hover-only -->
+          <div class="section-title">L1 + L2 · Hover-only labels &amp; row actions</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Icon buttons have no visible text (tooltip-only). Each row's action icons appear only on hover.</p>
+          <div class="card">
+            <div class="hov-row" data-row="1"><span style="flex:1">Item One</span>
+              <span class="hov-actions"><button data-act="hov-edit-1" data-tip="Edit">✎</button><button data-act="hov-delete-1" data-tip="Delete">✕</button></span></div>
+            <div class="hov-row" data-row="2"><span style="flex:1">Item Two</span>
+              <span class="hov-actions"><button data-act="hov-edit-2" data-tip="Edit">✎</button><button data-act="hov-delete-2" data-tip="Delete">✕</button></span></div>
+            <div class="hov-row" data-row="3"><span style="flex:1">Item Three</span>
+              <span class="hov-actions"><button data-act="hov-edit-3" data-tip="Edit">✎</button><button data-act="hov-delete-3" data-tip="Delete">✕</button></span></div>
+          </div>
+
+          <!-- W3: role=button div -->
+          <div class="section-title">W3 · <code>role="button"</code> div (not a real <code>&lt;button&gt;</code>)</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">Acts like a button but is a <code>&lt;div&gt;</code>. Selector heuristics that look only for <code>button</code> tag will miss it.</p>
+          <div class="card">
+            <div role="button" tabindex="0" data-act="div-button" style="background:#262a48;border:1px solid var(--line);color:#dfe4ff;padding:9px 16px;border-radius:6px;cursor:pointer;display:inline-block">I'm a div pretending to be a button</div>
+          </div>
+
+          <!-- W4: label without for -->
+          <div class="section-title">W4 · Label without <code>for=</code> (control wrapped inside)</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">No explicit <code>for=</code> attribute. Click on label text → checkbox toggles via parent-child association.</p>
+          <div class="card">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox"/>
+              <span>Click anywhere on this row (label) to toggle the checkbox</span>
+            </label>
+          </div>
+
+          <!-- X1: RTL -->
+          <div class="section-title">X1 · RTL container (visual order flipped)</div>
+          <p style="color:var(--mute);font-size:12px;margin:-4px 2px 8px">DOM order: A, B, C. With <code>dir="rtl"</code> the visual order is C, B, A. Coordinate clicks land on visual element; selectors land on DOM order.</p>
+          <div class="card">
+            <div dir="rtl" style="display:flex;gap:8px;justify-content:flex-start">
+              <button class="btn" data-act="rtl-A">A</button>
+              <button class="btn" data-act="rtl-B">B</button>
+              <button class="btn primary" data-act="rtl-C">C</button>
+            </div>
+            <div style="font-size:11px;color:var(--mute);margin-top:6px;font-family:ui-monospace,monospace">DOM: A B C · Visual (RTL): C B A</div>
+          </div>
+        </section>
+      </div>
+    </div>
+
   </main>
 </div>
 </div><!-- /.acme-app -->
@@ -1276,7 +1453,7 @@ function toast(msg){/* legacy hook — entries come from the global click captur
 function switchView(name){
   $$('.view').forEach(function(v){v.classList.toggle('active',v.dataset.view===name)});
   $$('.sidenav a').forEach(function(a){a.classList.toggle('active',a.dataset.view===name)});
-  var map={dashboard:'Dashboard',orders:'Orders',customers:'Customers',incidents:'Incidents',
+  var map={dashboard:'Dashboard',orders:'Orders',customers:'Customers',incidents:'Incidents',advanced:'More traps',
     reports:'Reports',overlap:'Overlap traps',simple:'Simple cases',patterns:'Patterns',forms:'Forms & Inputs',
     favorites:'Favorites',recent:'Recent',templates:'Templates'};
   $('#crumbActive').textContent=map[name]||name;
@@ -1496,7 +1673,123 @@ $$('#tplCats .pill').forEach(function(p){
   });
 });
 
-console.log('[Acme Ops Web] ready · v5');
+/* ===== Advanced view (More traps) wiring ===== */
+
+/* N1 — Submit disabled until both fields valid */
+(function(){
+  var e=document.getElementById('vf1e'),p=document.getElementById('vf1p'),b=document.getElementById('vf1Submit');
+  if(!e||!p||!b) return;
+  function check(){b.disabled = !(e.value.includes('@') && p.value.length>=6)}
+  e.addEventListener('input',check); p.addEventListener('input',check);
+  b.addEventListener('click',function(){if(!b.disabled) toast('Submitted')});
+})();
+
+/* N2 — Inline validation error */
+(function(){
+  var e=document.getElementById('vf2e'),er=document.getElementById('vf2err');
+  if(!e) return;
+  e.addEventListener('input',function(){
+    var bad = e.value.length>0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value);
+    e.classList.toggle('invalid',bad);
+    er.style.display = bad ? 'block' : 'none';
+  });
+})();
+
+/* N3 — Dependent dropdowns */
+(function(){
+  var c=document.getElementById('ddCountry'),s=document.getElementById('ddState'),ci=document.getElementById('ddCity');
+  if(!c) return;
+  var states={USA:['California','New York','Texas'],India:['Maharashtra','Karnataka','Delhi'],Germany:['Berlin','Bavaria','Hamburg']};
+  var cities={California:['San Francisco','Los Angeles'],'New York':['NYC','Buffalo'],Texas:['Austin','Dallas'],
+    Maharashtra:['Mumbai','Pune'],Karnataka:['Bangalore','Mysore'],Delhi:['New Delhi'],
+    Berlin:['Berlin'],Bavaria:['Munich','Nuremberg'],Hamburg:['Hamburg']};
+  c.addEventListener('change',function(){
+    var st=states[c.value]||[];
+    s.innerHTML='<option value="">— select —</option>'+st.map(function(x){return '<option>'+x+'</option>'}).join('');
+    s.disabled=!st.length; ci.innerHTML='<option>—</option>'; ci.disabled=true;
+  });
+  s.addEventListener('change',function(){
+    var ct=cities[s.value]||[];
+    ci.innerHTML='<option value="">— select —</option>'+ct.map(function(x){return '<option>'+x+'</option>'}).join('');
+    ci.disabled=!ct.length;
+  });
+})();
+
+/* O1 — OTP auto-advance */
+(function(){
+  var ots=document.querySelectorAll('.otp');
+  ots.forEach(function(o,i){
+    o.addEventListener('input',function(){
+      if(o.value && i<ots.length-1) ots[i+1].focus();
+    });
+    o.addEventListener('keydown',function(e){
+      if(e.key==='Backspace' && !o.value && i>0) ots[i-1].focus();
+    });
+  });
+})();
+
+/* O11 — Range slider value display */
+(function(){
+  var r=document.getElementById('advRange'),v=document.getElementById('advRangeVal');
+  if(r) r.addEventListener('input',function(){v.textContent=r.value});
+})();
+
+/* Q1 — Skeleton then real content */
+(function(){
+  var btn=document.getElementById('skelReload'),area=document.getElementById('skelArea');
+  if(!btn) return;
+  function render(){
+    area.innerHTML='<div class="skel-bar"></div><div class="skel-bar"></div><div class="skel-bar"></div>';
+    setTimeout(function(){
+      area.innerHTML='<div style="font-size:13px;color:#dfe4ff;line-height:1.7">'
+        +'<b>Q3 Revenue Report</b><br>Total: $184,203<br>YoY growth: +12.4%<br>'
+        +'<a href="#" data-act="skel-link">View detailed breakdown →</a></div>';
+    },1500);
+  }
+  btn.addEventListener('click',render);
+  render();
+})();
+
+/* Q2 — Inline button spinner */
+(function(){
+  var b=document.getElementById('spinBtn');
+  if(!b) return;
+  b.addEventListener('click',function(){
+    if(b.dataset.state==='submitting') return;
+    if(b.dataset.state==='done'){b.textContent='Submit';b.dataset.state='idle';return}
+    b.textContent='⟳ Submitting…';b.dataset.state='submitting';
+    setTimeout(function(){b.textContent='✓ Done!';b.dataset.state='done'},1100);
+  });
+})();
+
+/* R1 + R2 — Bulk select + action bar */
+(function(){
+  var body=document.getElementById('bulkBody'),all=document.getElementById('bulkAll'),bar=document.getElementById('bulkBar'),cnt=document.getElementById('bulkCount');
+  if(!body) return;
+  var rows=[
+    ['ORD-2001','Active'],['ORD-2002','Pending'],['ORD-2003','Active'],
+    ['ORD-2004','Failed'],['ORD-2005','Active']
+  ];
+  body.innerHTML=rows.map(function(r){
+    return '<tr><td><input type="checkbox" class="bulkRow"/></td><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>';
+  }).join('');
+  function refresh(){
+    var checked=body.querySelectorAll('.bulkRow:checked').length;
+    cnt.textContent=checked;
+    bar.style.display = checked>0 ? 'flex' : 'none';
+    all.checked = checked === rows.length;
+    all.indeterminate = checked>0 && checked<rows.length;
+  }
+  all.addEventListener('change',function(){
+    body.querySelectorAll('.bulkRow').forEach(function(c){c.checked=all.checked});
+    refresh();
+  });
+  body.addEventListener('change',function(e){
+    if(e.target.classList.contains('bulkRow')) refresh();
+  });
+})();
+
+console.log('[Acme Ops Web] ready · v6 — More traps view added');
 </script>
 
 </body>
