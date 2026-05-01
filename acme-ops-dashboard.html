@@ -1268,6 +1268,16 @@ label.field > .lbl {
 
           <div class="section-title">Coordinate ambiguity (5 overlapping layers)</div>
           <div class="card trap-card"><div class="stack" id="stack"><div class="layer l1" data-layer="Alpha">Alpha</div><div class="layer l2" data-layer="Bravo">Bravo</div><div class="layer l3" data-layer="Charlie">Charlie</div><div class="layer l4" data-layer="Delta">Delta</div><div class="layer l5" data-layer="Echo">Echo</div></div></div>
+
+          <div class="section-title">K1 · Iframe with 4 Drill buttons</div>
+          <div class="section-sub">Same-origin iframe via <code>srcdoc</code> — coordinate clicks must descend into child document.</div>
+          <div class="card trap-card" style="padding:0;overflow:hidden">
+            <iframe id="reportFrame" style="width:100%;height:230px;border:0;display:block" srcdoc='<style>body{margin:0;background:#FAFAF7;color:#14140F;font:13px Inter,sans-serif;padding:14px}h4{margin:0 0 8px;font-size:11px;color:#6E6D63;font-weight:600;text-transform:uppercase;letter-spacing:.06em}.r{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #ECEAE3}.r:last-child{border-bottom:0}button{background:#fff;border:1px solid #DCD9D0;color:#14140F;padding:5px 12px;border-radius:6px;font:inherit;font-size:12px;font-weight:500;cursor:pointer}button:hover{background:#F4F3EE}span{display:flex;align-items:center;gap:10px}.id{font-family:monospace;font-size:12.5px;color:#3A3A33}</style><h4>Top regions (iframe)</h4><div class="r"><span class="id">US-East</span><span>$78,210 <button data-act="iframe-drill-us-east">Drill</button></span></div><div class="r"><span class="id">US-West</span><span>$54,402 <button data-act="iframe-drill-us-west">Drill</button></span></div><div class="r"><span class="id">EU</span><span>$31,890 <button data-act="iframe-drill-eu">Drill</button></span></div><div class="r"><span class="id">APAC</span><span>$19,701 <button data-act="iframe-drill-apac">Drill</button></span></div>'></iframe>
+          </div>
+
+          <div class="section-title">K2 · Shadow DOM widget (open shadow root)</div>
+          <div class="section-sub">2 Save buttons + Cancel inside a shadow root. <code>document.querySelector("button")</code> won't find them; coord-clicks still work.</div>
+          <div class="card trap-card"><div id="shadowHost" style="padding:8px"></div></div>
         </section>
       </div>
     </div>
@@ -1357,6 +1367,10 @@ label.field > .lbl {
 
           <div class="section-title">Notification banner</div>
           <div class="card panel-body"><div class="banner"><div class="ic">i</div><div class="msg">A new version (4.13.0) is available.</div><button class="btn sm primary" data-act="banner-update">Update</button><button class="btn sm ghost" data-act="banner-later">Later</button></div></div>
+
+          <div class="section-title">Right-click context menu</div>
+          <div class="section-sub">Right-click anywhere in the box → custom 6-item menu appears</div>
+          <div class="card panel-body"><div id="ctxArea" style="border:1.5px dashed var(--line-strong);border-radius:8px;padding:24px;text-align:center;color:var(--ink-3);font-size:13px">Right-click here for custom context menu</div></div>
         </section>
       </div>
     </div>
@@ -1560,6 +1574,16 @@ label.field > .lbl {
   <button>○ Finance</button>
   <div class="divider"></div>
   <button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>New workspace</button>
+</div>
+
+<!-- ============ CTX MENU ============ -->
+<div class="menu" id="ctxMenu">
+  <button data-act="ctx-open">Open</button>
+  <button data-act="ctx-open-tab">Open in new tab</button>
+  <button data-act="ctx-copy">Copy link</button>
+  <div class="divider"></div>
+  <button data-act="ctx-rename">Rename</button>
+  <button data-act="ctx-delete">Delete</button>
 </div>
 
 <!-- ============ TOAST STACK ============ -->
@@ -1793,7 +1817,53 @@ if(sb) sb.addEventListener('click',function(){
   }).join('');
 })();
 
-console.log('[Acme Ops Console] redesigned — v6 ready');
+/* ===== K2 — Shadow DOM widget ===== */
+(function(){
+  var host=$('#shadowHost'); if(!host) return;
+  var root=host.attachShadow({mode:'open'});
+  root.innerHTML='<style>:host{display:block}.row{display:flex;gap:8px;align-items:center;padding:8px 0;font:13px Inter,sans-serif;color:#14140F}input{flex:1;padding:6px 10px;border:1px solid #DCD9D0;border-radius:6px;font:inherit;color:inherit}button{padding:6px 14px;border-radius:6px;border:1px solid #DCD9D0;background:#fff;color:#14140F;font:inherit;font-weight:500;cursor:pointer}button:hover{background:#F4F3EE}button.primary{background:#14140F;color:#fff;border-color:#14140F}button.primary:hover{background:#3A3A33}.note{font-size:11px;color:#6E6D63;font-style:italic}</style><div class="row"><input id="sin" placeholder="Inside shadow DOM…"/><button id="sbtn1" class="primary">Save</button></div><div class="row"><button id="sbtn2" class="primary">Save</button><button id="sbtn3">Cancel</button><span class="note">— same buttons, different shadow children</span></div>';
+  /* Forward shadow clicks into the global log */
+  root.addEventListener('click',function(e){
+    var t=e.target; if(t.tagName!=='BUTTON') return;
+    setLog({sel:'#shadow > button#'+t.id, text:t.textContent.trim(), meta:'inside-shadow-root', x:Math.round(e.clientX), y:Math.round(e.clientY)});
+  });
+})();
+
+/* ===== J1 — Live-pulsing rows in orders table ===== */
+setInterval(function(){
+  var rows=document.querySelectorAll('#ordersBody tr'); if(!rows.length) return;
+  var r=rows[Math.floor(Math.random()*rows.length)];
+  r.style.transition='background .8s';
+  r.style.background='var(--accent-soft)';
+  setTimeout(function(){r.style.background=''},800);
+},3000);
+
+/* ===== J2 — Late-loaded banner (appears 2s after init) ===== */
+setTimeout(function(){
+  var dash=document.querySelector('.view[data-view="dashboard"]');
+  if(!dash) return;
+  var c=document.createElement('div');
+  c.className='banner';
+  c.style.cssText='margin-top:16px;background:var(--warning-soft);border-color:var(--warning)';
+  c.innerHTML='<div class="ic" style="background:var(--warning)">!</div><div class="msg">System banner (late-loaded after 2s) — Scheduled DB failover at 02:00 UTC</div><button class="btn sm primary" data-act="latebanner-ack">Acknowledge</button><button class="btn sm" data-act="latebanner-snooze">Snooze</button><button class="btn sm ghost" data-act="latebanner-dismiss">Dismiss</button>';
+  /* Insert after the page-head */
+  var head=dash.querySelector('.page-head');
+  if(head&&head.nextElementSibling) head.parentNode.insertBefore(c, head.nextElementSibling);
+},2000);
+
+/* ===== Right-click context menu ===== */
+(function(){
+  var area=$('#ctxArea'),menu=$('#ctxMenu'); if(!area||!menu) return;
+  area.addEventListener('contextmenu',function(e){
+    e.preventDefault();
+    menu.style.left=Math.min(e.clientX,window.innerWidth-220)+'px';
+    menu.style.top=e.clientY+'px';
+    menu.style.right='auto';
+    menu.classList.add('show');
+  });
+})();
+
+console.log('[Acme Ops Console] redesigned — v7 ready (full coverage restored)');
 })();
 </script>
 
