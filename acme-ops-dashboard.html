@@ -972,6 +972,44 @@ label.field > .lbl {
 
 /* Tweaks panel custom overrides */
 .tweaks-panel input[type=color] { width: 36px; height: 28px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: transparent; }
+/* ===== Tier-1 additions (Native & timing) ===== */
+.tree { font-size: 13px; }
+.tree-item { display: flex; align-items: center; gap: 6px; padding: 5px 4px; cursor: pointer; border-radius: 5px; }
+.tree-item:hover { background: var(--surface-2); }
+.tree-item .chev { width: 14px; height: 14px; display: inline-grid; place-items: center; color: var(--ink-3); transition: transform .12s; }
+.tree-item.open > .chev { transform: rotate(90deg); }
+.tree-item .leaf-spacer { width: 14px; }
+.tree-children { padding-left: 18px; display: none; }
+.tree-item.open + .tree-children { display: block; }
+.hp-list .hp-row { padding: 8px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; position: relative; }
+.hp-list .hp-row:hover { background: var(--surface-2); }
+.hp-popover { position: absolute; left: 100%; top: 0; margin-left: 12px; width: 240px; padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-lg); display: none; z-index: 50; }
+.hp-row:hover .hp-popover { display: block; }
+.toast-stack { position: fixed; bottom: 56px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 250; pointer-events: none; }
+.toast { background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg); animation: tin .2s ease-out; max-width: 360px; pointer-events: auto; display: flex; align-items: center; gap: 10px; }
+.toast .undo { color: var(--accent-ink); cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .06em; padding: 0 4px; }
+.daterange-pop { display: none; position: absolute; top: 100%; left: 0; margin-top: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-lg); padding: 14px; z-index: 60; }
+.daterange-pop.show { display: flex; gap: 16px; }
+.dr-cal { width: 220px; }
+.dr-cal .dr-head { font-size: 12px; font-weight: 600; text-align: center; margin-bottom: 8px; color: var(--ink-2); }
+.dr-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.dr-day { aspect-ratio: 1; display: grid; place-items: center; font-size: 11px; cursor: pointer; border-radius: 4px; color: var(--ink-2); }
+.dr-day:hover { background: var(--surface-2); }
+.dr-day.dow { font-size: 10px; color: var(--ink-4); cursor: default; font-weight: 600; }
+.dr-day.dow:hover { background: transparent; }
+.dr-day.start, .dr-day.end { background: var(--ink); color: var(--bg); font-weight: 600; }
+.dr-day.in-range { background: var(--accent-soft); color: var(--accent-ink); }
+.dr-day.muted { color: var(--ink-5); }
+.edge-clip-wrap { position: relative; height: 80px; background: var(--surface-sunk); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.edge-clip-btn { position: absolute; top: 22px; right: -40px; padding: 8px 16px; background: var(--accent); color: white; border-radius: 6px; font-size: 13px; font-weight: 500; }
+.focus-trap-modal { display: none; position: fixed; inset: 0; background: rgba(20,20,15,.45); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.focus-trap-modal.show { display: flex; }
+.focus-trap-modal .ftm-card { background: var(--surface); padding: 24px; border-radius: 12px; width: 360px; box-shadow: var(--shadow-lg); }
+.focus-trap-modal .ftm-card h3 { margin: 0 0 8px; font-size: 16px; }
+.focus-trap-modal .ftm-card p { margin: 0 0 14px; font-size: 13px; color: var(--ink-3); }
+.focus-trap-modal .ftm-card input { margin-bottom: 10px; }
+.focus-trap-modal .ftm-card .ftm-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
 @media (max-width: 980px){
   .split-2 { grid-template-columns: 1fr; }
   .kpi-grid, .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -1065,6 +1103,10 @@ label.field > .lbl {
       <a class="nav-item" data-view="advanced">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         <span class="label">More traps</span>
+      </a>
+      <a class="nav-item" data-view="native">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M3 12h2M19 12h2"/></svg>
+        <span class="label">Native &amp; timing</span>
       </a>
     </nav>
 
@@ -1517,6 +1559,77 @@ label.field > .lbl {
       </div>
     </div>
 
+    <!-- ============ NATIVE & TIMING (Tier 1) ============ -->
+    <div class="view" data-view="native">
+      <div class="page-head"><div class="head-stack"><h1>Native &amp; timing</h1><span class="lab-badge">Tier 1</span><div class="desc">Native browser dialogs, transient elements, focus traps, edge clipping — high-impact prompt-accuracy tests.</div></div></div>
+
+      <div class="split-eq">
+        <section>
+          <div class="section-title">Y1 · <code>window.alert()</code></div>
+          <div class="section-sub">Native browser dialog. Opaque to DOM — KaneAI's prompt can't describe the OK button.</div>
+          <div class="card panel-body" style="text-align:center"><button class="btn primary" id="btnY1">Trigger alert()</button></div>
+
+          <div class="section-title">Y2 · <code>window.confirm()</code> Yes/No</div>
+          <div class="card panel-body" style="text-align:center"><button class="btn primary" id="btnY2">Trigger confirm()</button> <span id="y2result" class="mono" style="margin-left:10px;color:var(--ink-3);font-size:12px"></span></div>
+
+          <div class="section-title">Y3 · <code>window.prompt()</code></div>
+          <div class="card panel-body" style="text-align:center"><button class="btn primary" id="btnY3">Trigger prompt()</button> <span id="y3result" class="mono" style="margin-left:10px;color:var(--ink-3);font-size:12px"></span></div>
+
+          <div class="section-title">U1 · Tree view (3-level)</div>
+          <div class="section-sub">Same chevron icon at every depth. Selector must include the path.</div>
+          <div class="card panel-body"><div class="tree" id="treeRoot">
+            <div class="tree-item open" data-tree="src"><span class="chev">▶</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l2-3h6l2 3h8v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>src</div>
+            <div class="tree-children">
+              <div class="tree-item open" data-tree="src/components"><span class="chev">▶</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l2-3h6l2 3h8v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>components</div>
+              <div class="tree-children">
+                <div class="tree-item" data-tree="src/components/Button.tsx"><span class="leaf-spacer"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Button.tsx</div>
+                <div class="tree-item" data-tree="src/components/Modal.tsx"><span class="leaf-spacer"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Modal.tsx</div>
+              </div>
+              <div class="tree-item" data-tree="src/utils"><span class="chev">▶</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l2-3h6l2 3h8v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>utils</div>
+              <div class="tree-children">
+                <div class="tree-item" data-tree="src/utils/format.ts"><span class="leaf-spacer"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>format.ts</div>
+              </div>
+              <div class="tree-item" data-tree="src/index.ts"><span class="leaf-spacer"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>index.ts</div>
+            </div>
+            <div class="tree-item" data-tree="package.json"><span class="leaf-spacer"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>package.json</div>
+          </div></div>
+
+          <div class="section-title">L3 · Hover preview card</div>
+          <div class="section-sub">Hover any user → details popover appears. The popover only mounts on hover.</div>
+          <div class="card panel-body"><div class="hp-list">
+            <div class="hp-row" data-user="emma"><div style="width:24px;height:24px;border-radius:50%;background:#10B981;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:600">EM</div>Emma Lee<div class="hp-popover"><div style="font-weight:600">Emma Lee</div><div style="font-size:11.5px;color:var(--ink-3);margin-top:2px">Senior PM · Product</div><div style="font-size:12px;margin-top:8px">emma@acme.io</div><button class="btn sm primary" data-act="hp-msg-emma" style="margin-top:10px;width:100%">Message</button></div></div>
+            <div class="hp-row" data-user="rahul"><div style="width:24px;height:24px;border-radius:50%;background:#F59E0B;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:600">RA</div>Rahul Mehta<div class="hp-popover"><div style="font-weight:600">Rahul Mehta</div><div style="font-size:11.5px;color:var(--ink-3);margin-top:2px">Eng · Backend</div><div style="font-size:12px;margin-top:8px">rahul@acme.io</div><button class="btn sm primary" data-act="hp-msg-rahul" style="margin-top:10px;width:100%">Message</button></div></div>
+            <div class="hp-row" data-user="mira"><div style="width:24px;height:24px;border-radius:50%;background:#8B5CF6;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:600">MK</div>Mira K<div class="hp-popover"><div style="font-weight:600">Mira K</div><div style="font-size:11.5px;color:var(--ink-3);margin-top:2px">SRE</div><div style="font-size:12px;margin-top:8px">mira@acme.io</div><button class="btn sm primary" data-act="hp-msg-mira" style="margin-top:10px;width:100%">Message</button></div></div>
+          </div></div>
+        </section>
+
+        <section>
+          <div class="section-title">V1 · Auto-dismissing toast (3s)</div>
+          <div class="section-sub">Click → toast appears at bottom-right, vanishes after 3s. Recording vs replay timing-sensitive.</div>
+          <div class="card panel-body" style="text-align:center"><button class="btn primary" id="btnV1">Show toast</button></div>
+
+          <div class="section-title">V3 · Snackbar with Undo</div>
+          <div class="section-sub">Click → snackbar with Undo action. Action is only available during the display window.</div>
+          <div class="card panel-body" style="text-align:center"><button class="btn primary" id="btnV3">Delete item</button></div>
+
+          <div class="section-title">W1 · Focus-trap modal</div>
+          <div class="section-sub">Open → Tab cycles only inside the modal. Tab order ≠ DOM order if focus trap diverges.</div>
+          <div class="card panel-body" style="text-align:center"><button class="btn primary" id="btnFtm">Open focus-trap modal</button></div>
+
+          <div class="section-title">Z1 · Element clipped at viewport edge</div>
+          <div class="section-sub">Button positioned with <code>right: -40px</code> — half off-screen. Coord click on the visible portion still fires.</div>
+          <div class="card panel-body"><div class="edge-clip-wrap"><button class="edge-clip-btn" data-act="edge-clip-btn">Click visible portion →</button></div></div>
+
+          <div class="section-title">O4 · Custom date-range picker</div>
+          <div class="section-sub">Click → calendar popover with two months. Click start day, then end day to set range.</div>
+          <div class="card panel-body"><div style="position:relative;display:inline-block">
+            <input id="drInput" placeholder="Select date range…" readonly style="width:280px;cursor:pointer"/>
+            <div class="daterange-pop" id="drPop"></div>
+          </div></div>
+        </section>
+      </div>
+    </div>
+
   </main>
 
   <!-- ============ STATUSBAR ============ -->
@@ -1574,6 +1687,21 @@ label.field > .lbl {
   <button>○ Finance</button>
   <div class="divider"></div>
   <button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>New workspace</button>
+</div>
+
+<!-- ============ FOCUS-TRAP MODAL (W1) ============ -->
+<div class="focus-trap-modal" id="focusTrapModal" role="dialog" aria-modal="true">
+  <div class="ftm-card">
+    <h3>Focus-trap demo</h3>
+    <p>Tab cycles only inside this modal. Try it: press Tab repeatedly — focus stays on these 3 inputs and 2 buttons.</p>
+    <input type="text" placeholder="Field 1" id="ftm1"/>
+    <input type="text" placeholder="Field 2" id="ftm2"/>
+    <input type="text" placeholder="Field 3" id="ftm3"/>
+    <div class="ftm-actions">
+      <button class="btn ghost" id="ftmCancel">Cancel</button>
+      <button class="btn primary" id="ftmConfirm">Confirm</button>
+    </div>
+  </div>
 </div>
 
 <!-- ============ CTX MENU ============ -->
@@ -1863,7 +1991,102 @@ setTimeout(function(){
   });
 })();
 
-console.log('[Acme Ops Console] redesigned — v7 ready (full coverage restored)');
+/* ===== Tier-1 Native & timing ===== */
+
+/* Y1 alert */
+var y1=$('#btnY1'); if(y1) y1.addEventListener('click',function(){alert('This is a native browser alert. Click OK to dismiss.')});
+/* Y2 confirm */
+var y2=$('#btnY2'),y2r=$('#y2result'); if(y2) y2.addEventListener('click',function(){var v=confirm('Are you sure you want to proceed?'); y2r.textContent=' → '+(v?'Yes':'No')});
+/* Y3 prompt */
+var y3=$('#btnY3'),y3r=$('#y3result'); if(y3) y3.addEventListener('click',function(){var v=prompt('Enter your name:','Sahil'); y3r.textContent=' → '+(v||'(cancelled)')});
+
+/* U1 tree expand/collapse */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('#treeRoot .tree-item');
+  if(!t||!t.querySelector('.chev')) return;
+  t.classList.toggle('open');
+});
+
+/* L3 hover preview is pure CSS (.hp-row:hover .hp-popover) — no JS needed */
+
+/* V1 auto-dismissing toast */
+var toastStack=$('#toastStack');
+function pushToast(msg,opts){
+  if(!toastStack) return;
+  var t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  if(opts&&opts.undo){
+    var u=document.createElement('button'); u.className='undo'; u.textContent='Undo'; u.dataset.act='toast-undo';
+    u.addEventListener('click',function(){t.remove(); pushToast('Restored',{})});
+    t.appendChild(u);
+  }
+  toastStack.appendChild(t);
+  setTimeout(function(){if(t.parentNode) t.remove()},(opts&&opts.duration)||3000);
+}
+var v1=$('#btnV1'); if(v1) v1.addEventListener('click',function(){pushToast('Saved · changes synced',{})});
+var v3=$('#btnV3'); if(v3) v3.addEventListener('click',function(){pushToast('Item deleted',{undo:true,duration:5000})});
+
+/* W1 focus-trap modal */
+var ftm=$('#focusTrapModal'),btnFtm=$('#btnFtm'),ftmCancel=$('#ftmCancel'),ftmConfirm=$('#ftmConfirm');
+function getFtmFocusable(){return Array.from(ftm.querySelectorAll('input, button'))}
+function trapTab(e){
+  if(!ftm.classList.contains('show')||e.key!=='Tab') return;
+  var f=getFtmFocusable(); if(!f.length) return;
+  var first=f[0],last=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  else if(e.key==='Escape'){ftm.classList.remove('show')}
+}
+if(btnFtm) btnFtm.addEventListener('click',function(){ftm.classList.add('show'); setTimeout(function(){$('#ftm1').focus()},50)});
+if(ftmCancel) ftmCancel.addEventListener('click',function(){ftm.classList.remove('show')});
+if(ftmConfirm) ftmConfirm.addEventListener('click',function(){ftm.classList.remove('show')});
+document.addEventListener('keydown',trapTab);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ftm.classList.contains('show')) ftm.classList.remove('show')});
+
+/* O4 date-range picker (custom 2-month calendar) */
+(function(){
+  var inp=$('#drInput'),pop=$('#drPop'); if(!inp) return;
+  var today=new Date(); var rangeStart=null, rangeEnd=null;
+  function dim(y,m){return new Date(y,m+1,0).getDate()}
+  function fdow(y,m){return new Date(y,m,1).getDay()}
+  function buildMonth(year,month){
+    var name=['January','February','March','April','May','June','July','August','September','October','November','December'][month];
+    var dow=['S','M','T','W','T','F','S'];
+    var html='<div class="dr-cal"><div class="dr-head">'+name+' '+year+'</div><div class="dr-grid">';
+    dow.forEach(function(d){html+='<div class="dr-day dow">'+d+'</div>'});
+    var first=fdow(year,month), days=dim(year,month);
+    for(var i=0;i<first;i++) html+='<div class="dr-day muted"></div>';
+    for(var d=1;d<=days;d++){
+      var iso=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      var cls='dr-day';
+      if(rangeStart&&iso===rangeStart) cls+=' start';
+      if(rangeEnd&&iso===rangeEnd) cls+=' end';
+      if(rangeStart&&rangeEnd&&iso>rangeStart&&iso<rangeEnd) cls+=' in-range';
+      html+='<div class="'+cls+'" data-iso="'+iso+'">'+d+'</div>';
+    }
+    html+='</div></div>';
+    return html;
+  }
+  function render(){
+    var y=today.getFullYear(),m=today.getMonth();
+    var ny=m===11?y+1:y, nm=(m+1)%12;
+    pop.innerHTML=buildMonth(y,m)+buildMonth(ny,nm);
+  }
+  inp.addEventListener('click',function(){pop.classList.toggle('show'); if(pop.classList.contains('show')) render()});
+  pop.addEventListener('click',function(e){
+    var d=e.target.closest('.dr-day'); if(!d||d.classList.contains('dow')||d.classList.contains('muted')||!d.dataset.iso) return;
+    var iso=d.dataset.iso;
+    if(!rangeStart||(rangeStart&&rangeEnd)){rangeStart=iso; rangeEnd=null}
+    else if(iso<rangeStart){rangeStart=iso}
+    else {rangeEnd=iso}
+    if(rangeStart&&rangeEnd) inp.value=rangeStart+' → '+rangeEnd;
+    else if(rangeStart) inp.value=rangeStart+' → …';
+    render();
+    if(rangeStart&&rangeEnd) setTimeout(function(){pop.classList.remove('show')},250);
+  });
+  document.addEventListener('click',function(e){if(!e.target.closest('#drInput')&&!e.target.closest('#drPop')) pop.classList.remove('show')});
+})();
+
+console.log('[Acme Ops Console] redesigned — v8 ready (Tier-1 added: 88+10 cases)');
 })();
 </script>
 
