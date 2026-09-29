@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TE-29629 grid actions</title>
+  <link rel="stylesheet" href="_lab.css">
+</head>
+<body>
+<main>
+  <h1>TE-29629 · Icon-only actions in grid cells</h1>
+  <div class="subtitle">
+    Test pages for the KaneAI desktop-locate refinement (auteur-automind PR #1005). Each page records exactly what a click hit
+    in the sticky <strong>Last action</strong> bar: the icon name (EDIT, DELETE, …), <strong>MISS</strong> when the Action cell
+    was hit outside every icon (the reported bug), or <strong>BLOCKED</strong> for a disabled icon.
+  </div>
+  <div class="index-list">
+    <a href="a-core.html"><strong>A · Core repro</strong><small>The reported structure (unlabelled pencil, empty-name gridcell) plus a centred-pencil control.</small></a>
+    <a href="b-multi-icon.html"><strong>B · Several icons in one cell</strong><small>Pick the right glyph: view / edit / duplicate / delete / more.</small></a>
+    <a href="c-labelled.html"><strong>C · Labelled controls (regression)</strong><small>Accessible buttons, text cells and a dropdown — must behave as before.</small></a>
+    <a href="d-containers.html"><strong>D · Other containers and control types</strong><small>listitem, generic div rows, plain table, cards; custom checkbox, switch, icon link.</small></a>
+    <a href="e-geometry.html"><strong>E · Geometry</strong><small>Tiny icons, wide/tall cells, dense rows, horizontal scroll, pinned column.</small></a>
+    <a href="f-state.html"><strong>F · State</strong><small>Locked rows, missing icons, hover-reveal, late render, inline edit.</small></a>
+  </div>
+  <p class="subtitle">Test cases: <a href="https://github.com/sahilrlambdatest/lt-qa-html-fixtures/blob/main/te-29629-grid-actions/TEST-CASES.md">TEST-CASES.md</a></p>
+</main>
+</body>
+</html>

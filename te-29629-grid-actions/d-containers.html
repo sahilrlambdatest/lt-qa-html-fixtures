@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TE-29629 grid actions</title>
+  <link rel="stylesheet" href="_lab.css">
+</head>
+<body>
+<main>
+<div class="card">
+  <h2>Notification rules</h2>
+  <p class="scenario">D1 · role=listitem container: unlabelled pencil at the right end of each list item.</p>
+  <div id="gD1"></div>
+</div>
+<div class="card">
+  <h2>Crew roster (div rows)</h2>
+  <p class="scenario">D2 · Generic container: plain div rows with no ARIA roles at all.</p>
+  <div id="gD2"></div>
+</div>
+<div class="card">
+  <h2>Warehouse contacts (plain table)</h2>
+  <p class="scenario">D3 · Native table without ARIA (implicit role "cell"), unlabelled edit + download icons. The cell centre lands on DOWNLOAD, so an unrefined answer logs DOWNLOAD instead of EDIT.</p>
+  <div id="gD3"></div>
+</div>
+<div class="card">
+  <h2>Sales reps (cards)</h2>
+  <p class="scenario">D4 · Card grid: an unlabelled pencil in the top-right corner of each card. The whole card is the container.</p>
+  <div id="gD4"></div>
+</div>
+<div class="card">
+  <h2>Access control</h2>
+  <p class="scenario">D5 · Other control types inside gridcells, none of them accessible: a custom checkbox (Select), a custom switch (Active), an icon-only LINK with an empty name, and a pencil.</p>
+  <div id="gD5"></div>
+</div>
+</main>
+<script src="_lab.js"></script>
+<script>
+Lab.init({ title: 'D · Other containers and control types', subtitle: 'The trigger covers gridcell, cell, row, listitem and generic containers, and icon, button, link, checkbox and switch targets.' });
+Lab.container('#gD1', { id: 'D1', kind: 'list', rows: 4 });
+Lab.container('#gD2', { id: 'D2', kind: 'flex', rows: 4 });
+Lab.container('#gD3', { id: 'D3', kind: 'plain-table', rows: 4, actions: ['edit', 'download'] });
+Lab.container('#gD4', { id: 'D4', kind: 'cards', rows: 4 });
+Lab.grid('#gD5', { id: 'D5', caption: 'Access control', cols: ['select', 'name', 'role', 'active'], rows: 5, actions: ['link', 'edit'], actionWidth: 110 });
+</script>
+</body>
+</html>

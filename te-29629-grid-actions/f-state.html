@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TE-29629 grid actions</title>
+  <link rel="stylesheet" href="_lab.css">
+</head>
+<body>
+<main>
+<div class="card">
+  <h2>Locked rows</h2>
+  <p class="scenario">F1 · Priya Sharma and Chen Wei are LOCKED (greyed pencil, logs BLOCKED, opens nothing). Noah Williams has NO icons at all (no permission). Asking to edit Noah must not click another row.</p>
+  <div id="gF1"></div>
+</div>
+<div class="card">
+  <h2>Hover reveal</h2>
+  <p class="scenario">F2 · Icons are invisible until the row is hovered: the screenshot shows an empty Action cell.</p>
+  <div id="gF2"></div>
+</div>
+<div class="card">
+  <h2>Late render</h2>
+  <p class="scenario">F3 · Action cells show a loading skeleton for 5 seconds after page load, then the icons appear.</p>
+  <div id="gF3"></div>
+</div>
+<div class="card">
+  <h2>Inline edit</h2>
+  <p class="scenario">F4 · The pencil switches the row into inline edit: the name becomes an input and the Action cell swaps to unlabelled SAVE (check) and CANCEL (x) icons, a second icon-only click on the same cell.</p>
+  <div id="gF4"></div>
+</div>
+</main>
+<script src="_lab.js"></script>
+<script>
+Lab.init({ title: 'F · State edge cases', subtitle: 'Disabled, missing, hidden, late and changing icons.' });
+Lab.grid('#gF1', { id: 'F1', caption: 'Locked rows', actions: ['edit', 'delete'], actionWidth: 110, lockedFor: [2, 5], emptyFor: [7] });
+Lab.grid('#gF2', { id: 'F2', caption: 'Hover reveal', rows: 5, actions: ['edit', 'delete'], actionWidth: 110, className: 'hover-reveal' });
+Lab.grid('#gF3', { id: 'F3', caption: 'Late render', rows: 5, actionWidth: 96, lateMs: 5000 });
+Lab.grid('#gF4', { id: 'F4', caption: 'Inline edit', rows: 5, cols: ['name', 'role', 'city'], actionWidth: 96, inlineEdit: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TE-29629 grid actions</title>
+  <link rel="stylesheet" href="_lab.css">
+</head>
+<body>
+<main>
+<div class="card">
+  <h2>Tiny icons</h2>
+  <p class="scenario">E1 · 10px glyphs in a 120px cell — the 4x upscale is what makes these readable.</p>
+  <div id="gE1"></div>
+</div>
+<div class="card">
+  <h2>Wide action column</h2>
+  <p class="scenario">E2 · A 320px Action cell with the pencil at the far left. The column is at the right edge of the viewport, so the 40px crop padding has to be clamped to the image.</p>
+  <div id="gE2"></div>
+</div>
+<div class="card">
+  <h2>Tall rows</h2>
+  <p class="scenario">E3 · 76px rows with the pencil top-aligned: the cell centre is well below the icon.</p>
+  <div id="gE3"></div>
+</div>
+<div class="card">
+  <h2>Dense grid (20 rows)</h2>
+  <p class="scenario">E4 · 26px rows. The padded crop includes the pencils of the rows above and below; the refined answer must stay inside the ORIGINAL cell, so a neighbour-row hit must never be logged.</p>
+  <div id="gE4"></div>
+</div>
+<div class="card">
+  <h2>Wide grid (horizontal scroll)</h2>
+  <p class="scenario">E5 · 14 columns; the Action column is only visible after scrolling the grid right.</p>
+  <div class="scroll-x"><div id="gE5"></div></div>
+</div>
+<div class="card">
+  <h2>Pinned grid (horizontal scroll)</h2>
+  <p class="scenario">E6 · Same grid, but the Action column is sticky on the right edge and overlaps scrolled content.</p>
+  <div class="scroll-x pinned-right"><div id="gE6"></div></div>
+</div>
+</main>
+<script src="_lab.js"></script>
+<script>
+Lab.init({ title: 'E · Geometry edge cases', subtitle: 'Size, position and density of the crop the refinement works on.', fullBleed: true });
+Lab.grid('#gE1', { id: 'E1', caption: 'Tiny icons', rows: 4, actions: ['edit', 'delete'], iconClass: 'tiny', actionWidth: 120 });
+Lab.grid('#gE2', { id: 'E2', caption: 'Wide action column', rows: 4, actionWidth: 320 });
+Lab.grid('#gE3', { id: 'E3', caption: 'Tall rows', rows: 3, cols: ['name', 'role', 'city'], className: 'tall', actionWidth: 110 });
+Lab.grid('#gE4', { id: 'E4', caption: 'Dense grid', rows: 20, cols: ['name', 'role', 'city', 'status'], className: 'dense', actionWidth: 60 });
+const wide = ['name', 'email', 'phone', 'role', 'city', 'zip', 'region', 'source', 'owner', 'project', 'budget', 'tags', 'created', 'updated'];
+Lab.grid('#gE5', { id: 'E5', caption: 'Wide grid', rows: 5, cols: wide, actionWidth: 80 });
+Lab.grid('#gE6', { id: 'E6', caption: 'Pinned grid', rows: 5, cols: wide, actionWidth: 80 });
+</script>
+</body>
+</html>

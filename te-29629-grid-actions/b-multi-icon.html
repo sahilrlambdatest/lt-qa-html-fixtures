@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TE-29629 grid actions</title>
+  <link rel="stylesheet" href="_lab.css">
+</head>
+<body>
+<main>
+<div class="card">
+  <h2>Leads</h2>
+  <p class="scenario">B1 · Five unlabelled icons in one Action cell (view, edit, duplicate, delete, more), centred. The cell centre lands on DUPLICATE, so an unrefined answer logs COPY instead of EDIT.</p>
+  <div id="gB1"></div>
+</div>
+<div class="card">
+  <h2>Appointments</h2>
+  <p class="scenario">B2 · Edit + delete, left-aligned in a wide cell. Centre is empty (MISS). Wrong-icon hits are destructive here: a DELETE when you asked for EDIT is a fail.</p>
+  <div id="gB2"></div>
+</div>
+</main>
+<script src="_lab.js"></script>
+<script>
+Lab.init({ title: 'B · Several icons in one cell', subtitle: 'The refinement must pick the RIGHT glyph inside the crop, not just any glyph.' });
+Lab.grid('#gB1', { id: 'B1', caption: 'Leads', actions: ['view', 'edit', 'copy', 'delete', 'more'], align: 'center', actionWidth: 170 });
+Lab.grid('#gB2', { id: 'B2', caption: 'Appointments', cols: ['name', 'city', 'status'], rows: 6, actions: ['edit', 'delete'], actionWidth: 140 });
+</script>
+</body>
+</html>

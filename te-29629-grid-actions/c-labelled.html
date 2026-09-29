@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TE-29629 grid actions</title>
+  <link rel="stylesheet" href="_lab.css">
+</head>
+<body>
+<main>
+<div class="card">
+  <h2>Team members</h2>
+  <p class="scenario">C1 · Regression / non-trigger: the icons are real buttons with aria-labels ("Edit Priya Sharma", "Delete Priya Sharma"), so they have their own a11y entries. The first vision answer should already be the button; the refinement must NOT be needed and must not change the outcome. Also use this grid for plain text-cell clicks (logs CELL).</p>
+  <div id="gC1"></div>
+</div>
+<div class="card">
+  <h2>Installers</h2>
+  <p class="scenario">C2 · Labelled Status dropdown inside a gridcell (exercises adjust_for_dropdown_label, which now runs after the refinement) plus a labelled pencil.</p>
+  <div id="gC2"></div>
+</div>
+</main>
+<script src="_lab.js"></script>
+<script>
+Lab.init({ title: 'C · Labelled controls (should not trigger)', subtitle: 'Regression checks: accessible icons, text cells and dropdowns must behave exactly as before the fix.' });
+Lab.grid('#gC1', { id: 'C1', caption: 'Team members', actions: ['edit', 'delete'], labelled: true, actionWidth: 110 });
+Lab.grid('#gC2', { id: 'C2', caption: 'Installers', cols: ['name', 'email', 'statusSelect'], rows: 5, labelled: true, actionWidth: 76 });
+</script>
+</body>
+</html>
