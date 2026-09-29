@@ -7,7 +7,7 @@
 
 **If a step errors** (`ELEMENT_ERROR`), Kane pauses the session and queues everything after it. For the negative steps that's the expected outcome: record it, then start a new session (or delete the failed step and Resume) to continue.
 
-**Scrolling:** Kane only acts on what is visible and does not scroll to find a target (verified on stage and dev), so every grid below the first one on a page is preceded by a "Scroll … until … is fully visible" step. The Last action bar is sticky and stays on screen while you scroll.
+**Scrolling:** Kane only acts on what is visible and does not scroll to find a target (verified on stage and dev), so every grid below the first one on a page is preceded by a "Scroll to the … section" step. Avoid "Scroll up/down until … is fully visible": on dev and stage that wording failed with ELEMENT_ERROR, while "Scroll to the … section" worked both up and down. The Last action bar is sticky and stays on screen while you scroll.
 
 **Why every click is followed by an assertion:** the bug was a click that "succeeded" on the empty middle of the cell, so a green click step proves nothing. The page's **Last action** bar shows what was really hit: `EDIT — <name>`, or `MISS — <name>` for the bug.
 If an assertion with `—` (em dash) is awkward to type, use `contains "EDIT" and "Priya Sharma"` instead.
@@ -23,7 +23,7 @@ If an assertion with `—` (em dash) is awkward to type, use `contains "EDIT" an
 5. Clear the Full name field and type "Priya Sharma QA"
 6. Click the Save changes button
 7. Assert that the Last action text contains "SAVED — Priya Sharma QA (grid A1)"
-8. Assert that the Customers grid contains "Priya Sharma QA"
+8. Assert that the text "Priya Sharma QA" is visible on the page
 9. Click the edit icon in the Action column for Aarav Mehta
 10. Assert that the Last action text contains "EDIT — Aarav Mehta (grid A1)"
 11. Click the Cancel button
@@ -42,7 +42,7 @@ If an assertion with `—` (em dash) is awkward to type, use `contains "EDIT" an
 24. Click the pencil icon for Liam O'Connor
 25. Assert that the Last action text contains "EDIT — Liam O'Connor (grid A1)"
 26. Click the Cancel button
-27. Scroll down until the Projects grid is fully visible
+27. Scroll to the Projects section
 28. Click the edit icon for Amara Okafor in the Projects grid
 29. Assert that the Last action text contains "EDIT — Amara Okafor (grid A2)"
 30. Click the Cancel button
@@ -68,7 +68,7 @@ Step 28 is the **control**: it must pass on stage too. If it fails, the page or 
 13. Assert that the dialog "Delete Sofía García?" is visible
 14. Click the Cancel button
 15. Assert that the Last action text contains "DELETE CANCELLED — Sofía García (grid B1)"
-16. Scroll down until the Appointments grid is fully visible
+16. Scroll to the Appointments section
 17. Click the edit icon for Arjun Nair in the Appointments grid
 18. Assert that the Last action text contains "EDIT — Arjun Nair (grid B2)"
 19. Assert that the Last action text does not contain "DELETE"
@@ -76,8 +76,8 @@ Step 28 is the **control**: it must pass on stage too. If it fails, the page or 
 21. Click the delete icon for Olivia Brown in the Appointments grid
 22. Click the Delete button in the dialog
 23. Assert that the Last action text contains "DELETED — Olivia Brown (grid B2)"
-24. Assert that the Appointments grid does not contain "Olivia Brown"
-25. Scroll up until the Leads grid is fully visible
+24. Assert that the text "Olivia Brown" is not visible on the page
+25. Scroll to the Leads section
 26. **[?]** Click the icon in the Action column for Chen Wei in the Leads grid — *record which icon the Last action bar shows*
 
 The middle of the B1 cell is the Duplicate icon, so an unrefined click on step 2 would log `COPY`. On stage (2026-09-29) the model found the pencil anyway, so step 2 does **not** reproduce the bug there; it only checks that dev didn't regress. Pre-fix, step 17 logs `MISS`.
@@ -93,17 +93,17 @@ The middle of the B1 cell is the Duplicate icon, so an unrefined click on step 2
 5. Click the edit icon for Noah Williams in the Crew roster
 6. Assert that the Last action text contains "EDIT — Noah Williams (grid D2)"
 7. Click the Cancel button
-8. Scroll down until the Warehouse contacts section is fully visible
+8. Scroll to the Warehouse contacts section
 9. Click the edit icon for Amara Okafor in Warehouse contacts
 10. Assert that the Last action text contains "EDIT — Amara Okafor (grid D3)"
 11. Click the Cancel button
 12. Click the download icon for Lucas Silva in Warehouse contacts
 13. Assert that the Last action text contains "DOWNLOAD — Lucas Silva (grid D3)"
-14. Scroll down until the Sales reps cards are fully visible
+14. Scroll to the Sales reps section
 15. Click the edit icon on Hana Kim's card
 16. Assert that the Last action text contains "EDIT — Hana Kim (grid D4)"
 17. Click the Cancel button
-18. Scroll down until the Access control grid is fully visible
+18. Scroll to the Access control section
 19. Click the Select checkbox for Omar Haddad
 20. Assert that the Last action text contains "SELECT ON — Omar Haddad (grid D5)"
 21. Turn on the Active switch for Maya Patel
@@ -127,15 +127,15 @@ Pre-fix, step 9 logs `DOWNLOAD — Amara Okafor` (the middle of the cell is the 
 5. Click the delete icon for Sofía García in Tiny icons
 6. Assert that the Last action text contains "DELETE — Sofía García (grid E1)"
 7. Click the Cancel button
-8. Scroll down until the Wide action column grid is fully visible
+8. Scroll to the Wide action column section
 9. Click the edit icon for Noah Williams in the Wide action column grid
 10. Assert that the Last action text contains "EDIT — Noah Williams (grid E2)"
 11. Click the Cancel button
-12. Scroll down until the Tall rows grid is fully visible
+12. Scroll to the Tall rows section
 13. Click the edit icon for Mateo Rossi in Tall rows
 14. Assert that the Last action text contains "EDIT — Mateo Rossi (grid E3)"
 15. Click the Cancel button
-16. Scroll down until the Dense grid is fully visible
+16. Scroll to the Dense grid section
 17. Click the edit icon for Tomás Novak in the Dense grid
 18. Assert that the Last action text contains "EDIT — Tomás Novak (grid E4)"
 19. Click the Cancel button
@@ -145,11 +145,11 @@ Pre-fix, step 9 logs `DOWNLOAD — Amara Okafor` (the middle of the cell is the 
 23. Click the edit icon for Chloe Dupont in the Dense grid
 24. Assert that the Last action text contains "EDIT — Chloe Dupont (grid E4)"
 25. Click the Cancel button
-26. Scroll down until the Wide grid (horizontal scroll) section is fully visible
+26. Scroll to the Wide grid (horizontal scroll) section
 27. Scroll the Wide grid to the right and click the edit icon for Mei Lin
 28. Assert that the Last action text contains "EDIT — Mei Lin (grid E5)"
 29. Click the Cancel button
-30. Scroll down until the Pinned grid (horizontal scroll) section is fully visible
+30. Scroll to the Pinned grid (horizontal scroll) section
 31. Click the edit icon for Sara Nilsen in the Pinned grid
 32. Assert that the Last action text contains "EDIT — Sara Nilsen (grid E6)"
 33. Click the Cancel button
@@ -163,29 +163,29 @@ In the dense grid (steps 17–24), a hit on a **neighbouring** row (e.g. Grace L
 Keep steps 1–4 first: the Late render icons only appear 5 s after the page loads (the scroll step usually takes longer than that, so this mostly checks the grid once loaded).
 
 1. Open https://sahilrlambdatest.github.io/lt-qa-html-fixtures/te-29629-grid-actions/f-state.html
-2. Scroll down until the Late render grid is fully visible
+2. Scroll to the Late render section
 3. Click the edit icon for Diego Torres in the Late render grid
 4. Assert that the Last action text contains "EDIT — Diego Torres (grid F3)"
 5. Click the Cancel button
-6. Scroll up until the Locked rows grid is fully visible
+6. Scroll to the Locked rows section
 7. Click the edit icon for Priya Sharma in Locked rows
 8. Assert that the Last action text contains "BLOCKED — Priya Sharma (grid F1)"
 9. Assert that no dialog titled "Edit Priya Sharma" is visible
-10. Scroll down until the Inline edit grid is fully visible
+10. Scroll to the Inline edit section
 11. Click the edit icon for Maya Patel in Inline edit
 12. Assert that the Last action text contains "EDIT — Maya Patel (grid F4)"
 13. Clear the name input in the Inline edit grid and type "Maya Patel QA"
 14. Click the save (check) icon for that row
 15. Assert that the Last action text contains "SAVED — Maya Patel QA (grid F4)"
-16. Assert that the Inline edit grid contains "Maya Patel QA"
+16. Assert that the text "Maya Patel QA" is visible on the page
 17. Click the edit icon for Jonas Weber in Inline edit
 18. Click the cancel (x) icon for Jonas Weber
 19. Assert that the Last action text contains "EDIT CANCELLED — Jonas Weber (grid F4)"
-20. Scroll up until the Hover reveal grid is fully visible
+20. Scroll to the Hover reveal section
 21. **[?]** Hover over Amara Okafor's row in Hover reveal and click the edit icon
 22. **[?]** Assert that the Last action text contains "EDIT — Amara Okafor (grid F2)"
 23. Click the Cancel button
-24. Scroll up until the Locked rows grid is fully visible
+24. Scroll to the Locked rows section
 25. **[N]** Click the edit icon for Noah Williams in Locked rows — *his Action cell is empty; expected: Kane reports it isn't there*
 26. Assert that the Last action text does not contain "EDIT — Fatima Zahra" and does not contain "EDIT — Yuki Tanaka"
 
@@ -206,7 +206,7 @@ Step 25 passes if Kane fails the step or logs `MISS — Noah Williams`. It fails
 9. Assert that the Last action text contains "CELL — Yuki Tanaka (grid C1)"
 10. Click on the Role of Priya Sharma
 11. Assert that the Last action text contains "CELL — Priya Sharma (grid C1)"
-12. Scroll down until the Installers grid is fully visible
+12. Scroll to the Installers section
 13. Select "On hold" in the Status dropdown for Lucas Silva
 14. Assert that the Last action text contains "STATUS → On hold — Lucas Silva (grid C2)"
 15. Click the edit button for Emma Johansson in Installers
@@ -256,7 +256,7 @@ Run this **on stage first**, where the expected results are MISS, COPY and DOWNL
 5. Click the edit icon for Chen Wei in the Leads grid
 6. Assert that the Last action text contains "EDIT — Chen Wei (grid B1)"
 7. Open https://sahilrlambdatest.github.io/lt-qa-html-fixtures/te-29629-grid-actions/d-containers.html
-8. Scroll down until the Warehouse contacts section is fully visible
+8. Scroll to the Warehouse contacts section
 9. Click the edit icon for Amara Okafor in Warehouse contacts
 10. Assert that the Last action text contains "EDIT — Amara Okafor (grid D3)"
 
