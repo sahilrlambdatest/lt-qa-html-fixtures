@@ -7,7 +7,7 @@
 
 **If a step errors** (`ELEMENT_ERROR`), Kane pauses the session and queues everything after it. For the negative steps that's the expected outcome: record it, then start a new session (or delete the failed step and Resume) to continue.
 
-**Scrolling:** Kane only acts on what is visible and does not scroll to find a target (verified on stage and dev), so every grid below the first one on a page is preceded by a "Scroll to the … section" step. Avoid "Scroll up/down until … is fully visible": on dev and stage that wording failed with ELEMENT_ERROR, while "Scroll to the … section" worked both up and down. The Last action bar is sticky and stays on screen while you scroll.
+**Scrolling:** Kane only acts on what is visible and does not scroll to find a target (verified on stage and dev), so every grid below the first one on a page is preceded by a "Scroll to the … section" step. Avoid "Scroll up/down until … is fully visible": on dev and stage that wording failed with ELEMENT_ERROR, while "Scroll to the … section" worked. Kane scrolls DOWN by default, so a section above the current view needs "Scroll up to the … section". The Last action bar is sticky and stays on screen while you scroll.
 
 **Why every click is followed by an assertion:** the bug was a click that "succeeded" on the empty middle of the cell, so a green click step proves nothing. The page's **Last action** bar shows what was really hit: `EDIT — <name>`, or `MISS — <name>` for the bug.
 If an assertion with `—` (em dash) is awkward to type, use `contains "EDIT" and "Priya Sharma"` instead.
@@ -36,7 +36,7 @@ If an assertion with `—` (em dash) is awkward to type, use `contains "EDIT" an
 18. Click the edit button in row 7 of the Customers grid
 19. Assert that the Last action text contains "EDIT — Noah Williams (grid A1)"
 20. Click the Cancel button
-21. Edit the row of Sofía García
+21. Click the edit icon in the Customers grid for Sofía García
 22. Assert that the Last action text contains "EDIT — Sofía García (grid A1)"
 23. Click the Cancel button
 24. Click the pencil icon for Liam O'Connor
@@ -77,7 +77,7 @@ Step 28 is the **control**: it must pass on stage too. If it fails, the page or 
 22. Click the Delete button in the dialog
 23. Assert that the Last action text contains "DELETED — Olivia Brown (grid B2)"
 24. Assert that the text "Olivia Brown" is not visible on the page
-25. Scroll to the Leads section
+25. Scroll up to the Leads section
 26. **[?]** Click the icon in the Action column for Chen Wei in the Leads grid — *record which icon the Last action bar shows*
 
 The middle of the B1 cell is the Duplicate icon, so an unrefined click on step 2 would log `COPY`. On stage (2026-09-29) the model found the pencil anyway, so step 2 does **not** reproduce the bug there; it only checks that dev didn't regress. Pre-fix, step 17 logs `MISS`.
@@ -167,7 +167,7 @@ Keep steps 1–4 first: the Late render icons only appear 5 s after the page loa
 3. Click the edit icon for Diego Torres in the Late render grid
 4. Assert that the Last action text contains "EDIT — Diego Torres (grid F3)"
 5. Click the Cancel button
-6. Scroll to the Locked rows section
+6. Scroll up to the Locked rows section
 7. Click the edit icon for Priya Sharma in Locked rows
 8. Assert that the Last action text contains "BLOCKED — Priya Sharma (grid F1)"
 9. Assert that no dialog titled "Edit Priya Sharma" is visible
@@ -181,11 +181,11 @@ Keep steps 1–4 first: the Late render icons only appear 5 s after the page loa
 17. Click the edit icon for Jonas Weber in Inline edit
 18. Click the cancel (x) icon for Jonas Weber
 19. Assert that the Last action text contains "EDIT CANCELLED — Jonas Weber (grid F4)"
-20. Scroll to the Hover reveal section
+20. Scroll up to the Hover reveal section
 21. **[?]** Hover over Amara Okafor's row in Hover reveal and click the edit icon
 22. **[?]** Assert that the Last action text contains "EDIT — Amara Okafor (grid F2)"
 23. Click the Cancel button
-24. Scroll to the Locked rows section
+24. Scroll up to the Locked rows section
 25. **[N]** Click the edit icon for Noah Williams in Locked rows — *his Action cell is empty; expected: Kane reports it isn't there*
 26. Assert that the Last action text does not contain "EDIT — Fatima Zahra" and does not contain "EDIT — Yuki Tanaka"
 
