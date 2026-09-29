@@ -261,3 +261,30 @@ Run this **on stage first**, where the expected results are MISS, COPY and DOWNL
 10. Assert that the Last action text contains "EDIT — Amara Okafor (grid D3)"
 
 If a stage assertion **passes**, that case doesn't reproduce the bug for the stage model. Leave it out of the verdict.
+
+---
+
+## Session 10 — Dev failures to re-check (TC-20, TC-04)
+
+These failed on dev (2026-09-29). **F4 · Inline edit** has the same structure as the ticket's grid (an unlabelled pencil on the left of the Action cell), yet dev hit only 1 of 3 rows (Maya Patel and Jonas Weber logged MISS, Aisha Bello hit); stage missed all 3. **Row 7 wording** logged `MISS — Noah Williams` on dev in one of two runs. The Priya Sharma steps are the control: dev hit them 4 of 4.
+
+1. Open https://sahilrlambdatest.github.io/lt-qa-html-fixtures/te-29629-grid-actions/f-state.html
+2. Scroll to the Inline edit section
+3. Click the edit icon for Maya Patel in Inline edit
+4. Assert that the Last action text contains "EDIT — Maya Patel (grid F4)"
+5. Click the edit icon for Jonas Weber in Inline edit
+6. Assert that the Last action text contains "EDIT — Jonas Weber (grid F4)"
+7. Click the edit icon for Aisha Bello in Inline edit
+8. Assert that the Last action text contains "EDIT — Aisha Bello (grid F4)"
+9. Click the edit icon for Ines Duarte in Inline edit
+10. Assert that the Last action text contains "EDIT — Ines Duarte (grid F4)"
+11. Click the edit icon for Ethan Clarke in Inline edit
+12. Assert that the Last action text contains "EDIT — Ethan Clarke (grid F4)"
+13. Open https://sahilrlambdatest.github.io/lt-qa-html-fixtures/te-29629-grid-actions/a-core.html
+14. Click the edit icon in the Action column for Priya Sharma
+15. Assert that the Last action text contains "EDIT — Priya Sharma (grid A1)"
+16. Click the Cancel button
+17. Click the edit button in row 7 of the Customers grid
+18. Assert that the Last action text contains "EDIT — Noah Williams (grid A1)"
+
+A `MISS — <name>` in the Last action bar is the failure, even when Kane marks the click step green. Note each click step's duration and the session's `test_id` from the URL for the Retina vision-metadata check.
