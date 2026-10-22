@@ -38,6 +38,8 @@
     (ev) => {
       const hit = ev.target.closest('[data-qa]');
       record(hit ? hit.getAttribute('data-qa') : 'NONE', ev, hit);
+      // A wrong hit must not leave a list open over the next target.
+      if (!ev.target.closest('.dd')) document.querySelectorAll('.dd-list.open').forEach((l) => l.classList.remove('open'));
     },
     true,
   );
