@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- deliberately NO viewport meta: mobile Chrome lays this out at 980 CSS px and zooms out -->
+<title>LAST=NONE</title>
+<style>
+  body { margin:0; width:1200px; font:18px/1.4 Arial, sans-serif; color:#1d2330; background:#fafafa; }
+  header { height:70px; background:#12325f; color:#fff; display:flex; align-items:center; padding:0 24px; font-size:24px; font-weight:700; }
+  main { display:flex; gap:24px; padding:24px; }
+  .col { flex:1; } .col h2 { font-size:20px; }
+  .stack button { display:block; width:100%; height:48px; margin-bottom:6px; border:1px solid #cfd5df; border-radius:6px; background:#fff; font-size:18px; text-align:left; padding:0 12px; }
+</style>
+</head>
+<body>
+<header>Legacy desktop layout</header>
+<p style="padding:0 24px">Last hit: <span id="qa-last">NONE</span></p>
+<main>
+  <div class="col"><h2>Left column</h2><div class="stack">
+    <button data-qa="d-left-1">Left first</button><button data-qa="d-left-2">Left second</button>
+    <button data-qa="d-left-3">Left third</button><button data-qa="d-left-4">Left fourth</button></div></div>
+  <div class="col"><h2>Middle column</h2><div class="stack">
+    <button data-qa="d-mid-1">Middle first</button><button data-qa="d-mid-2">Middle second</button>
+    <button data-qa="d-mid-3">Middle third</button><button data-qa="d-mid-4">Middle fourth</button></div></div>
+  <div class="col"><h2>Right column</h2><div class="stack">
+    <button data-qa="d-right-1">Right first</button><button data-qa="d-right-2">Right second</button>
+    <button data-qa="d-right-3">Right third</button><button data-qa="d-right-4">Right fourth</button></div></div>
+</main>
+<script src="qa.js"></script>
+</body>
+</html>

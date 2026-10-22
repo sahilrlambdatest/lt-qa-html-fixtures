@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAST=NONE</title>
+<style>
+  :root { --ink:#1d2330; --mute:#5b6475; --line:#cfd5df; --bg:#f5f7fa; --card:#fff; --accent:#1b5fc1; }
+  * { box-sizing: border-box; }
+  body { margin:0; font: 15px/1.35 -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); padding-bottom:64px; }
+  header { position:sticky; top:0; z-index:20; height:52px; display:flex; align-items:center; gap:10px; padding:0 10px; background:#12325f; color:#fff; }
+  header .brand { font-weight:700; flex:1; }
+  .icon-btn { width:40px; height:40px; border:0; border-radius:6px; background:transparent; color:#fff; display:grid; place-items:center; }
+  .icon-btn svg { width:24px; height:24px; fill:currentColor; }
+  main { padding:12px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:14px; }
+  h1 { font-size:20px; margin:4px 0 8px; } h2 { font-size:15px; margin:0 0 10px; color:var(--mute); text-transform:uppercase; letter-spacing:.04em; }
+  .status { font-size:13px; color:var(--mute); } #qa-last { font-weight:700; color:var(--ink); }
+  .badge { display:inline-block; padding:3px 8px; border-radius:4px; background:#eef3fb; border:1px solid #c9d8f0; font-weight:600; }
+  label.lbl { display:block; font-size:13px; font-weight:600; margin:8px 0 3px; }
+  input[type=text], input[type=email], input[type=tel], select { width:100%; height:44px; border:1px solid var(--line); border-radius:6px; padding:0 10px; font-size:15px; background:#fff; }
+  .row { display:flex; gap:8px; } .row > * { flex:1; }
+  .btn { height:44px; border:1px solid var(--accent); background:var(--accent); color:#fff; border-radius:6px; font-size:15px; font-weight:600; }
+  .btn.ghost { background:#fff; color:var(--accent); }
+  /* uhaul-style custom dropdowns: 45px triggers, one form row apart */
+  .dd { position:relative; }
+  .dd-trigger { width:100%; height:45px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line); border-radius:6px; background:#fff; padding:0 10px; font-size:15px; text-align:left; }
+  .dd-trigger::after { content:""; border:6px solid transparent; border-top-color:var(--mute); margin-top:6px; }
+  .dd-list { display:none; position:absolute; z-index:10; left:0; right:0; top:46px; margin:0; padding:4px 0; list-style:none; background:#fff; border:1px solid var(--line); border-radius:6px; box-shadow:0 6px 16px rgba(0,0,0,.12); }
+  .dd-list.open { display:block; } .dd-list li { padding:10px 12px; }
+  .tight { display:grid; grid-template-columns:1fr; gap:2px; } .tight button { height:28px; font-size:13px; border:1px solid var(--line); background:#fff; border-radius:4px; text-align:left; padding:0 8px; }
+  canvas { width:324px; height:154px; display:block; border:1px solid var(--line); border-radius:6px; }
+  .hover-card { position:relative; display:inline-block; padding:10px 12px; border:1px dashed var(--accent); border-radius:6px; }
+  .hover-card .tip { display:none; position:absolute; left:0; top:44px; background:#1d2330; color:#fff; padding:6px 10px; border-radius:4px; white-space:nowrap; }
+  .hover-card:hover .tip, .hover-card:focus .tip { display:block; }
+  iframe { width:100%; height:130px; border:1px solid var(--line); border-radius:6px; background:#fff; }
+  .items { list-style:none; margin:0; padding:0; } .items li { border-bottom:1px solid #e7eaf0; }
+  .items button { width:100%; height:40px; border:0; background:transparent; text-align:left; padding:0 6px; font-size:15px; }
+  nav.bar { position:fixed; bottom:0; left:0; right:0; height:56px; display:flex; background:#fff; border-top:1px solid var(--line); z-index:20; }
+  nav.bar button { flex:1; border:0; background:transparent; font-size:13px; font-weight:600; color:var(--ink); }
+</style>
+</head>
+<body>
+<header>
+  <button class="icon-btn" data-qa="menu-btn" aria-label="Open menu">
+    <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <span class="brand">StoreRight QA</span>
+  <button class="icon-btn" data-qa="search-icon" aria-label="Search">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+  </button>
+  <button class="icon-btn" data-qa="cart-icon" aria-label="Cart">
+    <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45A2 2 0 0 0 7 17h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 20 4H5.21l-.94-2H1z"/></svg>
+  </button>
+</header>
+
+<main>
+  <section>
+    <h1>Find self storage near you</h1>
+    <p class="status">Last hit: <span id="qa-last">NONE</span></p>
+    <p>Reservation <span class="badge" data-qa="order-badge">QA-7731-K</span> &middot; Monthly rate <span class="badge" data-qa="rate-badge">$64.50</span></p>
+    <label class="lbl" for="zip">ZIP or City</label>
+    <div class="row">
+      <input id="zip" type="text" data-qa="zip-input" placeholder="e.g. 85004">
+      <button class="btn" data-qa="find-btn" style="flex:0 0 96px">Find</button>
+    </div>
+  </section>
+
+  <section id="dropdowns">
+    <h2>Storage options</h2>
+    <label class="lbl">Move-in Date</label>
+    <div class="dd"><button class="dd-trigger" data-qa="dd-movein"><span class="dd-value">Select a date</span></button>
+      <ul class="dd-list"><li>Today</li><li>Tomorrow</li><li>Next week</li></ul></div>
+    <label class="lbl">Unit Size (Optional)</label>
+    <div class="dd"><button class="dd-trigger" data-qa="dd-unitsize"><span class="dd-value">Any size</span></button>
+      <ul class="dd-list"><li>Small 5x5</li><li>Medium 10x10</li><li>Large 10x20</li></ul></div>
+    <label class="lbl">Storage Type</label>
+    <div class="dd"><button class="dd-trigger" data-qa="dd-storagetype"><span class="dd-value">Any type</span></button>
+      <ul class="dd-list"><li>Indoor</li><li>Drive-up</li><li>Outdoor parking</li></ul></div>
+    <label class="lbl">Climate Control</label>
+    <div class="dd"><button class="dd-trigger" data-qa="dd-climate"><span class="dd-value">No preference</span></button>
+      <ul class="dd-list"><li>Required</li><li>Not required</li></ul></div>
+    <label class="lbl">Access Hours</label>
+    <div class="dd"><button class="dd-trigger" data-qa="dd-access"><span class="dd-value">Standard</span></button>
+      <ul class="dd-list"><li>Standard</li><li>24 hours</li></ul></div>
+    <label class="lbl">Vehicle Storage</label>
+    <div class="dd"><button class="dd-trigger" data-qa="dd-vehicle"><span class="dd-value">None</span></button>
+      <ul class="dd-list"><li>Car</li><li>Boat</li><li>RV</li></ul></div>
+  </section>
+
+  <section id="selects">
+    <h2>Native selects</h2>
+    <label class="lbl" for="sel-floor">Preferred Floor</label>
+    <select id="sel-floor" data-qa="sel-floor"><option value="">Choose floor</option><option>Ground</option><option>First</option><option>Second</option></select>
+    <label class="lbl" for="sel-plan">Payment Plan</label>
+    <select id="sel-plan" data-qa="sel-plan"><option value="">Choose plan</option><option>Monthly</option><option>Quarterly</option><option>Yearly</option></select>
+    <label class="lbl" for="sel-ins">Insurance</label>
+    <select id="sel-ins" data-qa="sel-ins"><option value="">Choose cover</option><option>Basic</option><option>Premium</option></select>
+  </section>
+
+  <section id="contact">
+    <h2>Contact details</h2>
+    <label class="lbl" for="in-first">First name</label><input id="in-first" type="text" data-qa="in-first">
+    <label class="lbl" for="in-last">Last name</label><input id="in-last" type="text" data-qa="in-last">
+    <label class="lbl" for="in-email">Email</label><input id="in-email" type="email" data-qa="in-email">
+    <label class="lbl" for="in-phone">Phone</label><input id="in-phone" type="tel" data-qa="in-phone">
+    <div class="row" style="margin-top:12px">
+      <button class="btn ghost" data-qa="btn-back">Back</button>
+      <button class="btn" data-qa="btn-continue">Continue</button>
+    </div>
+  </section>
+
+  <section id="tight">
+    <h2>Compact rows (28px)</h2>
+    <div class="tight">
+      <button data-qa="tight-alpha">Alpha locker</button><button data-qa="tight-bravo">Bravo locker</button>
+      <button data-qa="tight-charlie">Charlie locker</button><button data-qa="tight-delta">Delta locker</button>
+      <button data-qa="tight-echo">Echo locker</button><button data-qa="tight-foxtrot">Foxtrot locker</button>
+    </div>
+  </section>
+
+  <section id="canvas-sec">
+    <h2>Canvas</h2>
+    <canvas id="qa-canvas" data-qa="canvas"></canvas>
+  </section>
+
+  <section id="hover-sec">
+    <h2>Hover</h2>
+    <span class="hover-card" tabindex="0" data-qa="hover-card">Hover for promo price<span class="tip" data-qa="hover-tip">Promo price $49.95</span></span>
+  </section>
+
+  <section id="frame-sec">
+    <h2>Embedded frame</h2>
+    <iframe id="qa-frame" title="Embedded offers" srcdoc="<style>body{margin:8px;font:15px sans-serif}button{display:block;width:100%;height:44px;margin-bottom:8px}</style><button onclick=&quot;parent.postMessage({qa:'frame-accept'},'*')&quot;>Accept offer</button><button onclick=&quot;parent.postMessage({qa:'frame-decline'},'*')&quot;>Decline offer</button>"></iframe>
+  </section>
+
+  <section id="misc">
+    <h2>Dialogs and tabs</h2>
+    <div class="row">
+      <button class="btn ghost" data-qa="alert-btn" onclick="setTimeout(()=>{alert('Reservation held');window.__qa.record('alert-closed')},50)">Show alert</button>
+      <a class="btn ghost" data-qa="newtab-link" href="details.html" target="_blank" style="display:grid;place-items:center;text-decoration:none">Open details</a>
+    </div>
+  </section>
+
+  <section id="list">
+    <h2>Available units</h2>
+    <ul class="items" id="items"></ul>
+  </section>
+</main>
+
+<nav class="bar">
+  <button data-qa="bar-home">Home</button>
+  <button data-qa="bar-saved">Saved</button>
+  <button data-qa="bar-account">Account</button>
+</nav>
+<script>
+  const ul = document.getElementById('items');
+  for (let i = 1; i <= 60; i++) {
+    const n = String(i).padStart(2, '0');
+    ul.insertAdjacentHTML('beforeend', `<li><button data-qa="unit-${n}">Unit ${n} &middot; ${5 + (i % 4) * 5}x10</button></li>`);
+  }
+</script>
+<script src="qa.js"></script>
+</body>
+</html>
