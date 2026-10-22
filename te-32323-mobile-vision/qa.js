@@ -64,6 +64,7 @@
   document.querySelectorAll('.dd').forEach((dd) => {
     const trigger = dd.querySelector('.dd-trigger');
     const list = dd.querySelector('.dd-list');
+    list.querySelectorAll('li').forEach((li) => li.setAttribute('data-qa', trigger.getAttribute('data-qa') + ':' + li.textContent));
     trigger.addEventListener('click', () => {
       document.querySelectorAll('.dd-list.open').forEach((l) => l !== list && l.classList.remove('open'));
       list.classList.toggle('open');
