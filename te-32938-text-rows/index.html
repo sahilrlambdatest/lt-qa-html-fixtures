@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAST=NONE</title>
+<style>
+  :root { --ink:#1d2330; --mute:#5b6475; --line:#cfd5df; --bg:#f2f3f7; --card:#fff; --accent:#1b5fc1; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.3 -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); }
+  header { height:48px; display:flex; align-items:center; padding:0 14px; background:#12325f; color:#fff; font-weight:700; }
+  .status { font-size:12px; color:var(--mute); padding:6px 14px; } #qa-last { font-weight:700; color:var(--ink); }
+  h2 { font-size:12px; margin:12px 14px 4px; color:var(--mute); text-transform:uppercase; letter-spacing:.05em; }
+  .list { margin:0 10px; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  /* Every row is a full-width bordered cell, 48px tall, like the Bally's developer menu. */
+  .cell { position:relative; height:48px; display:flex; align-items:center; padding:0 16px; border-bottom:1px solid #e3e6ec; width:100%; font-size:16px; }
+  .list > .cell:last-child { border-bottom:0; }
+  /* Dead row: the row is NOT tappable; only the label button inside it is. */
+  /* cursor:pointer only so iOS Safari fires click on dead space and the miss gets recorded;
+     it adds no accessibility node, so the native tree still has nothing tappable there. */
+  .cell.dead { cursor:pointer; }
+  .cell.dead .lbl { border:0; background:transparent; padding:0; font-size:16px; color:var(--ink); }
+  /* Live row: the whole row is one button. */
+  button.cell { border:0; border-bottom:1px solid #e3e6ec; background:var(--card); text-align:left; color:var(--ink); }
+  .chev::after { content:"\203A"; position:absolute; right:16px; font-size:22px; color:#9aa2b1; }
+  .cell .spacer { flex:1; }
+  .switch { width:51px; height:31px; border-radius:16px; border:0; background:#d5d9e0; position:relative; }
+  .switch::after { content:""; position:absolute; top:2px; left:2px; width:27px; height:27px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+  .switch.on { background:#34c759; } .switch.on::after { left:22px; }
+  .small-btn { height:30px; padding:0 14px; border:1px solid var(--accent); border-radius:15px; background:#fff; color:var(--accent); font-size:14px; font-weight:600; }
+  .danger { color:#c0322b !important; }
+  .panel { display:none; margin:10px; padding:12px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+  .panel.open { display:block; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>Developer Menu</header>
+<div class="status">Last hit: <span id="qa-last">NONE</span></div>
+
+<!-- A: Bally's shape. Text-only rows; the row is dead space, only the label is a button. -->
+<section data-sec="A">
+  <h2>Developer</h2>
+  <div class="list">
+    <div class="cell dead" data-qa="row-dead:debug-settings"><button class="lbl" data-qa="lbl:debug-settings" data-open="debug-panel">Debug Settings</button></div>
+    <div class="cell dead" data-qa="row-dead:environment-settings"><button class="lbl" data-qa="lbl:environment-settings">Environment Settings</button></div>
+    <div class="cell dead" data-qa="row-dead:feature-flags"><button class="lbl" data-qa="lbl:feature-flags">Feature Flags</button></div>
+    <div class="cell dead" data-qa="row-dead:vpn"><button class="lbl" data-qa="lbl:vpn">VPN</button></div>
+    <div class="cell dead" data-qa="row-dead:log-out"><button class="lbl danger" data-qa="lbl:log-out">Log Out</button></div>
+  </div>
+  <div class="panel" id="debug-panel" data-qa="debug-panel">Debug screen opened</div>
+</section>
+
+<!-- B: control rows. The whole text-only row is a button, so any point on it is a correct hit. -->
+<section data-sec="B">
+  <h2>Preferences</h2>
+  <div class="list">
+    <button class="cell" data-qa="row:notifications">Notifications</button>
+    <button class="cell chev" data-qa="row:account">Account</button>
+  </div>
+</section>
+
+<!-- C: a separate control in the row must still win over the label. -->
+<section data-sec="C">
+  <h2>Display</h2>
+  <div class="list">
+    <div class="cell dead" data-qa="row-dead:dark-mode"><span data-qa="text:dark-mode">Dark Mode</span><span class="spacer"></span><button class="switch" data-qa="toggle:dark-mode" aria-label="Dark Mode switch"></button></div>
+    <div class="cell dead" data-qa="row-dead:profile-photo"><span data-qa="text:profile-photo">Profile Photo</span><span class="spacer"></span><button class="small-btn" data-qa="btn:profile-photo-edit">Edit</button></div>
+  </div>
+</section>
+
+<script src="../te-32323-mobile-vision/qa.js"></script>
+<script>
+  // ?only=A,C shows just those sections, so every target is on the first screen without scrolling.
+  const only = new URLSearchParams(location.search).get('only');
+  if (only) {
+    const keep = only.toUpperCase().split(',');
+    document.querySelectorAll('section[data-sec]').forEach((s) => { s.hidden = !keep.includes(s.dataset.sec); });
+  }
+  document.querySelectorAll('[data-open]').forEach((b) =>
+    b.addEventListener('click', () => document.getElementById(b.dataset.open).classList.add('open')));
+  document.querySelectorAll('.switch').forEach((s) => s.addEventListener('click', () => s.classList.toggle('on')));
+</script>
+</body>
+</html>
